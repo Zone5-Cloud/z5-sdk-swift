@@ -108,4 +108,7 @@ public enum Roles: String, Codable {
 	
 	/** has access to curation tools */
 	case curation
+	
+	/** has access to query for users, request tokens on behalf of users etc */
+	case useradmin
 }
