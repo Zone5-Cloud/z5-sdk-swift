@@ -22,9 +22,15 @@ jobs:
         path: "${GITHUB_WORKSPACE}/DerivedData"
         key: ${{ runner.os }}-derived-data
 
+    - name: Select Java Release
+      uses: actions/setup-java@v2
+      with:
+        distribution: "adopt"
+        java-version: "11"
+
     - name: Install Sonar Scanner
       run: brew install sonar-scanner
-  
+
     - name: Run Tests
       run: |
         DEVELOPER_PATH=$(xcode-select --print-path)
@@ -73,12 +79,6 @@ jobs:
           (xcrun --run llvm-cov show "${BUNDLE_PATH}/${BINARY_NAME}" --instr-profile "${PROFDATA_INPUT}" || true) >> "${COVERAGE_OUTPUT}"
         done
 
-    - name: Select Java Release
-      uses: actions/setup-java@v2
-      with:
-        distribution: "adopt"
-        java-version: "11"
-        
     - name: SonarCloud
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
