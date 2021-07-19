@@ -69,7 +69,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(rawValue: "123"))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -81,7 +81,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -93,7 +93,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 5))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -105,7 +105,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc1", tokenExp: 4))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -117,7 +117,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: nil)
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertNil(z5.accessToken?.rawValue)
 	}
 	
@@ -129,7 +129,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -140,7 +140,7 @@ class Zone5Tests: XCTestCase {
 		expectation.isInverted = true
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(rawValue: "123"))
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -151,7 +151,7 @@ class Zone5Tests: XCTestCase {
 		expectation.isInverted = true
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4))
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -162,7 +162,7 @@ class Zone5Tests: XCTestCase {
 		expectation.isInverted = true
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: nil)
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		XCTAssertNil(z5.accessToken?.rawValue)
 	}
 	
@@ -174,7 +174,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthTokenAlt(rawValue: "123"))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -186,7 +186,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(rawValue: "123"))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -198,7 +198,7 @@ class Zone5Tests: XCTestCase {
 		expectation.expectedFulfillmentCount = 1
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthTokenAlt(rawValue: "1234"))
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("1234", z5.accessToken?.rawValue)
 	}
 	
@@ -212,7 +212,7 @@ class Zone5Tests: XCTestCase {
 		var oauth = OAuthTokenAlt(rawValue: "123")
 		oauth.tokenExp = 6
 		z5.configure(for: URL(string: "http://test")!, accessToken: oauth)
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -226,7 +226,7 @@ class Zone5Tests: XCTestCase {
 		var oauth = OAuthTokenAlt(rawValue: "123")
 		oauth.tokenExp = 6
 		z5.configure(for: URL(string: "http://test")!, accessToken: oauth)
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
@@ -237,17 +237,17 @@ class Zone5Tests: XCTestCase {
 		expectation.isInverted = true
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthTokenAlt(rawValue: "123"))
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 	}
 	
 	func testAccessTokenUsername() {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4, username: "testuser@gmail.com"))
 		
-		self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
+        let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "1234", refresh: "zxc", tokenExp: 4))
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		
 		XCTAssertEqual("testuser@gmail.com", z5.accessToken?.username)
 		XCTAssertEqual("1234", z5.accessToken?.rawValue)
@@ -256,10 +256,10 @@ class Zone5Tests: XCTestCase {
 	func testAccessTokenNewUsername() {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4, username: "testuser@gmail.com"))
 		
-		self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
+		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
 		
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "1234", refresh: "zxc", tokenExp: 4, username: "newuser"))
-		waitForExpectations(timeout: 1, handler: nil)
+		wait(for: [expectation], timeout: 1)
 		
 		XCTAssertEqual("newuser", z5.accessToken?.username)
 		XCTAssertEqual("1234", z5.accessToken?.rawValue)
