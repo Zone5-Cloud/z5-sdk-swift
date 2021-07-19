@@ -193,19 +193,20 @@ class ThirdPartyViewTests: XCTestCase {
 		]
 
 		execute(with: tests) { client, _, urlSession, test in
-			
 			let _ = client.thirdPartyConnections.deregisterDeviceWithThirdParty(token: "12345") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
+                DispatchQueue.main.async {
+                    switch (result, test.expectedResult) {
+                    case (.failure(let lhs), .failure(let rhs)):
+                        XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
+                        XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
 
-				//case (.success(let lhs), .success(let rhs)):
-				//XCTAssertEqual(lhs, rhs)  //TODO: how to test for success?
+                    //case (.success(let lhs), .success(let rhs)):
+                    //XCTAssertEqual(lhs, rhs)  //TODO: how to test for success?
 
-				default:
-					XCTFail("\(result) != \(test.expectedResult)")
-				}
+                    default:
+                        XCTFail("\(result) != \(test.expectedResult)")
+                    }
+                }
 			}
 		}
 	}
