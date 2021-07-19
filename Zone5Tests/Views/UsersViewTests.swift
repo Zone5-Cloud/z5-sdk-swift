@@ -32,28 +32,24 @@ class UsersViewTests: XCTestCase {
 			),
 		]
 
-		execute(with: tests) { client, _, urlSession, test in
+        let assertionsOnSuccess: Zone5.Result<User>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.id, rhs.id)
+            XCTAssertEqual(lhs.uuid, rhs.uuid)
+            XCTAssertEqual(lhs.email, rhs.email)
+            XCTAssertEqual(lhs.firstName, rhs.firstName)
+            XCTAssertEqual(lhs.lastName, rhs.lastName)
+            XCTAssertEqual(lhs.avatar, rhs.avatar)
+        }
 
-			client.users.me { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
+        var expectations: [XCTestExpectation] = []
+        execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
 
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.id, rhs.id)
-					XCTAssertEqual(lhs.uuid, rhs.uuid)
-					XCTAssertEqual(lhs.email, rhs.email)
-					XCTAssertEqual(lhs.firstName, rhs.firstName)
-					XCTAssertEqual(lhs.lastName, rhs.lastName)
-					XCTAssertEqual(lhs.avatar, rhs.avatar)
-
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
-			}
+            client.users.me(completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testLogin() {
@@ -144,6 +140,16 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        let assertionsOnSuccess: Zone5.Result<LoginResponse>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.user!.id, rhs.user!.id)
+            XCTAssertEqual(lhs.user!.uuid, rhs.user!.uuid)
+            XCTAssertEqual(lhs.user!.email, rhs.user!.email)
+            XCTAssertEqual(lhs.user!.firstName, rhs.user!.firstName)
+            XCTAssertEqual(lhs.user!.lastName, rhs.user!.lastName)
+            XCTAssertEqual(lhs.user!.avatar, rhs.user!.avatar)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
 			client.baseURL = URL(string: test.host)
 			client.accessToken = test.token
@@ -157,39 +163,22 @@ class UsersViewTests: XCTestCase {
 				return .success(test.json)
 			}
 
-			client.users.login(email: "jane.smith@example.com", password: "pword", clientID: test.clientId, clientSecret: test.secret, accept: test.accept) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertNil(client.accessToken)
-					
-					if case let Zone5.Error.serverError(message1) = lhs, case let Zone5.Error.serverError(message2) = rhs {
-						XCTAssertEqual(message1, message2)
-						XCTAssertEqual(message1.error, message2.error)
-						XCTAssertEqual(message1.statusCode, message2.statusCode)
-						XCTAssertEqual(message1.reason, message2.reason)
-						XCTAssertEqual(message1.errors, message2.errors)
-					} else if case Zone5.Error.invalidConfiguration = lhs, case Zone5.Error.invalidConfiguration = rhs {
-						break;
-					} else {
-						XCTFail()
-					}
-					
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.user!.id, rhs.user!.id)
-					XCTAssertEqual(lhs.user!.uuid, rhs.user!.uuid)
-					XCTAssertEqual(lhs.user!.email, rhs.user!.email)
-					XCTAssertEqual(lhs.user!.firstName, rhs.user!.firstName)
-					XCTAssertEqual(lhs.user!.lastName, rhs.user!.lastName)
-					XCTAssertEqual(lhs.user!.avatar, rhs.user!.avatar)
-					XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
+            client.users.login(email: "jane.smith@example.com", password: "pword", clientID: test.clientId, clientSecret: test.secret, accept: test.accept) { result in
+                if case .failure = result, case .failure = test.expectedResult {
+                    XCTAssertNil(client.accessToken)
+                }
+                else if case .success = result, case .success = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
+                }
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testLogout() {
@@ -214,24 +203,20 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
 
-			client.users.logout { result in
+            client.users.logout { result in
 				// token should always be cleared, regardless of outcome
 				XCTAssertNil(client.accessToken)
-				
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs, rhs);
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testDelete() {
@@ -256,21 +241,21 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
 			client.users.deleteAccount(userID: 123) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				case (.success(_), .success(_)):
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
-			}
+                if case .success = result, case .success = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
+                }
+
+                expectation.fulfill(with: result)
+            }
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testRegister() {
@@ -299,30 +284,29 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        let assertionsOnSuccess: Zone5.Result<User>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.id, rhs.id)
+            XCTAssertEqual(lhs.uuid, rhs.uuid)
+            XCTAssertEqual(lhs.email, rhs.email)
+            XCTAssertEqual(lhs.firstName, rhs.firstName)
+            XCTAssertEqual(lhs.lastName, rhs.lastName)
+            XCTAssertEqual(lhs.avatar, rhs.avatar)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
 			var newUser = RegisterUser()
 			newUser.email = "jame.smith@example.com"
 			newUser.firstname = "Jane"
 			newUser.units = UnitMeasurement.imperial
-			
-			client.users.register(user: newUser) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.id, rhs.id)
-					XCTAssertEqual(lhs.uuid, rhs.uuid)
-					XCTAssertEqual(lhs.email, rhs.email)
-					XCTAssertEqual(lhs.firstName, rhs.firstName)
-					XCTAssertEqual(lhs.lastName, rhs.lastName)
-					XCTAssertEqual(lhs.avatar, rhs.avatar)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
-			}
+
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
+            client.users.register(user: newUser, completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testExists() {
@@ -347,20 +331,15 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
-			client.users.isEmailRegistered(email: "jame@example") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs, rhs)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
-			}
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
+            client.users.isEmailRegistered(email: "jame@example", completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testResetPassword() {
@@ -397,24 +376,20 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
 			client.users.resetPassword(email: "jame@example") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					// token unaffected either way
-					XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs, rhs)
-					// token unaffected either way
-					XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+                // token unaffected either way
+                XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testChangePassword() {
@@ -439,23 +414,22 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
 			client.accessToken = test.token
-			
+
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
 			client.users.changePassword(oldPassword: "old", newPassword: "new") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				case (.success(_), .success(_)):
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+                // token unaffected either way
+                XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testChangePasswordSpecialized() {
@@ -485,21 +459,20 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests, configuration: config) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
 			client.users.changePassword(oldPassword: "old", newPassword: "new") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				case (.success(_), .success(_)):
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				default:
-					print("change passwordspecialized unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTAssertTrue(false)
-				}
+                // token unaffected either way
+                XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testUpdateUser() {
@@ -530,21 +503,20 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
 			client.users.updateUser(user: User(email: "test@gmail.com", password: "34123", firstname: "first", lastname: "name")) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				case (.success(_), .success(_)):
-					XCTAssertEqual(client.accessToken?.rawValue,  test.token?.rawValue)
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+                // token unaffected either way
+                XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	/// Test Gigya refresh, which does not need a refresh token, but does need an auth token in the header
@@ -574,23 +546,29 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        let assertionsOnSuccess: Zone5.Result<OAuthTokenAlt>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.tokenExp, rhs.tokenExp)
+            XCTAssertEqual(lhs.token, rhs.token)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
 			client.users.refreshToken { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-					XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.tokenExp, rhs.tokenExp)
-					XCTAssertEqual(lhs.token, rhs.token)
-					XCTAssertEqual(client.accessToken?.rawValue, "0987654321")
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+                if case .failure = result, case .failure = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
+                }
+                else if case .success = result, case .success = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue, "0987654321")
+                }
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testGetPrefs() {
@@ -629,21 +607,25 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        let assertionsOnSuccess: Zone5.Result<UsersPreferences>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.metric, rhs.metric)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
 			client.users.getPreferences(userID: 123) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.metric, rhs.metric)
-					XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+                if case .success = result, case .success = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
+                }
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testSetPrefs() {
@@ -678,24 +660,24 @@ class UsersViewTests: XCTestCase {
 			)
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
-			 
 			var prefs = UsersPreferences()
 			prefs.metric = .metric
-			client.users.setPreferences(preferences: prefs) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs, rhs)
-					XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
-				default:
-					print("unexpected response: \(result)", "expected: \(test.expectedResult)")
-					XCTFail()
-				}
+
+            let expectation = ResultExpectation(for: test.expectedResult)
+            expectations.append(expectation)
+
+            client.users.setPreferences(preferences: prefs) { result in
+                if case .success = result, case .success = test.expectedResult {
+                    XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
+                }
+
+                expectation.fulfill(with: result)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testPasswordComplexity() {
@@ -703,25 +685,30 @@ class UsersViewTests: XCTestCase {
 		let tests: [(token: AccessToken?,json: String, expectedResult: Result<String, Zone5.Error>)] = [
 			(token: OAuthToken(rawValue: "1234567890"), json: expected, expectedResult: .success(expected))
 		]
-		execute(with: tests) { client, _, urlSession, test in
 
-			client.users.passwordComplexity() { result in
-				switch result {
-				case .success(let regex):
-					XCTAssertEqual(regex, test.json)
-					
-				default:
-					XCTFail()
-				}
-			}
+        let assertionsOnSuccess: Zone5.Result<String>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs, rhs)
+        }
+
+        var expectations: [XCTestExpectation] = []
+        execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
+            client.users.passwordComplexity(completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testReconfirm() {
-		let tests = [""]
-		execute(with: tests) { client, _, urlSession, expected in
-			
-			urlSession.dataTaskHandler = { request in
+        let tests: [Result<Zone5.VoidReply, Zone5.Error>] = [
+            .success(Zone5.VoidReply()),
+        ]
+
+        var expectations: [XCTestExpectation] = []
+        execute(with: tests) { client, _, urlSession, expectedResult in
+            urlSession.dataTaskHandler = { request in
 				XCTAssertEqual(request.url?.path, "/rest/auth/reconfirm")
 				XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
 				XCTAssertEqual(request.url?.query, "email=test%2Bplus@gmail.com")
@@ -729,14 +716,12 @@ class UsersViewTests: XCTestCase {
 				return .success("")
 			}
 
-			client.users.reconfirmEmail(email: "test+plus@gmail.com") { result in
-				switch result {
-				case .success(_):
-					XCTAssertTrue(true)
-				default:
-					XCTFail()
-				}
-			}
+            let expectation = ResultExpectation(for: expectedResult)
+            expectations.append(expectation)
+
+            client.users.reconfirmEmail(email: "test+plus@gmail.com", completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 }

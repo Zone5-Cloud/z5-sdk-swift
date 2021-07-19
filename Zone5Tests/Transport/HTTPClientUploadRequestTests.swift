@@ -11,52 +11,51 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 		configuration.clientID = nil
 		configuration.clientSecret = nil
 
-		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<String>)] = [
-			(token: nil, json: "", expectedResult: .failure(.serverError(Zone5.Error.ServerMessage(message: "Unauthorized", statusCode: 401))))
+		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<User>)] = [
+            (token: nil, json: "", expectedResult: .failure(.invalidConfiguration))
 		]
-		
+
+        var expectations: [XCTestExpectation] = []
 		for method:Zone5.Method in [.get, .post] {
-			execute(with: tests, configuration: configuration) { zone5, httpClient, urlSession, test in
+            execute(with: tests, configuration: configuration) { zone5, httpClient, urlSession, test in
 				let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method)
 
 				let fileURL = developmentAssets.randomElement()
 				XCTAssertNotNil(fileURL)
 
-				_ = httpClient.upload(fileURL!, with: request, expectedType: User.self) { result in
-					if case .failure(let error) = result,
-						case .invalidConfiguration = error {
-							return // Success!
-					}
+                let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: { _, _ in XCTFail() })
+                expectations.append(expectation)
 
-					XCTFail("\(method.rawValue) request unexpectedly completed with \(result).")
-				}
+                _ = httpClient.upload(fileURL!, with: request, expectedType: User.self, completion: expectation.fulfill)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 
 	func testMissingAccessToken() {
 		var configuration = ConfigurationForTesting()
 		configuration.accessToken = nil
 
-		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<String>)] = [
-			(token: nil, json: "", expectedResult: .failure(.serverError(Zone5.Error.ServerMessage(message: "Unauthorized", statusCode: 401))))
+		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<User>)] = [
+            (token: nil, json: "", expectedResult: .failure(.serverError(.unauthorized)))
 		]
 		
+        var expectations: [XCTestExpectation] = []
 		for method:Zone5.Method in [.get, .post] {
 			execute(with: tests, configuration: configuration) { zone5, httpClient, urlSession, test in
 				let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method)
 
 				let fileURL = developmentAssets.randomElement()!
 
-				_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
-					if case .failure(let error) = result, case .serverError(let message) = error, message.statusCode == 401 {
-						return // Success!
-					}
+                let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: { _, _ in XCTFail() })
+                expectations.append(expectation)
 
-					XCTFail("\(method.rawValue) request unexpectedly completed with \(result).")
-				}
+                _ = httpClient.upload(fileURL, with: request, expectedType: User.self, completion: expectation.fulfill)
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 
 	func testUnexpectedRequestBody() {
@@ -65,6 +64,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			(.post, ["string": "hello world", "integer": 1234567890] as URLEncodedBody),
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
@@ -76,15 +76,13 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				return .error(Zone5.Error.unknown)
 			}
 
-			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
-				if case .failure(let error) = result,
-					case .unexpectedRequestBody = error {
-						return // Success!
-				}
+            let expectation = ResultExpectation(for: Zone5.Result<User>.failure(.unexpectedRequestBody), assertionsOnSuccess: { _, _ in XCTFail() })
+            expectations.append(expectation)
 
-				XCTFail("Request unexpectedly completed with \(result).")
-			}
+            _ = httpClient.upload(fileURL, with: request, expectedType: User.self, completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 
 	func testServerFailure() {
@@ -93,6 +91,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
@@ -125,16 +124,13 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				return .message(serverMessage.message, statusCode: 500)
 			}
 
-			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
-				if case .failure(let error) = result,
-					case .serverError(let message) = error,
-					message == serverMessage {
-						return // Success!
-				}
+            let expectation = ResultExpectation(for: Zone5.Result<User>.failure(.serverError(serverMessage)), assertionsOnSuccess: { _, _ in XCTFail() })
+            expectations.append(expectation)
 
-				XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-			}
+            _ = httpClient.upload(fileURL, with: request, expectedType: User.self, completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 
 	func testTransportFailure() {
@@ -143,6 +139,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
@@ -173,17 +170,13 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				return .error(transportError)
 			}
 
-			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
-				if case .failure(let error) = result,
-					case .transportFailure(let underlyingError) = error,
-					(underlyingError as NSError).domain == (transportError as NSError).domain,
-					(underlyingError as NSError).code == (transportError as NSError).code {
-						return // Success!
-				}
+            let expectation = ResultExpectation(for: Zone5.Result<User>.failure(.transportFailure(transportError)), assertionsOnSuccess: { _, _ in XCTFail() })
+            expectations.append(expectation)
 
-				XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-			}
+            _ = httpClient.upload(fileURL, with: request, expectedType: User.self, completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 
 	func testSuccessfulRequest() {
@@ -192,6 +185,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
+        var expectations: [XCTestExpectation] = []
 		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
@@ -221,6 +215,9 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				return .success("{\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}")
 			}
 
+            let expectation = XCTestExpectation()
+            expectations.append(expectation)
+
 			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
 				if case .success(let user) = result {
 					XCTAssertEqual(user.id, 12345678)
@@ -231,7 +228,12 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				else {
 					XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
 				}
+
+                expectation.fulfill()
 			}
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
+
 }
