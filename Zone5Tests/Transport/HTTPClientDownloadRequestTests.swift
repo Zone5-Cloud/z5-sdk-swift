@@ -153,28 +153,33 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			(.post, nil, nil)
 		]
 
-		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
-			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, queryParams: parameters.params, body: parameters.body)
-			let fileURL = developmentAssets.randomElement()!
+        execute(with: parameters) { zone5, httpClient, urlSession, parameters in
+            let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, queryParams: parameters.params, body: parameters.body)
 
-			urlSession.downloadTaskHandler = { urlRequest in
-				XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
-				XCTAssertEqual(urlRequest.httpMethod, request.method.rawValue)
-				XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Authorization"], "Bearer \(zone5.accessToken!)")
+            let fileUUID = UUID().uuidString
+            let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("Zone5HTTPClientDownloadRequestTests.testSuccessfulRequest.\(fileUUID).tmp")
+            try! fileUUID.write(to: fileURL, atomically: true, encoding: .utf8)
 
-				return .success(fileURL)
-			}
+            urlSession.downloadTaskHandler = { urlRequest in
+                XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
+                XCTAssertEqual(urlRequest.httpMethod, request.method.rawValue)
+                XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Authorization"], "Bearer \(zone5.accessToken!)")
 
-			_ = httpClient.download(request) { result in
-				if case .success(let downloadedURL) = result {
-					XCTAssert(FileManager.default.contentsEqual(atPath: downloadedURL.path, andPath: fileURL.path))
-				}
-				else {
-					XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-				}
-			}
-		}
-	}
+                return .success(fileURL)
+            }
+
+            _ = httpClient.download(request) { result in
+                if case .success(let downloadedURL) = result {
+                    XCTAssert(FileManager.default.contentsEqual(atPath: downloadedURL.path, andPath: fileURL.path))
+                }
+                else {
+                    XCTFail("\(parameters.method.rawValue) request using parameters (\(parameters.params?.description ?? "none")) unexpectedly completed with \(result).")
+                }
+
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+        }
+    }
 	
 	func testFailedRequest() {
 		let parameters: [(method: Zone5.Method, params: URLEncodedBody?, body: RequestBody?)] = [
