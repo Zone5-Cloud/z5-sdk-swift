@@ -180,12 +180,12 @@ class ThirdPartyViewTests: XCTestCase {
 		let tests: [(token: AccessToken?, json: String, expectedResult: Result<Zone5.VoidReply, Zone5.Error>)] = [
 			(
 				token: nil,
-				json: "{}",
+				json: "",
 				expectedResult: .failure(authFailure)
 			),
 			(
 				token: OAuthToken(rawValue: UUID().uuidString),
-				json: "{}",
+				json: "",
 				expectedResult: .success {
 					return Zone5.VoidReply()
 				}
@@ -200,8 +200,8 @@ class ThirdPartyViewTests: XCTestCase {
                         XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
                         XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
 
-                    //case (.success(let lhs), .success(let rhs)):
-                    //XCTAssertEqual(lhs, rhs)  //TODO: how to test for success?
+                    case (.success, .success):
+                        break // VoidReply response needs no further validation
 
                     default:
                         XCTFail("\(result) != \(test.expectedResult)")
