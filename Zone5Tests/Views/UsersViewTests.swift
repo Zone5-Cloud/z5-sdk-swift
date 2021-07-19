@@ -343,7 +343,7 @@ class UsersViewTests: XCTestCase {
 				// test exists does not require authentication
 				token: nil,
 				json: "false",
-				expectedResult: .success(true)
+				expectedResult: .success(false)
 			)
 		]
 
