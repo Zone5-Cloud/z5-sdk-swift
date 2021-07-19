@@ -380,7 +380,7 @@ extension JSONDecoder {
 
 }
 
-internal protocol HTTPClientURLSession: class {
+internal protocol HTTPClientURLSession: AnyObject {
 
 	func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask
 
