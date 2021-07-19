@@ -3,6 +3,7 @@ name: Build
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
     branches: [master, develop]
 
 jobs:
@@ -79,7 +80,26 @@ jobs:
           (xcrun --run llvm-cov show "${BUNDLE_PATH}/${BINARY_NAME}" --instr-profile "${PROFDATA_INPUT}" || true) >> "${COVERAGE_OUTPUT}"
         done
 
-    - name: SonarCloud
+    - name: SonarCloud (Push)
+      if: ${{ github.event_name == 'push' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=todaysplan \
+          -Dsonar.projectKey=z5-sdk-swift \
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.sources=. \
+          -Dsonar.swift.coverage.reportPaths="${GITHUB_WORKSPACE}/merged.lcov" \
+          -Dsonar.cfamily.build-wrapper-output.bypass=true \
+          -Dsonar.c.file.suffixes=- \
+          -Dsonar.cpp.file.suffixes=- \
+          -Dsonar.objc.file.suffixes=- \
+
+    - name: SonarCloud (Pull Request)
+      if: ${{ github.event_name == 'pull_request' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
