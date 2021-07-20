@@ -44,7 +44,7 @@ extension XCTestCase {
 		}
 	}
 	
-	var authFailure: Zone5.Error { return Zone5.Error.serverError(Zone5.Error.ServerMessage(message: "Unauthorized", statusCode: 401)) }
+    var authFailure: Zone5.Error { return .serverError(.unauthorized) }
 	
 	func createNewZone5() -> Zone5 {
 		let urlSession = TestHTTPClientURLSession()
@@ -64,7 +64,7 @@ extension XCTestCase {
 	}
 
 	typealias P<T:Decodable> = (token:AccessToken?, json:String, expectedResult:Zone5.Result<T>)
-	
+
 	func execute<T>(with parameters: [P<T>], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: Zone5HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: P<T>) throws -> Void) rethrows {
 		try parameters.forEach { parameter in
 			try execute(configuration: configuration) { zone5, httpClient, urlSession in
@@ -84,16 +84,16 @@ extension XCTestCase {
 						return .success(parameter.json)
 					}
 				}
-				
-				urlSession.uploadTaskHandler = { request, fileURL in
+
+                urlSession.uploadTaskHandler = { request, fileURL in
 					return urlSession.dataTaskHandler!(request)
 				}
-				
-				try tests(zone5, httpClient, urlSession, parameter)
+
+                try tests(zone5, httpClient, urlSession, parameter)
 			}
 		}
 	}
-	
+
 	func execute<T>(with parameters: [T], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: Zone5HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: T) throws -> Void) rethrows {
 		try parameters.forEach { parameter in
 			try execute(configuration: configuration) { zone5, httpClient, urlSession in
@@ -102,7 +102,7 @@ extension XCTestCase {
 		}
 	}
 
-	/// Convenience method to quickly decode a JSON string as the given `expectedType`.
+    /// Convenience method to quickly decode a JSON string as the given `expectedType`.
 	func decode<T: Decodable>(json: String, as expectedType: T.Type) throws -> T {
 		return try JSONDecoder().decode(expectedType, from: json.data(using: .utf8)!)
 	}

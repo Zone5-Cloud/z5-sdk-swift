@@ -107,7 +107,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		interceptor.startLoading()
 		
 		// wait for async callbacks
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectation], timeout: 5)
 		
 		// refresh should have triggered, our refresh token on the zone5 instance should've been updated and the original request should've fired
 		XCTAssertNotNil(interceptor.lastRequest)
@@ -161,7 +161,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		interceptors.forEach { let a = $0; queue.async { a.startLoading() } }
 		
 		// wait for async callbacks. all 5 requests should get called. Only one refresh (the first one).
-		waitForExpectations(timeout: 5, handler: nil)
+		wait(for: [expectationSendRequest, expectationRefresh], timeout: 5)
 		
 		// refresh should have triggered, our refresh token on the zone5 instance should've been updated and the original request should've fired
 		interceptors.forEach {

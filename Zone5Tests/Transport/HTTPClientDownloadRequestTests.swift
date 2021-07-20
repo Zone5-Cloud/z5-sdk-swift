@@ -12,7 +12,9 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 		configuration.baseURL = nil
 
 		for method: Zone5.Method in [.get, .post] {
-			execute(configuration: configuration) { zone5, httpClient, urlSession in
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.unknown))
+
+            execute(configuration: configuration) { zone5, httpClient, urlSession in
 				let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method)
 
 				urlSession.downloadTaskHandler = { urlRequest in
@@ -21,15 +23,10 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 					return .error(Zone5.Error.unknown)
 				}
 
-				_ = httpClient.download(request) { result in
-					if case .failure(let error) = result,
-						case .invalidConfiguration = error {
-							return // Success!
-					}
-
-					XCTFail("\(method.rawValue) request unexpectedly completed with \(result).")
-				}
+                _ = httpClient.download(request, completion: expectation.fulfill)
 			}
+
+            wait(for: [expectation], timeout: 5)
 		}
 	}
 
@@ -37,7 +34,9 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 		var configuration = ConfigurationForTesting()
 		configuration.accessToken = nil
 
-		for method: Zone5.Method in [.get, .post] {
+        for method: Zone5.Method in [.get, .post] {
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.serverError(.unauthorized)))
+
 			execute(configuration: configuration) { zone5, httpClient, urlSession in
 				let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method)
 
@@ -46,14 +45,10 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 					return .failure("Unauthorized", statusCode: 401)
 				}
 				
-				_ = httpClient.download(request) { result in
-					if case .failure(let error) = result, case .serverError(let message) = error, message.statusCode == 401 {
-						return // Success!
-					}
-
-					XCTFail("\(method.rawValue) request unexpectedly completed with \(result).")
-				}
+                _ = httpClient.download(request, completion: expectation.fulfill)
 			}
+
+            wait(for: [expectation], timeout: 5)
 		}
 	}
 
@@ -61,20 +56,17 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 		execute { zone5, httpClient, urlSession in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: .get, body: SearchInputReport.forInstance(activityType: .workout, identifier: 12345))
 
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.unexpectedRequestBody))
+
 			urlSession.downloadTaskHandler = { urlRequest in
 				XCTFail("Request should never be performed when encountering an unexpected request body.")
 
 				return .error(Zone5.Error.unknown)
 			}
 
-			_ = httpClient.download(request) { result in
-				if case .failure(let error) = result,
-					case .unexpectedRequestBody = error {
-						return // Success!
-				}
+            _ = httpClient.download(request, completion: expectation.fulfill)
 
-				XCTFail("Request unexpectedly completed with \(result).")
-			}
+            wait(for: [expectation], timeout: 5)
 		}
 	}
 
@@ -84,10 +76,11 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
-		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
+        execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
 			let serverMessage = Zone5.Error.ServerMessage(message: "A server error occurred", statusCode: 500)
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.serverError(serverMessage)))
 
 			urlSession.downloadTaskHandler = { urlRequest in
 				XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
@@ -97,15 +90,9 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 				return .message(serverMessage.message, statusCode: 500)
 			}
 
-			_ = httpClient.download(request, completion: { result in
-				if case .failure(let error) = result,
-					case .serverError(let message) = error,
-					message == serverMessage {
-						return // Success!
-				}
+			_ = httpClient.download(request, completion: expectation.fulfill)
 
-				XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-			})
+            wait(for: [expectation], timeout: 5)
 		}
 	}
 
@@ -115,10 +102,11 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
-		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
+        execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
 			let transportError = Zone5.Error.unknown
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.transportFailure(transportError)))
 
 			urlSession.downloadTaskHandler = { urlRequest in
 				XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
@@ -128,16 +116,9 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 				return .error(transportError)
 			}
 
-			_ = httpClient.download(request) { result in
-				if case .failure(let error) = result,
-					case .transportFailure(let underlyingError) = error,
-					(underlyingError as NSError).domain == (transportError as NSError).domain,
-					(underlyingError as NSError).code == (transportError as NSError).code {
-						return // Success!
-				}
+            _ = httpClient.download(request, completion: expectation.fulfill)
 
-				XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-			}
+            wait(for: [expectation], timeout: 5)
 		}
 	}
 
@@ -153,28 +134,40 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			(.post, nil, nil)
 		]
 
-		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
-			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, queryParams: parameters.params, body: parameters.body)
-			let fileURL = developmentAssets.randomElement()!
+        var expectations: [XCTestExpectation] = []
+        execute(with: parameters) { zone5, httpClient, urlSession, parameters in
+            let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, queryParams: parameters.params, body: parameters.body)
 
-			urlSession.downloadTaskHandler = { urlRequest in
-				XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
-				XCTAssertEqual(urlRequest.httpMethod, request.method.rawValue)
-				XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Authorization"], "Bearer \(zone5.accessToken!)")
+            let fileUUID = UUID().uuidString
+            let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("Zone5HTTPClientDownloadRequestTests.testSuccessfulRequest.\(fileUUID).tmp")
+            try! fileUUID.write(to: fileURL, atomically: true, encoding: .utf8)
 
-				return .success(fileURL)
-			}
+            urlSession.downloadTaskHandler = { urlRequest in
+                XCTAssertEqual(urlRequest.url?.path, request.endpoint.uri)
+                XCTAssertEqual(urlRequest.httpMethod, request.method.rawValue)
+                XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Authorization"], "Bearer \(zone5.accessToken!)")
 
-			_ = httpClient.download(request) { result in
-				if case .success(let downloadedURL) = result {
-					XCTAssert(FileManager.default.contentsEqual(atPath: downloadedURL.path, andPath: fileURL.path))
-				}
-				else {
-					XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-				}
-			}
-		}
-	}
+                return .success(fileURL)
+            }
+
+            let expectation = XCTestExpectation()
+            expectations.append(expectation)
+
+            _ = httpClient.download(request) { result in
+                if case .success(let downloadedURL) = result {
+                    XCTAssert(FileManager.default.contentsEqual(atPath: downloadedURL.path, andPath: fileURL.path))
+                }
+                else {
+                    XCTFail("\(parameters.method.rawValue) request using parameters (\(parameters.params?.description ?? "none")) unexpectedly completed with \(result).")
+                }
+
+                try? FileManager.default.removeItem(at: fileURL)
+                expectation.fulfill()
+            }
+        }
+
+        wait(for: expectations, timeout: 5)
+    }
 	
 	func testFailedRequest() {
 		let parameters: [(method: Zone5.Method, params: URLEncodedBody?, body: RequestBody?)] = [
@@ -185,7 +178,7 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			// post can have any combo
 		]
 
-		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
+        execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, queryParams: parameters.params, body: parameters.body)
 			let fileURL = developmentAssets.randomElement()!
 
@@ -197,14 +190,12 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 				return .success(fileURL)
 			}
 
-			_ = httpClient.download(request) { result in
-				if case .failure(let error) = result,
-				   case .unexpectedRequestBody = error {
-						return // Success!
-				}
+            let expectation = ResultExpectation(for: Zone5.Result<URL>.failure(.unexpectedRequestBody))
 
-				XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
-			}
+            _ = httpClient.download(request, completion: expectation.fulfill)
+
+            wait(for: [expectation], timeout: 5)
 		}
 	}
+
 }
