@@ -177,7 +177,7 @@ class ThirdPartyViewTests: XCTestCase {
 			),
 			(
 				token: OAuthToken(rawValue: UUID().uuidString),
-				json: "", // TODO: Check the example app
+				json: "",
 				expectedResult: .success(Zone5.VoidReply())
 			),
 		]
