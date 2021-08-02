@@ -12,7 +12,7 @@ import XCTest
 class MetricsViewTests: XCTestCase {
 	
 	func testBikeMetrics() {
-		let tests: [(token: AccessToken?, json: String, expectedResult: Result<MappedResult<UserWorkoutResult>, Zone5.Error>)] = [
+        let tests: [(token: AccessToken?, json: String, expectedResult: Zone5.Result<MappedResult<UserWorkoutResult>>)] = [
 			(
 				token: nil,
 				json: "n/a",
@@ -49,29 +49,26 @@ class MetricsViewTests: XCTestCase {
 			),
 		]
 
-		execute(with: tests) { client, _, urlSession, test in
+        let assertionsOnSuccess: Zone5.Result<MappedResult<UserWorkoutResult>>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.keys, rhs.keys)
+            XCTAssertEqual(lhs.results.count, rhs.results.count)
+            XCTAssertEqual(lhs.results[0].bike?.uuid, rhs.results[0].bike?.uuid)
+            XCTAssertEqual(lhs.results[0].maximum?.maximumSpeed, rhs.results[0].maximum?.maximumSpeed)
+            XCTAssertEqual(lhs.results[0].weightedAverage?.averageSpeed, rhs.results[0].weightedAverage?.averageSpeed)
+            XCTAssertEqual(lhs.results[0].sum?.distance, rhs.results[0].sum?.distance)
+            XCTAssertEqual(lhs.results[0].sum?.training, rhs.results[0].sum?.training)
+            XCTAssertEqual(lhs.results[0].sum?.ascent, rhs.results[0].sum?.ascent)
+            XCTAssertEqual(lhs.results[0].sum?.ascent, 692)
+        }
 
-			client.metrics.getBikeMetrics(ranges: [], fields: ["fields"], bikeUids: ["d584c5cb-e81f-4fbe-bc0d-667e9bcd2c4c"]) { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
+        var expectations: [XCTestExpectation] = []
+        execute(with: tests) { client, _, urlSession, test in
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
 
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.keys, rhs.keys)
-					XCTAssertEqual(lhs.results.count, rhs.results.count)
-					XCTAssertEqual(lhs.results[0].bike?.uuid, rhs.results[0].bike?.uuid)
-					XCTAssertEqual(lhs.results[0].maximum?.maximumSpeed, rhs.results[0].maximum?.maximumSpeed)
-					XCTAssertEqual(lhs.results[0].weightedAverage?.averageSpeed, rhs.results[0].weightedAverage?.averageSpeed)
-					XCTAssertEqual(lhs.results[0].sum?.distance, rhs.results[0].sum?.distance)
-					XCTAssertEqual(lhs.results[0].sum?.training, rhs.results[0].sum?.training)
-					XCTAssertEqual(lhs.results[0].sum?.ascent, rhs.results[0].sum?.ascent)
-					XCTAssertEqual(lhs.results[0].sum?.ascent, 692)
-				default:
-					print(result, test.expectedResult)
-					XCTFail()
-				}
-			}
+            client.metrics.getBikeMetrics(ranges: [], fields: ["fields"], bikeUids: ["d584c5cb-e81f-4fbe-bc0d-667e9bcd2c4c"], completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 }

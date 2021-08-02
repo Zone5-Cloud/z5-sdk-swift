@@ -1,20 +1,127 @@
 name: Build
+
 on:
-  push:
-    branches:
-      - master
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches: [master, develop]
+
 jobs:
-  sonarcloud:
-    runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: macOS-latest
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
-        # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+
+    - name: Cache Derived Data
+      id: cache-derived-data
+      uses: actions/cache@v2
+      with:
+        path: "${GITHUB_WORKSPACE}/DerivedData"
+        key: ${{ runner.os }}-derived-data
+
+    - name: Select Java Release
+      uses: actions/setup-java@v2
+      with:
+        distribution: "adopt"
+        java-version: "11"
+
+    - name: Install Sonar Scanner
+      run: brew install sonar-scanner
+
+    - name: Run Tests
+      run: |
+        DEVELOPER_PATH=$(xcode-select --print-path)
+        PLATFORM=$(ls -1 "${DEVELOPER_PATH}/Platforms/iPhoneOS.platform/DeviceSupport/" | sort -gr | head -n 1)
+        DEVICE=$(xcrun simctl list devices "iOS ${PLATFORM}" | grep "iPhone" | head -n 1 | sed -Ee 's/^.*\(([A-Z0-9\-]+)\).*$/\1/g')
+
+        xcodebuild test \
+          -project "Zone5.xcodeproj" \
+          -scheme "Zone5" \
+          -destination "platform=iOS Simulator,id=${DEVICE}" \
+          -enableCodeCoverage YES \
+          -derivedDataPath "${GITHUB_WORKSPACE}/DerivedData" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY=""
+
+    - name: Capture Logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Results
+        path: DerivedData/Logs/Test/*.xcresult
+        if-no-files-found: warn
+
+    - name: Merge Profile Data
+      run: |
+        PROFDATA_INPUT="${GITHUB_WORKSPACE}/DerivedData/Build/ProfileData/*/*.profdata"
+        PROFDATA_OUTPUT="${GITHUB_WORKSPACE}/merged.profdata"
+        xcrun llvm-profdata merge ${PROFDATA_INPUT[@]} -output "${PROFDATA_OUTPUT}"
+
+    - name: Prepare Coverage Report
+      run: |
+        PROFDATA_INPUT="${GITHUB_WORKSPACE}/merged.profdata"
+        COVERAGE_OUTPUT="${GITHUB_WORKSPACE}/merged.lcov"
+        BUNDLES="${GITHUB_WORKSPACE}/DerivedData/Build/Products/Debug-*/*"
+
+        for BUNDLE_PATH in ${BUNDLES}; do
+          if [[ -e "${BUNDLE_PATH}/Info.plist" ]]; then
+            PLIST_PATH="${BUNDLE_PATH}/Info.plist"
+          elif [[ -e "${BUNDLE_PATH}/Resources/Info.plist" ]]; then
+            PLIST_PATH="${BUNDLE_PATH}/Resources/Info.plist"
+          else
+            continue
+          fi
+
+          BINARY_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "${PLIST_PATH}")
+          (xcrun --run llvm-cov show "${BUNDLE_PATH}/${BINARY_NAME}" --instr-profile "${PROFDATA_INPUT}" || true) >> "${COVERAGE_OUTPUT}"
+        done
+
+    - name: SonarCloud (Push)
+      if: ${{ github.event_name == 'push' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=todaysplan \
+          -Dsonar.projectKey=z5-sdk-swift \
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.sources=. \
+          -Dsonar.swift.coverage.reportPaths="${GITHUB_WORKSPACE}/merged.lcov" \
+          -Dsonar.cfamily.build-wrapper-output.bypass=true \
+          -Dsonar.c.file.suffixes=- \
+          -Dsonar.cpp.file.suffixes=- \
+          -Dsonar.objc.file.suffixes=- \
+
+    - name: SonarCloud (Pull Request)
+      if: ${{ github.event_name == 'pull_request' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        PR_KEY: ${{ github.event.pull_request.number }}
+        PR_BASE: ${{ github.event.pull_request.base.ref }}
+      run: |
+        sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=todaysplan \
+          -Dsonar.projectKey=z5-sdk-swift \
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.sources=. \
+          -Dsonar.swift.coverage.reportPaths="${GITHUB_WORKSPACE}/merged.lcov" \
+          -Dsonar.cfamily.build-wrapper-output.bypass=true \
+          -Dsonar.c.file.suffixes=- \
+          -Dsonar.cpp.file.suffixes=- \
+          -Dsonar.objc.file.suffixes=- \
+          -Dsonar.pullrequest.branch="${PR_BRANCH}" \
+          -Dsonar.pullrequest.key="${PR_KEY}" \
+          -Dsonar.pullrequest.base="${PR_BASE}" \
+          -Dsonar.pullrequest.provider="GitHub" \
+          -Dsonar.pullrequest.github.repository="${GITHUB_REPOSITORY}" \
+          -Dsonar.pullrequest.github.endpoint="${GITHUB_API_URL}" \
+          -Dsonar.pullrequest.github.summary_comment=true
