@@ -9136,6 +9136,13 @@
       "warning": "undocumented"
     },
     {
+      "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Enums/UserConnectionType.swift",
+      "line": 44,
+      "symbol": "UserConnectionType.wahoo",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Enums/UserDelegateRelationship.swift",
       "line": 9,
       "symbol": "UserDelegateRelationship",
