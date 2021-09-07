@@ -41,6 +41,8 @@ public enum UserConnectionType: Int, Codable, CaseIterable {
 	
 	case nike = 15
 	
+	case wahoo = 16
+	
 	var connectionName: String {
 		switch self {
 		case .garminconnect: return "garminconnect"
@@ -59,6 +61,7 @@ public enum UserConnectionType: Int, Codable, CaseIterable {
 		case .turbo: return "turbo"
 		case .specialized: return "specialized"
 		case .nike: return "nike"
+		case .wahoo: return "wahoo"
 		}
 	}
 }
