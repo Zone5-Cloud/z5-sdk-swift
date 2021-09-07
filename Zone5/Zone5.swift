@@ -263,6 +263,8 @@ final public class Zone5 {
 			public var statusCode: Int?
 			public var errors: [ServerError]?
 
+            internal static let unauthorized = ServerMessage(message: "Unauthorized", statusCode: 401)
+
 		}
 
 		/// A textual description of the error, suitable for debugging.

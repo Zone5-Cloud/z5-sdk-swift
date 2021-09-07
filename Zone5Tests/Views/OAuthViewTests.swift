@@ -13,7 +13,7 @@ class OAuthViewTests: XCTestCase {
 			( // Should complete with .serverError(_:) if a message is transmitted.
 				prepareConfiguration: { $0.accessToken = nil },
 				response: .message("UT010031: Login failed", statusCode: 500),
-				expectedResult: .failure(.serverError(Zone5.Error.ServerMessage(message: "UT010031: Login failed")))
+                expectedResult: .failure(.serverError(Zone5.Error.ServerMessage(message: "UT010031: Login failed", statusCode: 500)))
 			),
 			( // Should complete with .serverError(_:) if a message is transmitted, even on success.
 				prepareConfiguration: { $0.accessToken = nil },
@@ -37,6 +37,11 @@ class OAuthViewTests: XCTestCase {
 			),
 		]
 
+        let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.accessToken, rhs.accessToken)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
 			var configuration = ConfigurationForTesting()
 			test.prepareConfiguration(&configuration)
@@ -49,21 +54,13 @@ class OAuthViewTests: XCTestCase {
 				return test.response
 			}
 
-			client.oAuth.accessToken(username: "username", password: "password") { result in
-				switch (result, test.expectedResult) {
-				case (.failure(let lhs), .failure(let rhs)):
-					print(lhs, rhs)
-					XCTAssertEqual((lhs as NSError).domain, (rhs as NSError).domain)
-					XCTAssertEqual((lhs as NSError).code, (rhs as NSError).code)
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
 
-				case (.success(let lhs), .success(let rhs)):
-					XCTAssertEqual(lhs.accessToken, rhs.accessToken)
-
-				default:
-					XCTFail("Unexpected result:\n\t- Got: \(result)\n\t- Expected: \(test.expectedResult)")
-				}
-			}
+            client.oAuth.accessToken(username: "username", password: "password", completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 	
 	func testAdhocToken() {
@@ -73,9 +70,15 @@ class OAuthViewTests: XCTestCase {
 		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<OAuthToken>)] = [
 			(token:expectedAuthToken, json:"{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
 		]
-		
+
+        let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
+            XCTAssertEqual(lhs.accessToken, rhs.accessToken)
+            XCTAssertEqual(lhs.expiresIn, rhs.expiresIn)
+            XCTAssertEqual(lhs.scope, rhs.scope)
+        }
+
+        var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, expected in
-			
 			urlSession.dataTaskHandler = { request in
 				XCTAssertEqual(request.url?.path, "/rest/oauth/access_token")
 				XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
@@ -83,17 +86,12 @@ class OAuthViewTests: XCTestCase {
 				return .success("{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}")
 			}
 
-			client.oAuth.accessToken(username: "username", password: "password") { result in
-				switch result {
-				case .success(let token):
-					XCTAssertEqual(token.accessToken, expectedAuthToken.accessToken)
-					XCTAssertEqual(token.expiresIn, expectedAuthToken.expiresIn)
-					XCTAssertEqual(token.scope, expectedAuthToken.scope)
-					
-				default:
-					XCTFail()
-				}
-			}
+            let expectation = ResultExpectation(for: expected.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            expectations.append(expectation)
+
+            client.oAuth.accessToken(username: "username", password: "password", completion: expectation.fulfill)
 		}
+
+        wait(for: expectations, timeout: 5)
 	}
 }

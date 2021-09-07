@@ -311,7 +311,7 @@ extension JSONDecoder {
 				// special handling required for Void types. Enforce enpty data. Create NoReply object.
 				if data.count > 0 {
 					z5Log("Failed to decode server response as `\(expectedType)`. Error: Non Void response")
-					return .failure(.failedDecodingResponse(Zone5.Error.failedDecodingResponse(Zone5.Error.unknown)))
+					return .failure(.failedDecodingResponse(Zone5.Error.unknown))
 				} else {
 					return .success(Zone5.VoidReply() as! T)
 				}
@@ -380,7 +380,7 @@ extension JSONDecoder {
 
 }
 
-internal protocol HTTPClientURLSession: class {
+internal protocol HTTPClientURLSession: AnyObject {
 
 	func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask
 
