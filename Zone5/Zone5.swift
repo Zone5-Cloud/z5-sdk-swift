@@ -116,23 +116,11 @@ final public class Zone5 {
 		if accessToken != nil {
 			return true // Access token will happily represent the user all by itself
 		}
-		else if clientID != nil && clientSecret != nil {
-			return true // For authentication purposes, we need a valid clientID and clientSecret
-		}
-		else if !requiresClientSecret {
-			return true // For some hosts, we don't need a valid clientID and clientSecret
+		else if clientID != nil {
+			return true // For authentication purposes, we need a valid clientID
 		}
 
 		return false
-	}
-	
-	/// Check to see whether this host requires authentication using clientID and clientSecret
-	public var requiresClientSecret: Bool {
-		if let server = self.baseURL, (server.host == Zone5.specializedServer || server.host == Zone5.specializedStagingServer) {
-			return false
-		}
-		
-		return true;
 	}
 
 	// MARK: Views

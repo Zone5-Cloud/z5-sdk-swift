@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0F1C9F8725898C89000C12FD /* ResponseDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */; };
+		0F25411126E98D530043B7D0 /* TermsAndConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411026E98D530043B7D0 /* TermsAndConditions.swift */; };
+		0F25411326E98D650043B7D0 /* UpdatedTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411226E98D650043B7D0 /* UpdatedTerms.swift */; };
 		0F4A88CA2564A1ED005C20A2 /* URLProtocolProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */; };
 		0F4A88CE2564ADC4005C20A2 /* URLRequestInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4A88CD2564ADC4005C20A2 /* URLRequestInterceptor.swift */; };
 		0F5F68DE25C1098D004A36C6 /* CodingKey+Prefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F68DD25C1098D004A36C6 /* CodingKey+Prefix.swift */; };
@@ -193,6 +195,8 @@
 
 /* Begin PBXFileReference section */
 		0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseDecodingTests.swift; sourceTree = "<group>"; };
+		0F25411026E98D530043B7D0 /* TermsAndConditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsAndConditions.swift; sourceTree = "<group>"; };
+		0F25411226E98D650043B7D0 /* UpdatedTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedTerms.swift; sourceTree = "<group>"; };
 		0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolProperty.swift; sourceTree = "<group>"; };
 		0F4A88CD2564ADC4005C20A2 /* URLRequestInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestInterceptor.swift; sourceTree = "<group>"; };
 		0F5F68DD25C1098D004A36C6 /* CodingKey+Prefix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CodingKey+Prefix.swift"; sourceTree = "<group>"; };
@@ -377,6 +381,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0F25410F26E98CF70043B7D0 /* TermsAndConditions */ = {
+			isa = PBXGroup;
+			children = (
+				0F25411026E98D530043B7D0 /* TermsAndConditions.swift */,
+				0F25411226E98D650043B7D0 /* UpdatedTerms.swift */,
+			);
+			path = TermsAndConditions;
+			sourceTree = "<group>";
+		};
 		0F7C8E67256CCBBB005CF025 /* Payments */ = {
 			isa = PBXGroup;
 			children = (
@@ -664,6 +677,7 @@
 		A1F058E32372A3840034C7D0 /* Zone5 */ = {
 			isa = PBXGroup;
 			children = (
+				0F25410F26E98CF70043B7D0 /* TermsAndConditions */,
 				0FB27F422406388700D7991B /* Company */,
 				A1F058E42372A3840034C7D0 /* Zone5.h */,
 				A182D1B32372AB0500112501 /* Zone5.swift */,
@@ -921,6 +935,7 @@
 				0FB27F442406389C00D7991B /* Company.swift in Sources */,
 				A196033123794AE100CEB121 /* DataAccessRequest.swift in Sources */,
 				0F7D4732253E66E7005B21A9 /* ThirdPartyResponse.swift in Sources */,
+				0F25411326E98D650043B7D0 /* UpdatedTerms.swift in Sources */,
 				21EEE872258271D30022F6A0 /* Logger.swift in Sources */,
 				A196035723794DD200CEB121 /* MappedFieldType.swift in Sources */,
 				A182D1D62372AB0F00112501 /* OAuthView.swift in Sources */,
@@ -973,6 +988,7 @@
 				A10AB23E237E147E00EBAC66 /* UserWorkoutResultPeakLss.swift in Sources */,
 				A190FFE5237938420059561D /* DataFileUploadContext.swift in Sources */,
 				0FA1F1B6242AECB5005AD490 /* UsersPreferences.swift in Sources */,
+				0F25411126E98D530043B7D0 /* TermsAndConditions.swift in Sources */,
 				A10AB21F237D161900EBAC66 /* ActivityType.swift in Sources */,
 				0F7C8E69256CCBFD005CF025 /* Products.swift in Sources */,
 				A10AB21B237D110200EBAC66 /* UserWorkoutDetails.swift in Sources */,

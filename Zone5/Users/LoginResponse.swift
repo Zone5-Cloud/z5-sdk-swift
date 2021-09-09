@@ -32,5 +32,13 @@ public struct LoginResponse: Codable {
 	
 	public var refresh: String?
 	
+	public var features: Int? // bitmask featureset
+	
+	public var identities: [String:String]? // cognito or gigya identity ids
+	
+	public var fs: String? // featureset
+	
+	public var updatedTerms: [UpdatedTerms]?
+	
 	public init() { }
 }

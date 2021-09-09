@@ -59,6 +59,8 @@ public struct RegisterUser: Codable, JSONEncodedBody {
 
 	/// Optional - Use this to request association with a specific company based on the company nic
 	public var tags: String?
+	
+	var accept: [String]?
 
 	/// Optional - Custom registration directives
 	public var params: [String: String]?

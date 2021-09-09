@@ -12,7 +12,7 @@ public class UsersView: APIView {
 		case logout = "/rest/auth/logout"
 		case exists = "/rest/auth/exists"
 		case passwordReset = "/rest/auth/reset"
-		case changePasswordSpecialized = "/rest/auth/set/password"
+		case changePassword = "/rest/auth/set/password"
 		case refreshToken = "/rest/auth/refresh"
 		case setPreferences = "/rest/users/set/UserPreferences"
 		case getPreferences = "/rest/users/prefs/{userID}"
@@ -62,20 +62,17 @@ public class UsersView: APIView {
 		
 		// Some hosts require clientID and clientSecret. Others do not.
 		let body: JSONEncodedBody
-		if !zone5.requiresClientSecret {
-			body = LoginRequest(email: email, password: password, clientID: clientID, clientSecret: clientSecret, accept: accept)
-		} else if let clientID = clientID, let clientSecret = clientSecret {
+		if let clientID = clientID {
 			body = LoginRequest(email: email, password: password, clientID: clientID, clientSecret: clientSecret, accept: accept)
 		} else {
-			// requires clientID and secretID but it has not been provided. FAIL.
+			// requires clientID but it has not been provided. FAIL.
 			completion(.failure(.invalidConfiguration))
 			return
 		}
         
-		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { [weak self] result in
+		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { result in
 		defer { completion(result) }
-
-			if let zone5 = self?.zone5, case .success(let loginResponse) = result {
+			if case .success(let loginResponse) = result {
 				zone5.accessToken = OAuthToken(loginResponse: loginResponse)
 			}
 		}
@@ -121,37 +118,10 @@ public class UsersView: APIView {
 		post(Endpoints.setUser, body: user, with: completion)
 	}
 	
-	/// Change a user's password - oldPassword is only required in Specialized environment
+	/// Change a user's password - oldPassword is only required in Specialized environment so is optional
 	public func changePassword(oldPassword: String?, newPassword: String, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) {
-		guard let zone5 = zone5 else {
-			completion(.failure(.invalidConfiguration))
-			return
-		}
-		
-		if zone5.requiresClientSecret {
-			// we are in an authenticated session with client and secret, so we don't need old password. Just change new password.
-			var user = User()
-			user.password = newPassword
-			_ = post(Endpoints.setUser, body: user, expectedType: Bool.self) { result in
-				// convert reply into a void so that changePasswordSpecialized and setUser are coerced to look the same
-				switch result {
-				case .failure(let error):
-					completion(.failure(error))
-				case .success(let result):
-					if result {
-						completion(.success(Zone5.VoidReply()))
-					} else {
-						completion(.failure(Zone5.Error.unknown))
-					}
-				}
-			}
-		} else if let oldPassword = oldPassword {
-			// Specialized usage with GIGYA token. We need old password and new password
-			let body = NewPassword(old: oldPassword, new: newPassword)
-			_ = post(Endpoints.changePasswordSpecialized, body: body, with: completion)
-		} else {
-			completion(.failure(.invalidParameters))
-		}
+		let body = NewPassword(old: oldPassword, new: newPassword)
+		_ = post(Endpoints.changePassword, body: body, with: completion)
 	}
 	
 	/// Refresh a bearer token - get a new token if the current one is nearing expiry

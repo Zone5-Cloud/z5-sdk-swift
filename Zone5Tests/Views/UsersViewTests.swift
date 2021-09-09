@@ -78,33 +78,23 @@ class UsersViewTests: XCTestCase {
 				expectedResult: .failure(.serverError(serverMessage))
 			),
 			(
-				// this test is for a host that does NOT require client and secret, which is not set, and should pass without them
+				// this test is for specialized and used to pass without a clientId, but now should fail
 				token: nil,
 				host: "http://\(Zone5.specializedStagingServer)",
 				clientId: nil,
 				secret: nil,
 				accept: nil,
 				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .success {
-					var user = User()
-					user.id = 12345678
-					user.email = "jame.smith@example.com"
-					user.firstName = "Jane"
-					user.lastName = "Smith"
-					var lr = LoginResponse()
-					lr.user = user
-					lr.token = "1234567890"
-					return lr
-				}
+				expectedResult: .failure(.invalidConfiguration)
 			),
 			(
-				// this test is the same as above but includes accept strings
+				// this test has clientId and should pass, it also includes accept strings
 				token: nil,
 				host: "http://\(Zone5.specializedStagingServer)",
-				clientId: nil,
+				clientId: "CLIENT",
 				secret: nil,
 				accept: ["id1", "id2"],
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
+				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\", \"updatedTerms\":[{\"id\":\"terms123\"}]}",
 				expectedResult: .success {
 					var user = User()
 					user.id = 12345678
@@ -114,18 +104,21 @@ class UsersViewTests: XCTestCase {
 					var lr = LoginResponse()
 					lr.user = user
 					lr.token = "1234567890"
+					var t = UpdatedTerms()
+					t.id = "terms123"
+					lr.updatedTerms = [t]
 					return lr
 				}
 			),
 			(
-				// this test is for a host that requires client and secret, and it is provided, so should succeed.
+				// this test has clientId and should pass.
 				// also, sticking in a bogus AccessToken which should get overwritten
 				token: OAuthToken(rawValue: UUID().uuidString),
 				host: "http://google.com",
 				clientId: "CLIENT",
 				secret: "SECRET",
 				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
+				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\", \"tokenExp\": 1631074590000, \"features\": 0, \"identities\": { \"COGNITO\": \"123\", \"GIGYA\": \"456\"},\"roles\": [\"user\", \"premium\"], \"refresh\": \"eyJjd\", \"fs\":\"specialized\"}",
 				expectedResult: .success {
 					var user = User()
 					user.id = 12345678
@@ -135,6 +128,12 @@ class UsersViewTests: XCTestCase {
 					var lr = LoginResponse()
 					lr.user = user
 					lr.token = "1234567890"
+					lr.refresh = "eyJjd"
+					lr.features = 0
+					lr.fs = "specialized"
+					lr.tokenExp = 1631074590000
+					lr.roles = [Roles.user, Roles.premium]
+					lr.identities = ["COGNITO":"123","GIGYA":"456"]
 					return lr
 				}
 			)
@@ -172,6 +171,15 @@ class UsersViewTests: XCTestCase {
                 }
                 else if case .success = result, case .success = test.expectedResult {
                     XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
+					XCTAssertEqual(try? result.get().token, try? test.expectedResult.get().token)
+					XCTAssertEqual(try? result.get().refresh, try? test.expectedResult.get().refresh)
+					XCTAssertEqual(try? result.get().tokenExp, try? test.expectedResult.get().tokenExp)
+					XCTAssertEqual(try? result.get().roles, try? test.expectedResult.get().roles)
+					XCTAssertEqual(try? result.get().identities, try? test.expectedResult.get().identities)
+					XCTAssertEqual(try? result.get().fs, try? test.expectedResult.get().fs)
+					XCTAssertEqual(try? result.get().features, try? test.expectedResult.get().features)
+					XCTAssertEqual(try? result.get().updatedTerms?.count, try? test.expectedResult.get().updatedTerms?.count)
+					XCTAssertEqual(try? result.get().updatedTerms?[0].id, try? test.expectedResult.get().updatedTerms?[0].id)
                 }
 
                 expectation.fulfill(with: result)
@@ -403,7 +411,7 @@ class UsersViewTests: XCTestCase {
 			(
 				// token set.
 				token: OAuthToken(rawValue: "1234567890"),
-				json: "true",
+				json: "",
 				expectedResult: .success(Zone5.VoidReply())
 			),
 			(
