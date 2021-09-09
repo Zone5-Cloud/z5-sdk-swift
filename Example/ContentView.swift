@@ -408,16 +408,19 @@ struct ContentView: View {
                     }
                 }
                 Section(header: Text("Third Party Connections"), footer: Text("")) {
-                    EndpointLink<ThirdPartyInitializeResponse>("Init GC Connection") { client, completion in
-                        client.thirdPartyConnections.initializeThirdPartyConnection(type: .garminconnect, completion: completion)
+                    EndpointLink<ThirdPartyInitializeResponse>("Init Wahoo Connection") { client, completion in
+						client.thirdPartyConnections.initializeThirdPartyConnection(type: .wahoo, redirect: URL(string: "https://staging.todaysplan.com.au")!) { result in
+							print(result)
+							completion(result)
+						}
                     }
-                    EndpointLink<Bool>("Has GC Connection") { client, completion in
+                    EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
                         client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
                     }
-                    EndpointLink<Zone5.VoidReply>("Set GC Connection") { client, completion in
-                        client.thirdPartyConnections.setThirdPartyToken(type: .garminconnect, parameters: ["oau thToken": "1234", "oauthVerifier": "1234"], completion: completion)
+                    EndpointLink<Zone5.VoidReply>("Set Wahoo Connection") { client, completion in
+                        client.thirdPartyConnections.setThirdPartyToken(type: .garminconnect, parameters: ["oauthToken": "1234", "oauthVerifier": "1234"], completion: completion)
                     }
-                    EndpointLink<Bool>("Remove GC Connection") { client, completion in
+                    EndpointLink<Bool>("Remove Wahoo Connection") { client, completion in
                         client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
                     }
                     EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
@@ -450,7 +453,7 @@ struct ContentView: View {
             ConfigurationView(apiClient: self.apiClient, keyValueStore: self.keyValueStore, password: self.password)
         }
         .onAppear {
-            if !self.apiClient.isConfigured || self.password.password.isEmpty {
+            if !self.apiClient.isConfigured  {
                 self.displayConfiguration = true
             }
         }

@@ -30,7 +30,7 @@ public class APIView {
 		}
 	}
 
-	internal func get<T>(_ endpoint: InternalRequestEndpoint, parameters queryParams: URLEncodedBody?, expectedType: T.Type, with completionHandler: @escaping Completion<T>) -> PendingRequest? {
+	internal func get<T>(_ endpoint: InternalRequestEndpoint, parameters queryParams: URLEncodedBody? = nil, expectedType: T.Type, with completionHandler: @escaping Completion<T>) -> PendingRequest? {
 		return perform(with: completionHandler) { zone5 in
 			let request = try Request(endpoint: Zone5RequestEndpoint(endpoint, with: zone5), method: .get, queryParams: queryParams)
 			return zone5.httpClient.perform(request, expectedType: T.self, completion: completionHandler)
