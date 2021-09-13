@@ -408,21 +408,62 @@ struct ContentView: View {
                     }
                 }
                 Section(header: Text("Third Party Connections"), footer: Text("")) {
-                    EndpointLink<ThirdPartyInitializeResponse>("Init Wahoo Connection") { client, completion in
-						client.thirdPartyConnections.initializeThirdPartyConnection(type: .wahoo, redirect: URL(string: "https://staging.todaysplan.com.au")!) { result in
-							print(result)
+                    EndpointLink<String>("Pair Wahoo Connection") { client, completion in
+						client.thirdPartyConnections.pairThirdPartyConnection(type: .wahoo, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+							if case .success(let r) = result, let url = URL(string: r) {
+								DispatchQueue.main.async {
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
+							}
 							completion(result)
 						}
                     }
+					EndpointLink<String>("Pair Garmin Connection") { client, completion in
+						client.thirdPartyConnections.pairThirdPartyConnection(type: .garminconnect, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+							if case .success(let r) = result, let url = URL(string: r) {
+								DispatchQueue.main.async {
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
+							}
+							completion(result)
+						}
+					}
+					EndpointLink<String>("Pair Strava Connection") { client, completion in
+						client.thirdPartyConnections.pairThirdPartyConnection(type: .strava, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+							if case .success(let r) = result, let url = URL(string: r) {
+								DispatchQueue.main.async {
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
+							}
+							completion(result)
+						}
+					}
                     EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
-                        client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
+                        client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
                     }
-                    EndpointLink<Zone5.VoidReply>("Set Wahoo Connection") { client, completion in
-                        client.thirdPartyConnections.setThirdPartyToken(type: .garminconnect, parameters: ["oauthToken": "1234", "oauthVerifier": "1234"], completion: completion)
-                    }
+					EndpointLink<Bool>("Has Garmin Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
+					}
+					EndpointLink<Bool>("Has Strava Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .strava, completion: completion)
+					}
                     EndpointLink<Bool>("Remove Wahoo Connection") { client, completion in
-                        client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
+                        client.thirdPartyConnections.removeThirdPartyToken(type: .wahoo, completion: completion)
                     }
+					EndpointLink<Bool>("Remove Garmin Connection") { client, completion in
+						client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
+					}
+					EndpointLink<Bool>("Remove Strava Connection") { client, completion in
+						client.thirdPartyConnections.removeThirdPartyToken(type: .strava, completion: completion)
+					}
+				}
+				Section(header: Text("Push Registration")) {
                     EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
                         let rego = PushRegistration(token: "1234", platform: "strava", deviceId: "gwjh4")
                         client.thirdPartyConnections.registerDeviceWithThirdParty(registration: rego, completion: completion)
