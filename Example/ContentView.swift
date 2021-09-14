@@ -444,6 +444,18 @@ struct ContentView: View {
 							completion(result)
 						}
 					}
+					EndpointLink<String>("Pair Garmin TrainingConnection") { client, completion in
+						client.thirdPartyConnections.pairThirdPartyConnection(type: .garmintraining, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+							if case .success(let r) = result, let url = URL(string: r) {
+								DispatchQueue.main.async {
+									if UIApplication.shared.canOpenURL(url) {
+										UIApplication.shared.open(url)
+									}
+								}
+							}
+							completion(result)
+						}
+					}
                     EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
                         client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
                     }
@@ -453,15 +465,15 @@ struct ContentView: View {
 					EndpointLink<Bool>("Has Strava Connection") { client, completion in
 						client.thirdPartyConnections.hasThirdPartyToken(type: .strava, completion: completion)
 					}
-                    EndpointLink<Bool>("Remove Wahoo Connection") { client, completion in
+					EndpointLink<Bool>("Has Garmin Training Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .garmintraining, completion: completion)
+					}
+                    EndpointLink<Bool>("Remove All Connectiona") { client, completion in
                         client.thirdPartyConnections.removeThirdPartyToken(type: .wahoo, completion: completion)
-                    }
-					EndpointLink<Bool>("Remove Garmin Connection") { client, completion in
 						client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
-					}
-					EndpointLink<Bool>("Remove Strava Connection") { client, completion in
 						client.thirdPartyConnections.removeThirdPartyToken(type: .strava, completion: completion)
-					}
+						client.thirdPartyConnections.removeThirdPartyToken(type: .garmintraining, completion: completion)
+                    }
 				}
 				Section(header: Text("Push Registration")) {
                     EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
