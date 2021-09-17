@@ -24,7 +24,10 @@ struct ConfigurationView: View {
 	
 	@State var keyValueStore: KeyValueStore = .shared
 	
-	@State var boundPassword: Password = Password("")
+	@State var boundClientId: String
+	@State var boundSecret: String
+	@State var boundPassword = Password("")
+	@State var boundUserAgent: String
 
 	@Environment(\.presentationMode) var presentationMode
 
@@ -41,20 +44,18 @@ struct ConfigurationView: View {
 	init(apiClient: Zone5 = .shared, keyValueStore: KeyValueStore = .shared, password: Password) {
 		self.apiClient = apiClient
 		self.userPassword = password
+		
+		_boundClientId = State(initialValue: keyValueStore.clientID ?? "")
+		_boundSecret = State(initialValue: keyValueStore.clientSecret ?? "")
+		_boundUserAgent = State(initialValue: keyValueStore.userAgent ?? "")
+		
 		self.keyValueStore = keyValueStore
 	}
 
 	var body: some View {
 		NavigationView {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				Picker("Boop", selection: $pickerIndex) {
-					Text("OAuth Client").tag(0)
-					Text("GIGYA").tag(1)
-				}
-				.pickerStyle(SegmentedPickerStyle())
-				.padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
-				.background(Color(.systemGroupedBackground))
-
+				
 				Form {
 					Section(header: Text("Base URL"), footer: Text("The URL for the server the SDK should communicate with.")) {
 						TextField("Base URL", text: $keyValueStore.baseURLString)
@@ -74,14 +75,12 @@ struct ConfigurationView: View {
 					}
 					
 					Section(header: Text("User Agent"), footer: Text("String passed with User-Agent header (useful for testing getDeprecated)")) {
-						TextField("User Agent", text: $keyValueStore.userAgent)
+						TextField("User Agent", text: $boundUserAgent)
 					}
 
-					if self.pickerIndex == 0 {
-						Section(header: Text("Client Details"), footer: Text("These values are used to identify your application during user authentication.")) {
-							TextField("ID", text: $keyValueStore.clientID)
-							TextField("Secret", text: $keyValueStore.clientSecret)
-						}
+					Section(header: Text("Client Details"), footer: Text("These values are used to identify your application during user authentication.")) {
+						TextField("ID", text: $boundClientId)
+						TextField("Secret", text: $boundSecret)
 					}
 				}
 				.listStyle(GroupedListStyle())
@@ -118,24 +117,11 @@ struct ConfigurationView: View {
 			self.userPassword.password = boundPassword.password
 		}
 
-		// There are two ways to prepare your client for accessing the Zone5 API. If you are using Specialized Staging or Prod
-		// then no clientID or clientSecret are required as all auth goes through GIGYA.
-		//
-		// Otherwise, you'll need to first configure your application with a valid `clientID` and `clientSecret` before
-		// then authenticating the user to retrieve an access token.
-		if pickerIndex == 0 {
-			// First we'll configure our client using the `baseURL`, `clientID` and `clientSecret` entered via the UI.
-			// These values would normally be embedded in your application and thus hidden from the user, as they
-			// identify your application.
-			apiClient.configure(for: keyValueStore.baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, userAgent: keyValueStore.userAgent)
-			self.dismiss()
-		} else if pickerIndex == 1 {
-			apiClient.configure(for: keyValueStore.baseURL, userAgent: keyValueStore.userAgent)
-			self.dismiss()
-		}
-		else {
-			error = .invalidConfiguration
-		}
+		keyValueStore.clientSecret = boundSecret
+		keyValueStore.clientID = boundClientId
+		keyValueStore.userAgent = boundUserAgent
+		apiClient.configure(for: keyValueStore.baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, userAgent: keyValueStore.userAgent)
+		dismiss()
 	}
 
 	func dismiss() {

@@ -36,7 +36,7 @@ struct Request {
 		
 		// if there are queryParams, set them in the request. This is valid on all types.
 		if let queryParams = queryParams {
-			try request.url = queryParams.appendToURL(url)
+			try request.url = url.addingQueryParams(queryParams)
 		}
         
 		// if there are headers, add it to the request

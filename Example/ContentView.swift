@@ -49,17 +49,11 @@ struct ContentView: View {
         self.keyValueStore = keyValueStore
         apiClient.debugLogging = true
 
-        let baseURL = keyValueStore.baseURL
-        if !keyValueStore.clientID.isEmpty, !keyValueStore.clientSecret.isEmpty {
-            apiClient.configure(for: baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, accessToken: OAuthToken(token: keyValueStore.token, refresh: keyValueStore.refresh, tokenExp: keyValueStore.tokenExp, username: keyValueStore.userEmail))
-        }
-        else {
-            apiClient.configure(for: baseURL, accessToken: OAuthToken(token: keyValueStore.token, refresh: keyValueStore.refresh, tokenExp: keyValueStore.tokenExp))
-        }
-
+		apiClient.configure(for: keyValueStore.baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, userAgent: keyValueStore.userAgent, accessToken: keyValueStore.oauthToken)
+		
         apiClient.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: apiClient, queue: nil) { notification in
-            let token = notification.userInfo?["accessToken"] as? AccessToken
-            keyValueStore.updateToken(token)
+            let token = notification.userInfo?["accessToken"] as? OAuthToken
+            keyValueStore.oauthToken = token
         }
     }
 

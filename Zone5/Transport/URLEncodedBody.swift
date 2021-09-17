@@ -31,19 +31,6 @@ public struct URLEncodedBody: RequestBody, CustomStringConvertible, ExpressibleB
 	public func get(_ name: String) -> String? {
 		return queryItems.first(where: {$0.name == name})?.value
 	}
-	
-	internal func appendToURL(_ url: URL) throws -> URL? {
-		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-			z5Log("Request URL could not be converted to URLComponents: \(url)")
-			throw Zone5.Error.failedEncodingRequestBody
-		}
-
-		components.queryItems = queryItems
-		// URLComponents does not encode "+". Need to do manually
-		components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-		return components.url
-	}
-
 
 	// MARK Custom string convertible
 
@@ -99,4 +86,18 @@ public struct URLEncodedBody: RequestBody, CustomStringConvertible, ExpressibleB
 		case requiresLossyConversion
 	}
 
+}
+
+extension URL {
+	internal func addingQueryParams(_ query: URLEncodedBody) throws -> URL? {
+		guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else {
+			z5Log("Request URL could not be converted to URLComponents: \(self)")
+			throw Zone5.Error.failedEncodingRequestBody
+		}
+
+		components.queryItems = query.queryItems
+		// URLComponents does not encode "+". Need to do manually
+		components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+		return components.url
+	}
 }
