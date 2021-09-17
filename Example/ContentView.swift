@@ -407,8 +407,8 @@ struct ContentView: View {
                         }
                     }
                 }
-                Section(header: Text("Third Party Connections"), footer: Text("")) {
-                    EndpointLink<String>("Pair Wahoo Connection") { client, completion in
+				Section(header: Text("Third Party Connections"), footer: Text("")) {
+					EndpointLink<String>("Pair Wahoo Connection") { client, completion in
 						client.thirdPartyConnections.pairThirdPartyConnection(type: .wahoo, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
 							if case .success(let r) = result, let url = URL(string: r) {
 								DispatchQueue.main.async {
@@ -419,7 +419,7 @@ struct ContentView: View {
 							}
 							completion(result)
 						}
-                    }
+					}
 					EndpointLink<String>("Pair Garmin Connection") { client, completion in
 						client.thirdPartyConnections.pairThirdPartyConnection(type: .garminconnect, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
 							if case .success(let r) = result, let url = URL(string: r) {
@@ -456,9 +456,9 @@ struct ContentView: View {
 							completion(result)
 						}
 					}
-                    EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
-                        client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
-                    }
+					EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
+					}
 					EndpointLink<Bool>("Has Garmin Connection") { client, completion in
 						client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
 					}
@@ -468,22 +468,22 @@ struct ContentView: View {
 					EndpointLink<Bool>("Has Garmin Training Connection") { client, completion in
 						client.thirdPartyConnections.hasThirdPartyToken(type: .garmintraining, completion: completion)
 					}
-                    EndpointLink<Bool>("Remove All Connectiona") { client, completion in
-                        client.thirdPartyConnections.removeThirdPartyToken(type: .wahoo, completion: completion)
+					EndpointLink<Bool>("Remove All Connectiona") { client, completion in
+						client.thirdPartyConnections.removeThirdPartyToken(type: .wahoo, completion: completion)
 						client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
 						client.thirdPartyConnections.removeThirdPartyToken(type: .strava, completion: completion)
 						client.thirdPartyConnections.removeThirdPartyToken(type: .garmintraining, completion: completion)
-                    }
+					}
 				}
 				Section(header: Text("Push Registration")) {
-                    EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
-                        let rego = PushRegistration(token: "1234", platform: "strava", deviceId: "gwjh4")
-                        client.thirdPartyConnections.registerDeviceWithThirdParty(registration: rego, completion: completion)
-                    }
-                    EndpointLink<Zone5.VoidReply>("Deregister Device") { client, completion in
-                        client.thirdPartyConnections.deregisterDeviceWithThirdParty(token: "1234", completion: completion)
-                    }
-                }
+					EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
+						let rego = PushRegistration(token: "1234", platform: "strava", deviceId: "gwjh4")
+						client.thirdPartyConnections.registerDeviceWithThirdParty(registration: rego, completion: completion)
+					}
+					EndpointLink<Zone5.VoidReply>("Deregister Device") { client, completion in
+						client.thirdPartyConnections.deregisterDeviceWithThirdParty(token: "1234", completion: completion)
+					}
+				}
                 Section(header: Text("User Agent Queries")) {
                     EndpointLink<UpgradeAvailableResponse>("Is upgrade available") { client, completion in
                         client.userAgents.getDeprecated(completion: completion)
