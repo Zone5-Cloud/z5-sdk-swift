@@ -13,6 +13,28 @@ class ThirdPartyViewTests: XCTestCase {
 	
 	let pushRegistration1 = PushRegistration(token: "12345", platform: "ios", deviceId: "johhny")
 
+	func testPairThirdParty() {
+		let tests: [(type: UserConnectionType, redirect: URL, expectedResult: Zone5.Result<String>)] = [
+			(type: .wahoo, redirect: URL(string: "https://redirect.com")!, expectedResult: .success("https://thisisaurl.com")),
+			(type: .strava, redirect: URL(string: "nativeapp://native.com")!, expectedResult: .success("https://connect.specialized.com"))
+		]
+		
+		var expectations: [XCTestExpectation] = []
+		execute(with: tests) { client, _, urlSession, test in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/rest/users/connections/service/\(test.type.connectionName)")
+				return .success((try? test.expectedResult.get()) ?? "")
+			}
+
+			let expectation = ResultExpectation(for: test.expectedResult)
+			expectations.append(expectation)
+
+			_ = client.thirdPartyConnections.pairThirdPartyConnection(type: test.type, redirect: test.redirect, completion: expectation.fulfill)
+		}
+
+		wait(for: expectations, timeout: 5)
+	}
+	
     func testSetThirdPartyToken() {
 		var tests: [(type: UserConnectionType, parameters: URLEncodedBody, expectedResult: Zone5.Result<Zone5.VoidReply>)] = []
 		
