@@ -57,9 +57,9 @@ public class ThirdPartyConnectionsView: APIView {
 	
 	/// pair a connection for the current user for the given 3rd party type
 	/// - Parameters
-	/// - type: third party to connect to. e.g. garmin | wahoo | strava
+	/// - type: third party to connect to. e.g. garminconnect | garmintraining | wahoo | strava
 	/// - redirect: the URL that the user will be redirected back to on completion of third party authentication
-	/// - Returns a reponse containing a thrid party authentication URL. Navigate to this link so the user can authenticate with the third party. On completion the user will be redirected to the passed in redirect URL
+	/// - Returns a reponse containing a thrid party authentication URL. Open this link in a browser so the user can authenticate with the third party. On completion the user will be redirected back to the passed in redirect URL
 	@discardableResult
 	public func pairThirdPartyConnection(type: UserConnectionType, redirect: URL, completion: @escaping Zone5.ResultHandler<String>) -> PendingRequest? {
 		let endpoint = Endpoints.connectService.replacingTokens(["connectionType": type.connectionName])
