@@ -25,6 +25,7 @@
 		0F96094D25672265009D8448 /* UserWorkoutResultTurboExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F96094C25672265009D8448 /* UserWorkoutResultTurboExt.swift */; };
 		0F9D70FE2445723E0053C6FD /* MetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9D70FD2445723E0053C6FD /* MetricsView.swift */; };
 		0F9D710224458EBD0053C6FD /* MetricsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9D710124458EBD0053C6FD /* MetricsViewTests.swift */; };
+		0F9F702226F4732800AEFDC9 /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9F702126F4732800AEFDC9 /* TermsView.swift */; };
 		0FA1F1B6242AECB5005AD490 /* UsersPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FA1F1B5242AECB5005AD490 /* UsersPreferences.swift */; };
 		0FAA75502407350E00CB3C73 /* RegisterUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FAA754F2407350E00CB3C73 /* RegisterUser.swift */; };
 		0FAA75542407374B00CB3C73 /* UserThresholdHeart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FAA75532407374B00CB3C73 /* UserThresholdHeart.swift */; };
@@ -212,6 +213,7 @@
 		0F96094C25672265009D8448 /* UserWorkoutResultTurboExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserWorkoutResultTurboExt.swift; sourceTree = "<group>"; };
 		0F9D70FD2445723E0053C6FD /* MetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsView.swift; sourceTree = "<group>"; };
 		0F9D710124458EBD0053C6FD /* MetricsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsViewTests.swift; sourceTree = "<group>"; };
+		0F9F702126F4732800AEFDC9 /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
 		0FA1F1B5242AECB5005AD490 /* UsersPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersPreferences.swift; sourceTree = "<group>"; };
 		0FAA754F2407350E00CB3C73 /* RegisterUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterUser.swift; sourceTree = "<group>"; };
 		0FAA75532407374B00CB3C73 /* UserThresholdHeart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserThresholdHeart.swift; sourceTree = "<group>"; };
@@ -510,6 +512,7 @@
 				0F7C8E63256CCB02005CF025 /* PaymentsView.swift */,
 				0FE9E2D5257DDCFE0036B44A /* UserAgentView.swift */,
 				0FE9E2F1257F1FB10036B44A /* ExternalView.swift */,
+				0F9F702126F4732800AEFDC9 /* TermsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -967,6 +970,7 @@
 				0F903484240692AA00051277 /* VoidReply.swift in Sources */,
 				A10AB23F237E147E00EBAC66 /* UserWorkoutResultRating.swift in Sources */,
 				0FAA75542407374B00CB3C73 /* UserThresholdHeart.swift in Sources */,
+				0F9F702226F4732800AEFDC9 /* TermsView.swift in Sources */,
 				A182D1D32372AB0F00112501 /* ActivitiesView.swift in Sources */,
 				80D51FDA25378E4D000BEC54 /* ThirdPartyConnectionsView.swift in Sources */,
 				A10AB213237D0B5100EBAC66 /* UserHeadunit.swift in Sources */,
