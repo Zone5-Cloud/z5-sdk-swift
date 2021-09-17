@@ -10,6 +10,7 @@ public class UsersView: APIView {
 		case preRegisterUser = "/rest/auth/preregister"
 		case login = "/rest/auth/login"
 		case logout = "/rest/auth/logout"
+		case requiredTerms = "/rest/auth/terms/required"
 		case exists = "/rest/auth/exists"
 		case passwordReset = "/rest/auth/reset"
 		case changePassword = "/rest/auth/set/password"
@@ -134,6 +135,11 @@ public class UsersView: APIView {
 				zone5.accessToken = token
 			}
 		}
+	}
+	
+	/// Get the list of required terms for the currently configured clientID. This is an unauthenticated endpoint and can be called before logging in.
+	public func getRequiredTerms(completion: @escaping Zone5.ResultHandler<[TermsAndConditions]>) -> PendingRequest? {
+		return get(Endpoints.requiredTerms, with: completion)
 	}
 
 	/// Set the given user's preferences, e.g. metric/imperial units
