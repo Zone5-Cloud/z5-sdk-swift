@@ -403,52 +403,16 @@ struct ContentView: View {
                 }
 				Section(header: Text("Third Party Connections"), footer: Text("")) {
 					EndpointLink<String>("Pair Wahoo Connection") { client, completion in
-						client.thirdPartyConnections.pairThirdPartyConnection(type: .wahoo, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
-							if case .success(let r) = result, let url = URL(string: r) {
-								DispatchQueue.main.async {
-									if UIApplication.shared.canOpenURL(url) {
-										UIApplication.shared.open(url)
-									}
-								}
-							}
-							completion(result)
-						}
+						pairThirdParty(type: .wahoo, client: client, completion)
 					}
 					EndpointLink<String>("Pair Garmin Connection") { client, completion in
-						client.thirdPartyConnections.pairThirdPartyConnection(type: .garminconnect, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
-							if case .success(let r) = result, let url = URL(string: r) {
-								DispatchQueue.main.async {
-									if UIApplication.shared.canOpenURL(url) {
-										UIApplication.shared.open(url)
-									}
-								}
-							}
-							completion(result)
-						}
+						pairThirdParty(type: .garminconnect, client: client, completion)
 					}
 					EndpointLink<String>("Pair Strava Connection") { client, completion in
-						client.thirdPartyConnections.pairThirdPartyConnection(type: .strava, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
-							if case .success(let r) = result, let url = URL(string: r) {
-								DispatchQueue.main.async {
-									if UIApplication.shared.canOpenURL(url) {
-										UIApplication.shared.open(url)
-									}
-								}
-							}
-							completion(result)
-						}
+						pairThirdParty(type: .strava, client: client, completion)
 					}
 					EndpointLink<String>("Pair Garmin TrainingConnection") { client, completion in
-						client.thirdPartyConnections.pairThirdPartyConnection(type: .garmintraining, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
-							if case .success(let r) = result, let url = URL(string: r) {
-								DispatchQueue.main.async {
-									if UIApplication.shared.canOpenURL(url) {
-										UIApplication.shared.open(url)
-									}
-								}
-							}
-							completion(result)
-						}
+						pairThirdParty(type: .garmintraining, client: client, completion)
 					}
 					EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
 						client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
@@ -506,6 +470,19 @@ struct ContentView: View {
         }
     }
 
+	private func pairThirdParty(type: UserConnectionType, client: Zone5, _ completion: @escaping (Result<String, Zone5.Error>) -> Void) {
+		client.thirdPartyConnections.pairThirdPartyConnection(type: type, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+			if case .success(let r) = result, let url = URL(string: r) {
+				DispatchQueue.main.async {
+					if UIApplication.shared.canOpenURL(url) {
+						UIApplication.shared.open(url)
+					}
+				}
+			}
+			completion(result)
+		}
+	}
+	
     private func checkUploadStatus(_ client: Zone5, index: DataFileUploadIndex, completion: @escaping (_ result: Result<DataFileUploadIndex, Zone5.Error>) -> Void) {
         completion(.success(index))
 
