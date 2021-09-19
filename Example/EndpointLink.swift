@@ -9,7 +9,7 @@
 import SwiftUI
 import Zone5
 
-protocol AnyParameter: class {
+protocol AnyParameter: AnyObject {
 
 }
 

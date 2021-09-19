@@ -49,17 +49,11 @@ struct ContentView: View {
         self.keyValueStore = keyValueStore
         apiClient.debugLogging = true
 
-        let baseURL = keyValueStore.baseURL
-        if !keyValueStore.clientID.isEmpty, !keyValueStore.clientSecret.isEmpty {
-            apiClient.configure(for: baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, accessToken: OAuthToken(token: keyValueStore.token, refresh: keyValueStore.refresh, tokenExp: keyValueStore.tokenExp, username: keyValueStore.userEmail))
-        }
-        else {
-            apiClient.configure(for: baseURL, accessToken: OAuthToken(token: keyValueStore.token, refresh: keyValueStore.refresh, tokenExp: keyValueStore.tokenExp))
-        }
-
+		apiClient.configure(for: keyValueStore.baseURL, clientID: keyValueStore.clientID, clientSecret: keyValueStore.clientSecret, userAgent: keyValueStore.userAgent, accessToken: keyValueStore.oauthToken)
+		
         apiClient.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: apiClient, queue: nil) { notification in
-            let token = notification.userInfo?["accessToken"] as? AccessToken
-            keyValueStore.updateToken(token)
+            let token = notification.userInfo?["accessToken"] as? OAuthToken
+            keyValueStore.oauthToken = token
         }
     }
 
@@ -407,27 +401,47 @@ struct ContentView: View {
                         }
                     }
                 }
-                Section(header: Text("Third Party Connections"), footer: Text("")) {
-                    EndpointLink<ThirdPartyInitializeResponse>("Init GC Connection") { client, completion in
-                        client.thirdPartyConnections.initializeThirdPartyConnection(type: .garminconnect, completion: completion)
-                    }
-                    EndpointLink<Bool>("Has GC Connection") { client, completion in
-                        client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
-                    }
-                    EndpointLink<Zone5.VoidReply>("Set GC Connection") { client, completion in
-                        client.thirdPartyConnections.setThirdPartyToken(type: .garminconnect, parameters: ["oau thToken": "1234", "oauthVerifier": "1234"], completion: completion)
-                    }
-                    EndpointLink<Bool>("Remove GC Connection") { client, completion in
-                        client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
-                    }
-                    EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
-                        let rego = PushRegistration(token: "1234", platform: "strava", deviceId: "gwjh4")
-                        client.thirdPartyConnections.registerDeviceWithThirdParty(registration: rego, completion: completion)
-                    }
-                    EndpointLink<Zone5.VoidReply>("Deregister Device") { client, completion in
-                        client.thirdPartyConnections.deregisterDeviceWithThirdParty(token: "1234", completion: completion)
-                    }
-                }
+				Section(header: Text("Third Party Connections"), footer: Text("")) {
+					EndpointLink<String>("Pair Wahoo Connection") { client, completion in
+						pairThirdParty(type: .wahoo, client: client, completion)
+					}
+					EndpointLink<String>("Pair Garmin Connection") { client, completion in
+						pairThirdParty(type: .garminconnect, client: client, completion)
+					}
+					EndpointLink<String>("Pair Strava Connection") { client, completion in
+						pairThirdParty(type: .strava, client: client, completion)
+					}
+					EndpointLink<String>("Pair Garmin TrainingConnection") { client, completion in
+						pairThirdParty(type: .garmintraining, client: client, completion)
+					}
+					EndpointLink<Bool>("Has Wahoo Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .wahoo, completion: completion)
+					}
+					EndpointLink<Bool>("Has Garmin Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .garminconnect, completion: completion)
+					}
+					EndpointLink<Bool>("Has Strava Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .strava, completion: completion)
+					}
+					EndpointLink<Bool>("Has Garmin Training Connection") { client, completion in
+						client.thirdPartyConnections.hasThirdPartyToken(type: .garmintraining, completion: completion)
+					}
+					EndpointLink<Bool>("Remove All Connectiona") { client, completion in
+						client.thirdPartyConnections.removeThirdPartyToken(type: .wahoo, completion: completion)
+						client.thirdPartyConnections.removeThirdPartyToken(type: .garminconnect, completion: completion)
+						client.thirdPartyConnections.removeThirdPartyToken(type: .strava, completion: completion)
+						client.thirdPartyConnections.removeThirdPartyToken(type: .garmintraining, completion: completion)
+					}
+				}
+				Section(header: Text("Push Registration")) {
+					EndpointLink<PushRegistrationResponse>("Register Device") { client, completion in
+						let rego = PushRegistration(token: "1234", platform: "strava", deviceId: "gwjh4")
+						client.thirdPartyConnections.registerDeviceWithThirdParty(registration: rego, completion: completion)
+					}
+					EndpointLink<Zone5.VoidReply>("Deregister Device") { client, completion in
+						client.thirdPartyConnections.deregisterDeviceWithThirdParty(token: "1234", completion: completion)
+					}
+				}
                 Section(header: Text("User Agent Queries")) {
                     EndpointLink<UpgradeAvailableResponse>("Is upgrade available") { client, completion in
                         client.userAgents.getDeprecated(completion: completion)
@@ -450,12 +464,25 @@ struct ContentView: View {
             ConfigurationView(apiClient: self.apiClient, keyValueStore: self.keyValueStore, password: self.password)
         }
         .onAppear {
-            if !self.apiClient.isConfigured || self.password.password.isEmpty {
+            if !self.apiClient.isConfigured  {
                 self.displayConfiguration = true
             }
         }
     }
 
+	private func pairThirdParty(type: UserConnectionType, client: Zone5, _ completion: @escaping (Result<String, Zone5.Error>) -> Void) {
+		client.thirdPartyConnections.pairThirdPartyConnection(type: type, redirect: URL(string: "zone5Example://zone5Example.zone5cloud.com")!) { result in
+			if case .success(let r) = result, let url = URL(string: r) {
+				DispatchQueue.main.async {
+					if UIApplication.shared.canOpenURL(url) {
+						UIApplication.shared.open(url)
+					}
+				}
+			}
+			completion(result)
+		}
+	}
+	
     private func checkUploadStatus(_ client: Zone5, index: DataFileUploadIndex, completion: @escaping (_ result: Result<DataFileUploadIndex, Zone5.Error>) -> Void) {
         completion(.success(index))
 
