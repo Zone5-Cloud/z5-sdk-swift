@@ -43,8 +43,8 @@ public class ThirdPartyConnectionsView: APIView {
 		return post(endpoint, body: EmptyBody(), with: completion)
 	}
 
-	/// @available(*, deprecated, message: "Use `pairThirdPartyConnection(type:redirect:completion)` instead.")
 	@discardableResult
+	@available(*, deprecated, message: "Use `pairThirdPartyConnection(type:redirect:completion)` instead.")
 	public func setThirdPartyToken(type: UserConnectionType, parameters: URLEncodedBody, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
 		let endpoint = Endpoints.confirmConnection.replacingTokens(["connectionType": type.connectionName])
 		
