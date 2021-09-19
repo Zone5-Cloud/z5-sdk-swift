@@ -36,16 +36,7 @@ struct Request {
 		
 		// if there are queryParams, set them in the request. This is valid on all types.
 		if let queryParams = queryParams {
-			guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-				z5Log("Request URL could not be converted to URLComponents: \(url)")
-				throw Zone5.Error.failedEncodingRequestBody
-			}
-
-			components.queryItems = queryParams.queryItems
-			// URLComponents does not encode "+". Need to do manually
-			components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
-			request.url = components.url
-	
+			try request.url = url.addingQueryParams(queryParams)
 		}
         
 		// if there are headers, add it to the request
