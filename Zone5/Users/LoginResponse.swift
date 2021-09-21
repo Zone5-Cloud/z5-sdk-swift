@@ -38,7 +38,9 @@ public struct LoginResponse: Codable {
 	
 	public var fs: String? // featureset
 	
-	public var updatedTerms: [UpdatedTerms]?
+	public var updatedTerms: [UpdatedTerms]? // List of terms (previously accepted) that have been updated and need re-acceptance
+	
+	public var needChangePassword: Bool? // flag to indicate that the user needs to change their password
 	
 	public init() { }
 }

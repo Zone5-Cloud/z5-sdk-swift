@@ -43,6 +43,7 @@ struct ContentView: View {
     @State var me: User = User() // currently logged in user
     @State var lastRegisteredId: Int? // last registered user, this is also who you can delete
     @State var isEbike: Bool = false
+	@State var termsList: [TermsAndConditions] = []
 
     init(apiClient: Zone5 = .shared, keyValueStore: KeyValueStore = .shared) {
         self.apiClient = apiClient
@@ -55,6 +56,10 @@ struct ContentView: View {
             let token = notification.userInfo?["accessToken"] as? OAuthToken
             keyValueStore.oauthToken = token
         }
+		
+		apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: apiClient, queue: nil) { notification in
+			print("There are updated terms that can be accepted")
+		}
     }
 
     var body: some View {
@@ -65,6 +70,130 @@ struct ContentView: View {
                         self.displayConfiguration = true
                     })
                 }
+				Section(header: Text("Register/Login Flow")) {
+					EndpointLink<Bool>("Check User Exists") { client, completion in
+						client.users.isEmailRegistered(email: keyValueStore.userEmail, completion: completion)
+					}
+					EndpointLink<[TermsAndConditions]>("Get Required Terms") { client, completion in
+						client.terms.requiredTerms { result in
+							if case .success(let terms) = result {
+								termsList = terms
+							}
+							completion(result)
+						}
+					}
+					EndpointLink<URL>("Download Terms") { client, completion in
+						client.terms.downloadTerms(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail")) { result in
+							if case .success(let url) = result {
+								// need to move it because it will be deleted
+								let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("lastDownload")
+								try? FileManager.default.removeItem(at: file) // only ever save last 1 so don't consume disk space
+								try? FileManager.default.copyItem(at: url, to: file)
+								DispatchQueue.main.async {
+									if UIApplication.shared.canOpenURL(file) {
+										UIApplication.shared.open(file)
+									}
+								}
+							}
+							
+							completion(result)
+						}
+					}
+					EndpointLink<Zone5.VoidReply>("Accept Updated Terms (authenticated)") { client, completion in
+						client.terms.acceptTerms(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail"), completion: completion)
+					}
+					EndpointLink<User>("Register New User") { client, completion in
+						let email = keyValueStore.userEmail
+						let password = self.password.password
+						let firstname = "test"
+						let lastname = "person"
+						if !email.isEmpty, !password.isEmpty {
+							var registerUser = RegisterUser(email: email, password: password, firstname: firstname, lastname: lastname, accept: termsList.map { (t) -> String in return t.termsId })
+							registerUser.units = UnitMeasurement.imperial
+							client.users.register(user: registerUser) { value in
+								switch value {
+								case .success(let user):
+									if let id = user.id, id > 0 {
+										self.lastRegisteredId = id
+									}
+
+								case .failure(_):
+									print("failed to create new user")
+								}
+
+								completion(value)
+							}
+						} else {
+							completion(.failure(.invalidConfiguration))
+						}
+					}
+					EndpointLink<LoginResponse>("Login") { client, completion in
+						let userPassword: String = self.password.password
+						client.users.login(email: keyValueStore.userEmail, password: userPassword, clientID: self.apiClient.clientID, clientSecret: self.apiClient.clientSecret, accept: termsList.map { (t) -> String in return t.termsId }) { value in
+							switch(value) {
+							case .success(let response):
+								if let user = response.user, let id = user.id, id > 0 {
+									self.me.id = id
+								}
+							case .failure(_):
+								print("failed to log in")
+							}
+							completion(value)
+						}
+					}
+					EndpointLink("Logout") { client, completion in
+						client.users.logout(completion: completion)
+					}
+					EndpointLink<Zone5.VoidReply>("Resend email confirmation") { client, completion in
+						let email = keyValueStore.userEmail
+						if !email.isEmpty {
+							client.users.reconfirmEmail(email: email, completion: completion)
+						} else {
+							completion(.failure(.invalidConfiguration))
+						}
+					}
+					EndpointLink<String>("Get Password Complexity Regex") { client, completion in
+						client.users.passwordComplexity(completion: completion)
+					}
+					EndpointLink<Zone5.VoidReply>("Delete last registered Account (if any)") { client, completion in
+						if let id = self.lastRegisteredId {
+							client.users.deleteAccount(userID: id, completion: completion)
+						} else {
+							completion(.failure(.unknown))
+						}
+					}
+					
+				}
+				
+				Section(header: Text("Auth"), footer: Text("Note that Register New User may requires a second auth step of going to the email for the user and clicking confirm email - depends on Cognito Client Key configuration")) {
+					EndpointLink<Bool>("Reset Password") { client, completion in
+						client.users.resetPassword(email: keyValueStore.userEmail, completion: completion)
+					}
+					EndpointLink<Zone5.VoidReply>("Change password") { client, completion in
+						let oldpass = self.me.password ?? self.password.password
+						let newpass = "MyNewP@ssword\(Date().milliseconds)"
+						client.users.changePassword(oldPassword: oldpass, newPassword: newpass) { result in
+							switch(result) {
+								case .success(let r):
+									self.password.password = newpass
+									self.me.password = newpass
+									completion(.success(r))
+								case .failure(let error):
+									completion(.failure(error))
+							}
+						}
+					}
+					EndpointLink<OAuthToken>("Refresh OAuth Token") { client, completion in
+						client.oAuth.refreshAccessToken(accept: termsList.map { (t) -> String in return t.termsId }, completion: completion)
+					}
+					EndpointLink<OAuthToken>("Get Access Token") { client, completion in
+						client.oAuth.accessToken(username: keyValueStore.userEmail, password: self.password.password, completion: completion)
+					}
+					EndpointLink<OAuthToken>("Get Adhoc Access Token") { client, completion in
+						client.oAuth.adhocAccessToken(for: "wahooride", completion: completion)
+					}
+				}
+				
                 Section(header: Text("Users")) {
                     EndpointLink<UsersPreferences>("Get user preferences") { client, completion in
                         if let id = self.me.id {
@@ -95,9 +224,6 @@ struct ContentView: View {
                             completion(.failure(.invalidConfiguration))
                         }
                     }
-                    EndpointLink<Bool>("Check User Exists") { client, completion in
-                        client.users.isEmailRegistered(email: keyValueStore.userEmail, completion: completion)
-                    }
                     EndpointLink<User>("Me") { client, completion in
                         client.users.me { value in
                             switch value {
@@ -124,101 +250,8 @@ struct ContentView: View {
                     EndpointLink<[String:Bool]>("Check Email Status") { client, completion in
                         client.users.getEmailValidationStatus(email: keyValueStore.userEmail, completion: completion)
                     }
-                    EndpointLink<User>("Register New User") { client, completion in
-                        let email = keyValueStore.userEmail
-                        let password = self.password.password
-                        let firstname = "test"
-                        let lastname = "person"
-                        if !email.isEmpty, !password.isEmpty {
-                            var registerUser = RegisterUser(email: email, password: password, firstname: firstname, lastname: lastname)
-                            registerUser.units = UnitMeasurement.imperial
-                            client.users.register(user: registerUser) { value in
-                                switch value {
-                                case .success(let user):
-                                    if let id = user.id, id > 0 {
-                                        self.lastRegisteredId = id
-                                    }
-
-                                case .failure(_):
-                                    print("failed to create new user")
-                                }
-
-                                completion(value)
-                            }
-                        } else {
-                            completion(.failure(.invalidConfiguration))
-                        }
-                    }
-                    EndpointLink<Zone5.VoidReply>("Delete last registered Account (if any)") { client, completion in
-                        if let id = self.lastRegisteredId {
-                            client.users.deleteAccount(userID: id, completion: completion)
-                        } else {
-                            completion(.failure(.unknown))
-                        }
-                    }
                 }
-                Section(header: Text("Auth"), footer: Text("Note that Register New User may requires a second auth step of going to the email for the user and clicking confirm email - depends on Cognito Client Key configuration")) {
-                    EndpointLink<Bool>("Reset Password") { client, completion in
-                        client.users.resetPassword(email: keyValueStore.userEmail, completion: completion)
-                    }
-                    EndpointLink<Zone5.VoidReply>("Change password") { client, completion in
-                        if let oldpass = self.me.password {
-                            let newpass = "MyNewP@ssword\(Date().milliseconds)"
-                            client.users.changePassword(oldPassword: oldpass, newPassword: newpass) { result in
-                                switch(result) {
-                                case .success(let r):
-                                    self.password.password = newpass
-                                    self.me.password = newpass
-                                    completion(.success(r))
-                                case .failure(let error):
-                                    completion(.failure(error))
-                                }
-                            }
-                        } else {
-                            completion(.failure(.invalidConfiguration))
-                        }
-                    }
-                    EndpointLink<OAuthTokenAlt>("Refresh Gigya Token") { client, completion in
-                        client.users.refreshToken(completion: completion)
-                    }
-                    EndpointLink<OAuthToken>("Refresh Cognito Token") { client, completion in
-                        client.oAuth.refreshAccessToken(username: keyValueStore.userEmail, completion: completion)
-                    }
-                    EndpointLink<LoginResponse>("Login") { client, completion in
-                        let userPassword: String = self.password.password
-                        client.users.login(email: keyValueStore.userEmail, password: userPassword, clientID: self.apiClient.clientID, clientSecret: self.apiClient.clientSecret, accept: ["Specialized_Terms_Apps", "Specialized_Terms"]) { value in
-                            switch(value) {
-                            case .success(let response):
-                                if let user = response.user, let id = user.id, id > 0 {
-                                    self.me.id = id
-                                }
-                            case .failure(_):
-                                print("failed to log in")
-                            }
-                            completion(value)
-                        }
-                    }
-                    EndpointLink("Logout") { client, completion in
-                        client.users.logout(completion: completion)
-                    }
-                    EndpointLink<OAuthToken>("Get Access Token") { client, completion in
-                        client.oAuth.accessToken(username: keyValueStore.userEmail, password: self.password.password, completion: completion)
-                    }
-                    EndpointLink<OAuthToken>("Get Adhoc Access Token") { client, completion in
-                        client.oAuth.adhocAccessToken(for: "wahooride", completion: completion)
-                    }
-                    EndpointLink<Zone5.VoidReply>("Resend email confirmation") { client, completion in
-                        let email = keyValueStore.userEmail
-                        if !email.isEmpty {
-                            client.users.reconfirmEmail(email: email, completion: completion)
-                        } else {
-                            completion(.failure(.invalidConfiguration))
-                        }
-                    }
-                    EndpointLink<String>("Get Password Complexity Regex") { client, completion in
-                        client.users.passwordComplexity(completion: completion)
-                    }
-                }
+				
                 Section(header: Text("Activities"), footer: Text("Attempting to view \"Next Page\" before performing a legitimate search request—such as by opening the \"Last 30 days\" screen—will return an empty result.")) {
                     EndpointLink<SearchResult<UserWorkoutResult>>("Last 3 days") { client, completion in
                         var criteria = UserWorkoutFileSearch()

@@ -7,6 +7,8 @@ public protocol AccessToken: Codable, CustomStringConvertible, CustomDebugString
 	var rawValue: String { get }
 	var tokenExp: Int? { get set }
 	var username: String? { get set }
+	var refreshToken: String? { get }
+	var accessToken: String { get }
 	
 	func equals(_ other: AccessToken?) -> Bool
 }

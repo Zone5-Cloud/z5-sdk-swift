@@ -8,28 +8,45 @@
 
 import Foundation
 
-struct LoginRequest: JSONEncodedBody {
+/// body used in login and refresh endpoints
+internal struct LoginRequest: JSONEncodedBody {
 	var email: String
-	var password: String
+	var password: String?
+	var refreshToken: String?
 	let token: String = "true"
 	var clientID: String?
 	var clientSecret: String?
 	var accept: [String]?
+	var billingCountry: String?
 	
 	private enum CodingKeys: String, CodingKey {
 		case email = "username"
 		case password
+		case refreshToken = "refresh"
 		case token
 		case clientID = "clientId"
 		case clientSecret
-		case accept 
+		case accept
+		case billingCountry
 	}
 	
-	public init(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil) {
+	/// used  in login using a username and password
+	public init(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil) {
 		self.email = email
 		self.password = password
 		self.clientID = clientID
 		self.clientSecret = clientSecret
 		self.accept = accept
+		self.billingCountry = billingCountry
+	}
+	
+	/// used in refresh using username and refresh token
+	public init(email: String, refreshToken: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil) {
+		self.email = email
+		self.refreshToken = refreshToken
+		self.clientID = clientID
+		self.clientSecret = clientSecret
+		self.accept = accept
+		self.billingCountry = billingCountry
 	}
 }

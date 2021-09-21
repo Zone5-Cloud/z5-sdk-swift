@@ -45,54 +45,20 @@ class KeyValueStore {
 		}
 	}
 	
-	private var token: String? {
-		get { return userDefaults.string(forKey: "Zone5_token") }
-		set {
-			if let newValue = newValue, !newValue.isEmpty {
-				userDefaults.set(newValue, forKey: "Zone5_token")
-			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token")
-			}
-		}
-	}
-	
-	private var refresh: String? {
-		get { return userDefaults.string(forKey: "Zone5_token_refresh") }
-		set {
-			if let newValue = newValue, !newValue.isEmpty {
-				userDefaults.set(newValue, forKey: "Zone5_token_refresh")
-			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token_refresh")
-			}
-		}
-	}
-	
-	private var tokenExp: Int? {
-		get { return userDefaults.integer(forKey: "Zone5_token_expiry") }
-		set {
-			if let newValue = newValue, newValue > 0 {
-				userDefaults.set(newValue, forKey: "Zone5_token_expiry")
-			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token_expiry")
-			}
-		}
-	}
-	
 	var oauthToken: OAuthToken? {
 		get {
-			if let token = token, let tokenExp = tokenExp {
-				return OAuthToken(token: token, refresh: refresh, expiresIn: tokenExp, username: userEmail)
+			if let data = userDefaults.data(forKey: "Zone5_oauth_token"), let token = try? JSONDecoder().decode(OAuthToken.self, from: data) {
+				return token
+			} else {
+				return nil
 			}
-			
-			return nil
 		}
 		set {
-			token = newValue?.accessToken
-			refresh = newValue?.refreshToken
-			tokenExp = newValue?.tokenExp
+			if let newValue = newValue, !newValue.accessToken.isEmpty, let data = try? JSONEncoder().encode(newValue) {
+				userDefaults.set(data, forKey: "Zone5_oauth_token")
+			} else {
+				userDefaults.removeObject(forKey: "Zone5_oauth_token")
+			}
 		}
 	}
 	

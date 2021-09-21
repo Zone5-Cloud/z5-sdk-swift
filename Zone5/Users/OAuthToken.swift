@@ -14,13 +14,14 @@ import Foundation
 /// Cognito tokens will have refreshToken and expiresIn set
 public struct OAuthToken: Codable, Equatable, AccessToken {
 	/// String value of the OAuth token
-	public var accessToken: String
+	public let accessToken: String
 	public var refreshToken: String?
 	public var tokenType: String?
 	public var expiresIn: Int? // seconds til expiry
-	public var tokenExp: Int? // timestamp of expiry, ms since epoch
 	public var scope: String?
-	public var username: String?
+	
+	public var username: String? // attached locally from login response, not part of http oauth serialisation
+	public var tokenExp: Int? // timestamp of expiry, ms since epoch, from login response or derived from expiresIn, not part of http oauth serialisation
 	
 	public init(rawValue: String) {
 		accessToken = rawValue
@@ -80,10 +81,15 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 	// MARK: Codable
 
 	private enum CodingKeys: String, CodingKey {
+		// Standard OAuth token returned from server
 		case accessToken = "access_token"
 		case refreshToken = "refresh_token"
 		case tokenType = "token_type"
 		case expiresIn = "expires_in"
 		case scope = "scope"
+		
+		// to file serialisation for saving
+		case username = "username"
+		case tokenExp = "token_exp"
 	}
 }

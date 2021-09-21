@@ -13,7 +13,6 @@ public class UsersView: APIView {
 		case exists = "/rest/auth/exists"
 		case passwordReset = "/rest/auth/reset"
 		case changePassword = "/rest/auth/set/password"
-		case refreshToken = "/rest/auth/refresh"
 		case setPreferences = "/rest/users/set/UserPreferences"
 		case getPreferences = "/rest/users/prefs/{userID}"
 		case getEmailStatus = "/rest/auth/status"
@@ -54,26 +53,19 @@ public class UsersView: APIView {
 	
 	/// Login as a user and obtain a bearer token - clientId and clientSecret are not required in Specialized featureset
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
-	public func login(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, completion: @escaping Zone5.ResultHandler<LoginResponse>) {
-		guard let zone5 = zone5 else {
-			completion(.failure(.invalidConfiguration))
-			return
-		}
+	public func login(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping Zone5.ResultHandler<LoginResponse>) {
 		
-		// Some hosts require clientID and clientSecret. Others do not.
-		let body: JSONEncodedBody
-		if let clientID = clientID {
-			body = LoginRequest(email: email, password: password, clientID: clientID, clientSecret: clientSecret, accept: accept)
-		} else {
-			// requires clientID but it has not been provided. FAIL.
-			completion(.failure(.invalidConfiguration))
-			return
-		}
+		let body: JSONEncodedBody = LoginRequest(email: email, password: password, clientID: clientID ?? zone5?.clientID, clientSecret: clientSecret ?? zone5?.clientSecret, accept: accept, billingCountry: billingCountry)
         
-		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { result in
-		defer { completion(result) }
-			if case .success(let loginResponse) = result {
+		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { [weak self] result in
+			defer { completion(result) }
+			if case .success(let loginResponse) = result, let zone5 = self?.zone5 {
 				zone5.accessToken = OAuthToken(loginResponse: loginResponse)
+				if let updatedTerms = loginResponse.updatedTerms {
+					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: self, userInfo: [
+						"updatedTerms": updatedTerms
+					])
+				}
 			}
 		}
 	}
@@ -122,18 +114,6 @@ public class UsersView: APIView {
 	public func changePassword(oldPassword: String?, newPassword: String, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) {
 		let body = NewPassword(old: oldPassword, new: newPassword)
 		_ = post(Endpoints.changePassword, body: body, with: completion)
-	}
-	
-	/// Refresh a bearer token - get a new token if the current one is nearing expiry
-	public func refreshToken(completion: @escaping Zone5.ResultHandler<OAuthTokenAlt>) {
-		_ = get(Endpoints.refreshToken, parameters: nil, expectedType: OAuthTokenAlt.self) { [weak self] result in
-			defer { completion(result) }
-			
-			if let zone5 = self?.zone5, case .success(let token) = result {
-				// if we successfully refreshed, update the token
-				zone5.accessToken = token
-			}
-		}
 	}
 
 	/// Set the given user's preferences, e.g. metric/imperial units

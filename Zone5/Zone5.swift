@@ -14,6 +14,7 @@ final public class Zone5 {
 	internal static let specializedStagingServer: String = "api-sp-staging.todaysplan.com.au"
 	
 	public static let authTokenChangedNotification = Notification.Name("authTokenChangedNotification")
+	public static let updatedTermsNotification = Notification.Name("updatedTermsNotification")
 	
 	init(httpClient: Zone5HTTPClient = .init()) {
 		self.httpClient = httpClient
@@ -165,6 +166,11 @@ final public class Zone5 {
 		return PaymentsView(zone5: self)
 	}()
 	
+	/// A collection of API endpoints related to Terms and Conditions
+	public lazy var terms: TermsView = {
+		return TermsView(zone5: self)
+	}()
+	
 	/// A collection of functions to call API endpoints to a server external to Zone5
 	public lazy var external: ExternalView = {
 		return ExternalView(zone5: self)
@@ -234,10 +240,15 @@ final public class Zone5 {
 		/// Structure that represents a message produced by the server when an error occurs.
 		public struct ServerMessage: Swift.Error, Codable, Equatable {
 
+			public struct ErrorMeta: Codable, Equatable {
+				public var required: [String]?
+			}
+			
 			public struct ServerError: Codable, Equatable {
 				public var field: String?
 				public var message: String?
 				public var code: Int?
+				public var metadata: ErrorMeta?
 			}
 			
 			internal init(message: String, statusCode: Int? = nil) {

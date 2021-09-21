@@ -8,14 +8,6 @@
 
 import Foundation
 
-public struct TermsAction: Codable, JSONEncodedBody {
-	public var firstName: String?
-	public var lastName: String?
-	public var email: String
-	public var uid: String
-	public var ts: Int?
-}
-
 /// Returned by /rest/auth/terms/required
 public struct TermsAndConditions: Codable, JSONEncodedBody {
 	// matches the server side TermsAndConditionsVersionView
@@ -30,6 +22,4 @@ public struct TermsAndConditions: Codable, JSONEncodedBody {
 	public var entityType: String
 	public var active: Bool?
 	public var status: String?
-	public var createdBy: TermsAction?
-	public var publishedBy: TermsAction?
 }

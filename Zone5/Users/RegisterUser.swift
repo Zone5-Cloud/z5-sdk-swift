@@ -66,10 +66,11 @@ public struct RegisterUser: Codable, JSONEncodedBody {
 	public var params: [String: String]?
 	
 	public init() { }
-	public init(email: String, password: String, firstname: String, lastname: String) {
+	public init(email: String, password: String, firstname: String, lastname: String, accept: [String]? = nil) {
 		self.email = email
 		self.password = password
 		self.firstname = firstname
 		self.lastname = lastname
+		self.accept = accept
 	}
 }
