@@ -54,12 +54,16 @@ public class UsersView: APIView {
 	/// Login as a user and obtain a bearer token - clientId and clientSecret are not required in Specialized featureset
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
 	public func login(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping Zone5.ResultHandler<LoginResponse>) {
+		guard let zone5 = zone5, let clientID = clientID ?? zone5.clientID else {
+			completion(.failure(.invalidConfiguration))
+			return
+		}
 		
-		let body: JSONEncodedBody = LoginRequest(email: email, password: password, clientID: clientID ?? zone5?.clientID, clientSecret: clientSecret ?? zone5?.clientSecret, accept: accept, billingCountry: billingCountry)
+		let body: JSONEncodedBody = LoginRequest(email: email, password: password, clientID: clientID, clientSecret: clientSecret ?? zone5.clientSecret, accept: accept, billingCountry: billingCountry)
         
-		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { [weak self] result in
+		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { result in
 			defer { completion(result) }
-			if case .success(let loginResponse) = result, let zone5 = self?.zone5 {
+			if case .success(let loginResponse) = result {
 				zone5.accessToken = OAuthToken(loginResponse: loginResponse)
 				if let updatedTerms = loginResponse.updatedTerms {
 					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: self, userInfo: [
@@ -73,10 +77,10 @@ public class UsersView: APIView {
 	/// Logout - this will invalidate any active JSESSION and will also invalidate your bearer token
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
 	public func logout(completion: @escaping Zone5.ResultHandler<Bool>) {
-		_ = get(Endpoints.logout, parameters: nil, expectedType: Bool.self)  { [weak self] result in
+		_ = get(Endpoints.logout, parameters: nil, expectedType: Bool.self)  { result in
 			defer { completion(result) }
 			
-			if let zone5 = self?.zone5 {
+			if let zone5 = self.zone5 {
 				// invalidate the token and clear cookies
 				zone5.accessToken = nil
 				if let url = zone5.baseURL {

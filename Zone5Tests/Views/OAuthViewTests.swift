@@ -64,11 +64,11 @@ class OAuthViewTests: XCTestCase {
 	}
 	
 	func testAdhocToken() {
-		var expectedAuthToken = OAuthToken(token: "test token", expiresIn: 123)
+		var expectedAuthToken = OAuthToken(token: "adhoc token", refresh: "refresh token", expiresIn: 123)
 		expectedAuthToken.scope = "things"
 		
 		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<OAuthToken>)] = [
-			(token:expectedAuthToken, json:"{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
+			(token:OAuthToken(token: "configured token", refresh: "refresh", username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
@@ -80,16 +80,17 @@ class OAuthViewTests: XCTestCase {
         var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, expected in
 			urlSession.dataTaskHandler = { request in
-				XCTAssertEqual(request.url?.path, "/rest/oauth/access_token")
-				XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
+				XCTAssertEqual(request.url?.path, "/rest/oauth/newtoken/clientA")
+				XCTAssertNotNil(request.allHTTPHeaderFields?["Authorization"])
+				XCTAssertEqual("Bearer configured token", request.value(forHTTPHeaderField: "Authorization"))
 
-				return .success("{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}")
+				return .success("{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}")
 			}
 
             let expectation = ResultExpectation(for: expected.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
 
-            client.oAuth.accessToken(username: "username", password: "password", completion: expectation.fulfill)
+            client.oAuth.adhocAccessToken(for: "clientA", completion: expectation.fulfill)
 		}
 
         wait(for: expectations, timeout: 5)

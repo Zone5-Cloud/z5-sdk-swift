@@ -31,20 +31,37 @@ final public class Zone5 {
 	/// during a previous session.
 	public internal(set) var accessToken: AccessToken? {
 		didSet {
-			if var token = accessToken, !token.equals(oldValue) {
-				if token.username == nil {
-					token.username = oldValue?.username
+			if var token = accessToken {
+				if token.username == nil, let oldUsername = oldValue?.username {
+					token.username = oldUsername
+					// accessToken is a struct, so token is a copy of accessToken, not pointer to same
+					// so we need to set this again after change
 					accessToken = token
 				}
-				notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
-					"accessToken": token
-				])
+				if !token.equals(oldValue) {
+					// notify change of accessToken
+					notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
+						"accessToken": token
+					])
+				}
 			} else if accessToken == nil && oldValue != nil {
+				// notify deletion of accessToken
 				notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self)
 			}
 		}
 	}
-    
+	
+	/// convenience function to set token and return the token with username added
+	internal func setToken(to token: OAuthToken) -> OAuthToken {
+		var token = token
+		if token.username == nil {
+			token.username = accessToken?.username
+		}
+		
+		self.accessToken = token
+		return token
+	}
+
     public var debugLogging: Bool = false
 
 	/// The root URL for the server that we want to communicate with.

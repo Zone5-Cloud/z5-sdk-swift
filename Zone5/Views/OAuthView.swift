@@ -48,15 +48,14 @@ public class OAuthView: APIView {
 			"redirect_uri": zone5.redirectURI,
 		]
 
-		_ = post(Endpoints.accessToken, body: body, expectedType: OAuthToken.self) { [weak self] result in
-
-			if let zone5 = self?.zone5, case .success(var token) = result {
+		_ = post(Endpoints.accessToken, body: body, expectedType: OAuthToken.self) { result in
+			if case .success(var token) = result {
 				if let expiresIn = token.expiresIn {
 					token.tokenExp = Date().addingTimeInterval(Double(expiresIn)).milliseconds.rawValue
 				}
-				zone5.accessToken = token
 				
-				completion(Zone5.Result.success((zone5.accessToken as! OAuthToken?)!))
+				token = zone5.setToken(to: token)
+				completion(Zone5.Result.success(token))
 			} else {
 				completion(result)
 			}
@@ -83,24 +82,20 @@ public class OAuthView: APIView {
 	/// Does not pass back a PendingRequest as this is not something that we want to cancel mid-request
 	///
 	/// If you are using the sdk for all comms then explicit use of this method is unnessessary as it is done implicitely whenever your token nears expiry
-	public func refreshAccessToken(username: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping (_ result: Result<OAuthToken, Zone5.Error>) -> Void) {
-		guard let username = username ?? zone5?.accessToken?.username, let refreshToken = zone5?.accessToken?.refreshToken else {
+	public func refreshAccessToken(username: String? = nil, refreshToken: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping (_ result: Result<OAuthToken, Zone5.Error>) -> Void) {
+		guard let zone5 = zone5, let username = username ?? zone5.accessToken?.username, let refreshToken = refreshToken ?? zone5.accessToken?.refreshToken else {
 			completion(.failure(.invalidConfiguration))
 			return
 		}
 		
-		_ = post(Endpoints.refreshToken, body: LoginRequest(email: username, refreshToken: refreshToken, accept: accept, billingCountry: billingCountry), expectedType: LoginResponse.self) { [weak self] result in
+		_ = post(Endpoints.refreshToken, body: LoginRequest(email: username, refreshToken: refreshToken, accept: accept, billingCountry: billingCountry), expectedType: LoginResponse.self) { result in
 			if case .success(let loginResponse) = result {
-				var token = OAuthToken(loginResponse: loginResponse)
-				if let zone5 = self?.zone5 {
-					zone5.accessToken = token
-					token = (zone5.accessToken as! OAuthToken?)!
-					
-					if let updatedTerms = loginResponse.updatedTerms {
-						zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
-							"updatedTerms": updatedTerms
-						])
-					}
+				let token = zone5.setToken(to: OAuthToken(loginResponse: loginResponse))
+				
+				if let updatedTerms = loginResponse.updatedTerms {
+					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
+						"updatedTerms": updatedTerms
+					])
 				}
 				
 				completion(.success(token))

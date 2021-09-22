@@ -14,7 +14,7 @@ final class RequestTests: XCTestCase {
 	override func setUpWithError() throws {
 		// configure auth token
 		zone5 = createNewZone5()
-		zone5.configure(for: baseURL, userAgent: "testagent/1.1.1 (222)", accessToken: OAuthToken(rawValue: UUID().uuidString))
+		zone5.configure(for: baseURL, userAgent: "testagent/1.1.1 (222)", accessToken: OAuthToken(token: UUID().uuidString))
 	}
 	
 	func testRequest() {

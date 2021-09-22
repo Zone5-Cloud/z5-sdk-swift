@@ -23,10 +23,6 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 	public var username: String? // attached locally from login response, not part of http oauth serialisation
 	public var tokenExp: Int? // timestamp of expiry, ms since epoch, from login response or derived from expiresIn, not part of http oauth serialisation
 	
-	public init(rawValue: String) {
-		accessToken = rawValue
-	}
-	
 	/// initializer called from login response
 	public init(loginResponse: LoginResponse) {
 		self.accessToken = loginResponse.token ?? ""
@@ -50,11 +46,11 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 		calculateExpiry()
 	}
 	
-	public init(token: String, refresh: String? = nil, expiresIn: Int, username: String? = nil) {
+	/// used in unit tests to mimic the form of OAuthTokens over the wire
+	internal init(token: String, refresh: String, expiresIn: Int) {
 		self.accessToken = token
 		self.refreshToken = refresh
 		self.expiresIn = expiresIn
-		self.username = username
 		calculateExpiry()
 	}
 	
@@ -63,7 +59,7 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 	}
 	
 	public func equals(_ other: AccessToken?) -> Bool {
-		if let other = other as? OAuthToken, other.accessToken == self.accessToken, other.refreshToken == self.refreshToken, other.tokenExp == self.tokenExp {
+		if let other = other as? OAuthToken, other.accessToken == self.accessToken, other.refreshToken == self.refreshToken, other.tokenExp == self.tokenExp, other.username == self.username {
 			return true
 		}
 		

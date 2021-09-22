@@ -161,7 +161,7 @@ class ThirdPartyViewTests: XCTestCase {
 			),
 			(
 				// success
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refresh", tokenExp: 30000, username: "testuser"),
 				json: "{\"token\": 12345}",
 				expectedResult: .success {
 					return PushRegistrationResponse(token: 12345)
@@ -169,7 +169,7 @@ class ThirdPartyViewTests: XCTestCase {
 			),
 			(
 				// invalid response
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refresh", tokenExp: 30000, username: "testuser"),
 				json: "{\"success\": true}",
 				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -198,7 +198,7 @@ class ThirdPartyViewTests: XCTestCase {
 				expectedResult: .failure(authFailure)
 			),
 			(
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refresh", tokenExp: 30000, username: "testuser"),
 				json: "",
 				expectedResult: .success(Zone5.VoidReply())
 			),
@@ -223,7 +223,7 @@ class ThirdPartyViewTests: XCTestCase {
 				expectedResult: .failure(authFailure)
 			),
 			(
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refresh", tokenExp: 30000, username: "testuser"),
 				json: "{\"upgrade\": true}",  //TODO: Find out what the tag/result really is
 				expectedResult: .success {
 					return UpgradeAvailableResponse(isUpgradeAvailable: true)
