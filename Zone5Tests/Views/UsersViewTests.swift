@@ -309,6 +309,7 @@ class UsersViewTests: XCTestCase {
 			newUser.email = "jame.smith@example.com"
 			newUser.firstname = "Jane"
 			newUser.units = UnitMeasurement.imperial
+			newUser.accept = ["termsid", "terms2id"]
 
             let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
