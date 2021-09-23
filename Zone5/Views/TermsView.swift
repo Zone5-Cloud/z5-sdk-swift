@@ -18,7 +18,7 @@ public class TermsView: APIView {
 	
 	/// Get the list of required terms for the currently configured clientID. This is an unauthenticated endpoint and can be called before logging in.
 	@discardableResult
-	public func requiredTerms(completion: @escaping Zone5.ResultHandler<[TermsAndConditions]>) -> PendingRequest? {
+	public func required(completion: @escaping Zone5.ResultHandler<[TermsAndConditions]>) -> PendingRequest? {
 		return get(Endpoints.requiredTerms, with: completion)
 	}
 	
@@ -26,14 +26,14 @@ public class TermsView: APIView {
 	/// The purpose of this call is to accept updated versions or already accepted terms. For instance if after a login the login is successful but the LoginResponse
 	/// contains updated terms.
 	@discardableResult
-	public func acceptTerms(termsID: String, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
+	public func accept(termsID: String, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
 		return post(Endpoints.acceptTerms.replacingTokens(["termsID": termsID]), body: nil, with: completion)
 	}
 	
 	/// Download the content of the passed in terms - if the terms contain content. Some terms are merely a url to external content. This is an unauthenticated endpoint.
 	/// The terms must be required by the currently configured ClientID.
 	@discardableResult
-	public func downloadTerms(termsID: String, completion: @escaping Zone5.ResultHandler<URL>) -> PendingRequest? {
+	public func download(termsID: String, completion: @escaping Zone5.ResultHandler<URL>) -> PendingRequest? {
 		return download(Endpoints.downloadTerms.replacingTokens(["termsID": termsID]), with: completion)
 	}
 }

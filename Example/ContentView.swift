@@ -75,7 +75,7 @@ struct ContentView: View {
 						client.users.isEmailRegistered(email: keyValueStore.userEmail, completion: completion)
 					}
 					EndpointLink<[TermsAndConditions]>("Get Required Terms") { client, completion in
-						client.terms.requiredTerms { result in
+						client.terms.required { result in
 							if case .success(let terms) = result {
 								termsList = terms
 							}
@@ -83,7 +83,7 @@ struct ContentView: View {
 						}
 					}
 					EndpointLink<URL>("Download Terms") { client, completion in
-						client.terms.downloadTerms(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail")) { result in
+						client.terms.download(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail")) { result in
 							if case .success(let url) = result {
 								// need to move it because it will be deleted
 								let file = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("lastDownload")
@@ -100,7 +100,7 @@ struct ContentView: View {
 						}
 					}
 					EndpointLink<Zone5.VoidReply>("Accept Updated Terms (authenticated)") { client, completion in
-						client.terms.acceptTerms(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail"), completion: completion)
+						client.terms.accept(termsID: (!termsList.isEmpty ? termsList[0].termsId : "bogustermsid-should-fail"), completion: completion)
 					}
 					EndpointLink<User>("Register New User") { client, completion in
 						let email = keyValueStore.userEmail

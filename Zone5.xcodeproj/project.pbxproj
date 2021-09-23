@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0F1C9F8725898C89000C12FD /* ResponseDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */; };
+		0F23B2F426FC08ED00516F79 /* TermsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F23B2F326FC08ED00516F79 /* TermsViewTests.swift */; };
 		0F25411126E98D530043B7D0 /* TermsAndConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411026E98D530043B7D0 /* TermsAndConditions.swift */; };
 		0F25411326E98D650043B7D0 /* UpdatedTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411226E98D650043B7D0 /* UpdatedTerms.swift */; };
 		0F4A88CA2564A1ED005C20A2 /* URLProtocolProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */; };
@@ -196,6 +197,7 @@
 
 /* Begin PBXFileReference section */
 		0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseDecodingTests.swift; sourceTree = "<group>"; };
+		0F23B2F326FC08ED00516F79 /* TermsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsViewTests.swift; sourceTree = "<group>"; };
 		0F25411026E98D530043B7D0 /* TermsAndConditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsAndConditions.swift; sourceTree = "<group>"; };
 		0F25411226E98D650043B7D0 /* UpdatedTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedTerms.swift; sourceTree = "<group>"; };
 		0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolProperty.swift; sourceTree = "<group>"; };
@@ -475,6 +477,7 @@
 				A1713CC02387435E0084BDDC /* OAuthViewTests.swift */,
 				0F9D710124458EBD0053C6FD /* MetricsViewTests.swift */,
 				801D9720253A377900A20433 /* ThirdPartyViewTests.swift */,
+				0F23B2F326FC08ED00516F79 /* TermsViewTests.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1045,6 +1048,7 @@
 				A124B0D92373E33A0000919C /* TestHTTPClientURLSession.swift in Sources */,
 				A124B0D62373D9470000919C /* UsersViewTests.swift in Sources */,
 				0F1C9F8725898C89000C12FD /* ResponseDecodingTests.swift in Sources */,
+				0F23B2F426FC08ED00516F79 /* TermsViewTests.swift in Sources */,
 				A1BF294E2387883E00CFC458 /* MillisecondsTests.swift in Sources */,
 				A1C42B6623850CF2004E33B9 /* HTTPClientDownloadRequestTests.swift in Sources */,
 				0F9D710224458EBD0053C6FD /* MetricsViewTests.swift in Sources */,
