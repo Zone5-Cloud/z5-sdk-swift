@@ -27,18 +27,22 @@ class OAuthViewTests: XCTestCase {
 			),
 			( // Should succeed when a valid response is returned from the server.
 				prepareConfiguration: { $0.accessToken = nil },
-				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\",\"ignored_value\":\"that is dropped during decoding\"}"),
-				expectedResult: .success(OAuthToken(rawValue: "ACCESS_TOKEN_VALUE"))
+				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\",\"ignored_value\":\"that is dropped during decoding\", \"refresh_token\": \"REFRESH_TOKEN_VALUE\", \"expires_in\":600}"),
+				expectedResult: .success(OAuthToken(token: "ACCESS_TOKEN_VALUE", refresh: "REFRESH_TOKEN_VALUE", tokenExp: Date().addingTimeInterval(600).milliseconds.rawValue, username: "username"))
 			),
-			( // Should succeed even if a valid AccessToken exists.
-				prepareConfiguration: { _ in },
-				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\"}"),
-				expectedResult: .success(OAuthToken(rawValue: "ACCESS_TOKEN_VALUE"))
+			( // Should succeed even if a valid AccessToken exists, and the new authenticated name should repplace the old username
+				prepareConfiguration: { $0.accessToken = OAuthToken(token: "original", refresh: "original", tokenExp: 0, username: "test-user-should-get-overwritten") },
+				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\", \"refresh_token\": \"REFRESH_TOKEN_VALUE\", \"expires_in\": 600}"),
+				expectedResult: .success(OAuthToken(token: "ACCESS_TOKEN_VALUE", refresh: "REFRESH_TOKEN_VALUE", tokenExp: Date().addingTimeInterval(600).milliseconds.rawValue, username: "username"))
 			),
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
             XCTAssertEqual(lhs.accessToken, rhs.accessToken)
+			XCTAssertEqual(lhs.refreshToken, rhs.refreshToken)
+			XCTAssertEqual(lhs.expiresIn!, rhs.expiresIn!, accuracy: 50)
+			XCTAssertEqual(lhs.username, rhs.username)
+			XCTAssertEqual(lhs.tokenExp!, rhs.tokenExp!, accuracy: 2000)
         }
 
         var expectations: [XCTestExpectation] = []

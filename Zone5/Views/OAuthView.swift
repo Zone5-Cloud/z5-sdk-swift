@@ -54,6 +54,9 @@ public class OAuthView: APIView {
 					token.tokenExp = Date().addingTimeInterval(Double(expiresIn)).milliseconds.rawValue
 				}
 				
+				// set the username to the passed in username that we authenticated with to get this token
+				token.username = username
+				
 				token = zone5.setToken(to: token)
 				completion(Zone5.Result.success(token))
 			} else {
