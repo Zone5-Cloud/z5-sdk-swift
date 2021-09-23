@@ -19,8 +19,7 @@ public class OAuthView: APIView {
 	/// Perform user authentication with the given `username` and `password`.
 	///
 	/// This method requires that the SDK has been configured with a valid `clientID` and `clientSecret`, using
-	/// `Zone5.configure(baseURL:clientID:clientSecret)`. If this has not been done, the method will call the completion
-	/// with `Zone5.Error.invalidConfiguration`.
+	/// `Zone5.configure(baseURL:clientID:clientSecret)`.
 	///
 	/// - Parameters:
 	///   - username: The user's username.
@@ -33,16 +32,15 @@ public class OAuthView: APIView {
 	///
 	/// Does not pass back a PendingRequest as this is not something that we want to cancel mid-request
 	public func accessToken(username: String, password: String, redirectURI: String = "https://localhost", completion: @escaping (_ result: Result<OAuthToken, Zone5.Error>) -> Void) {
-		guard let zone5 = zone5, let clientID = zone5.clientID else {
+		guard let zone5 = zone5 else {
 			completion(.failure(.invalidConfiguration))
-
 			return
 		}
 
 		let body: URLEncodedBody = [
 			"username": username,
 			"password": password,
-			"client_id": clientID,
+			"client_id": zone5.clientID,
 			"client_secret": zone5.clientSecret,
 			"grant_type": "password",
 			"redirect_uri": redirectURI,
@@ -69,9 +67,8 @@ public class OAuthView: APIView {
 	///
 	/// This method requires that the SDK has been configured with a valid `clientID` and optionally `clientSecret`, using
 	/// `Zone5.configure(baseURL:clientID:clientSecret)`.
-	/// It also needs to be configured with a valid OAuthToken.
-	/// If these conditions are not met, the method will call the completion with `Zone5.Error.invalidConfiguration`.
-	///
+	/// It also needs to be configured with a valid refreshable OAuthToken.
+	/// 
 	/// - Parameters:
 	/// 	- username: The user's username. If not passed, the configured username is used.
 	/// 	- completion: Handler called the authentication completes. If successful, the result will contain an access

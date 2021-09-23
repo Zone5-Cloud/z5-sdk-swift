@@ -129,7 +129,7 @@ struct ContentView: View {
 					}
 					EndpointLink<LoginResponse>("Login") { client, completion in
 						let userPassword: String = self.password.password
-						client.users.login(email: keyValueStore.userEmail, password: userPassword, clientID: self.apiClient.clientID, clientSecret: self.apiClient.clientSecret, accept: termsList.map { (t) -> String in return t.termsId }) { value in
+						client.users.login(email: keyValueStore.userEmail, password: userPassword, accept: termsList.map { (t) -> String in return t.termsId }) { value in
 							switch(value) {
 							case .success(let response):
 								if let user = response.user, let id = user.id, id > 0 {
@@ -162,16 +162,18 @@ struct ContentView: View {
 							completion(.failure(.unknown))
 						}
 					}
-					
 				}
 				
 				Section(header: Text("Auth"), footer: Text("Note that Register New User may requires a second auth step of going to the email for the user and clicking confirm email - depends on Cognito Client Key configuration")) {
 					EndpointLink<Bool>("Reset Password") { client, completion in
 						client.users.resetPassword(email: keyValueStore.userEmail, completion: completion)
 					}
+					EndpointLink<TestPasswordResponse>("Test password candidate") { client, completion in
+						client.users.testPassword(username: keyValueStore.userEmail, password: "ComplexP@55word!", completion: completion)
+					}
 					EndpointLink<Zone5.VoidReply>("Change password") { client, completion in
 						let oldpass = self.me.password ?? self.password.password
-						let newpass = "MyNewP@ssword\(Date().milliseconds)"
+						let newpass = "test"//"MyNewP@ssword\(Date().milliseconds)"
 						client.users.changePassword(oldPassword: oldpass, newPassword: newpass) { result in
 							switch(result) {
 								case .success(let r):

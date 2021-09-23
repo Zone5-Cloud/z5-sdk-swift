@@ -58,16 +58,6 @@ class UsersViewTests: XCTestCase {
 		
 		let tests: [(token: AccessToken?, host: String, clientId: String?, secret: String?, accept: [String]?, json: String, expectedResult: Result<LoginResponse, Zone5.Error>)] = [
 			(
-				// this test should fail because clientId is not set
-				token: nil,
-				host: "http://google.com",
-				clientId: nil,
-				secret: nil,
-				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .failure(.invalidConfiguration)
-			),
-			(
 				// simulate a server error
 				token: nil,
 				host: "http://google.com",
@@ -78,17 +68,7 @@ class UsersViewTests: XCTestCase {
 				expectedResult: .failure(.serverError(serverMessage))
 			),
 			(
-				// this test should fail because clientId is not set ( does not matter that it is specialized as there are no more gigya tokens )
-				token: nil,
-				host: "http://\(Zone5.specializedStagingServer)",
-				clientId: nil,
-				secret: nil,
-				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .failure(.invalidConfiguration)
-			),
-			(
-				// this test has clientId and should pass, it also includes accept strings
+				// this test has should pass, it also includes accept strings
 				token: nil,
 				host: "http://\(Zone5.specializedStagingServer)",
 				clientId: "CLIENT",
@@ -111,7 +91,7 @@ class UsersViewTests: XCTestCase {
 				}
 			),
 			(
-				// this test has clientId and should pass.
+				// this test should pass.
 				// also, sticking in a bogus AccessToken which should get overwritten
 				token: OAuthToken(token: UUID().uuidString, refresh: "refreshtoken", tokenExp: 300000000, username: "testuser"),
 				host: "http://google.com",
@@ -441,6 +421,58 @@ class UsersViewTests: XCTestCase {
 		}
 
         wait(for: expectations, timeout: 5)
+	}
+	
+	func testTestPassword() {
+		let expectation = self.expectation(description: "request returned")
+		
+		execute(with: ["{\"error\":true,\"message\":\"This password can not be used. It does not meet the complexity requirements\",\"reason\":\"complexity\"}"]) { z5, _, urlSession, test in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/rest/auth/test-password")
+				
+				return .success(test)
+			}
+			
+			z5.users.testPassword(username: "user@gmail.com", password: "password") { result in
+				if case .success(let msg) = result {
+					XCTAssertNotNil(msg.error)
+					XCTAssertNotNil(msg.message)
+					XCTAssertNotNil(msg.reason)
+				} else {
+					XCTAssert(false, "unexpected failure")
+				}
+				
+				expectation.fulfill()
+			}
+		}
+		
+		wait(for: [expectation], timeout: 5.0)
+	}
+	
+	func testTestPasswordNoError() {
+		let expectation = self.expectation(description: "request returned")
+		
+		execute(with: ["{\"error\":false}"]) { z5, _, urlSession, test in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/rest/auth/test-password")
+				
+				return .success(test)
+			}
+			
+			z5.users.testPassword(username: "user@gmail.com", password: "password") { result in
+				if case .success(let msg) = result {
+					XCTAssertNotNil(msg.error)
+					XCTAssertNil(msg.message)
+					XCTAssertNil(msg.reason)
+				} else {
+					XCTAssert(false, "unexpected failure")
+				}
+				
+				expectation.fulfill()
+			}
+		}
+		
+		wait(for: [expectation], timeout: 5.0)
 	}
 	
 	func testChangePasswordSpecialized() {

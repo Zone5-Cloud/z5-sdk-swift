@@ -5,11 +5,6 @@ class OAuthViewTests: XCTestCase {
 
 	func testAccessToken() {
 		let tests: [(prepareConfiguration: (_ configuration: inout ConfigurationForTesting) -> Void, response: TestHTTPClientURLSession.Result<String>, expectedResult: Zone5.Result<OAuthToken>)] = [
-			( // Should complete with .invalidConfiguration when client is not configured correctly.
-				prepareConfiguration: { $0.accessToken = nil; $0.clientID = nil; $0.clientSecret = nil },
-				response: .message("{\"message\":\"UT010031: Login failed\"}", statusCode: 500),
-				expectedResult: .failure(.invalidConfiguration)
-			),
 			( // Should complete with .serverError(_:) if a message is transmitted.
 				prepareConfiguration: { $0.accessToken = nil },
 				response: .message("UT010031: Login failed", statusCode: 500),

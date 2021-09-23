@@ -3,7 +3,7 @@ import Foundation
 public class UsersView: APIView {
 
 	internal enum Endpoints: String, InternalRequestEndpoint {
-		case me = "/rest/users/me"
+		case me = "/rest/users"
 		case deleteUser = "/rest/users/delete/{userID}"
 		case setUser = "/rest/users/set/User"
 		case registerUser = "/rest/auth/register"
@@ -18,6 +18,7 @@ public class UsersView: APIView {
 		case getEmailStatus = "/rest/auth/status"
 		case passwordComplexity = "/rest/auth/password-complexity"
 		case reconfirmEmail = "/rest/auth/reconfirm"
+		case testPassword = "/rest/auth/test-password"
 
 		var requiresAccessToken: Bool {
 			switch self {
@@ -51,10 +52,10 @@ public class UsersView: APIView {
 		return get(endpoint, with: completion)
 	}
 	
-	/// Login as a user and obtain a bearer token - clientId and clientSecret are not required in Specialized featureset
+	/// Login as a user and obtain a bearer token
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
 	public func login(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping Zone5.ResultHandler<LoginResponse>) {
-		guard let zone5 = zone5, let clientID = clientID ?? zone5.clientID else {
+		guard let zone5 = zone5 else {
 			completion(.failure(.invalidConfiguration))
 			return
 		}
@@ -118,6 +119,20 @@ public class UsersView: APIView {
 	public func changePassword(oldPassword: String?, newPassword: String, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) {
 		let body = NewPassword(old: oldPassword, new: newPassword)
 		_ = post(Endpoints.changePassword, body: body, with: completion)
+	}
+	
+	/// Test if a given password passes comlpexity rules for the currently configured clientID
+	/// - Parameters:
+	/// 	- username: user to test password for
+	///		- password: password to test
+	@discardableResult
+	public func testPassword(username: String, password: String, completion: @escaping Zone5.ResultHandler<TestPasswordResponse>) -> PendingRequest? {
+		
+		var user = User()
+		user.email = username
+		user.password = password
+		
+		return post(Endpoints.testPassword, body: user, with: completion)
 	}
 
 	/// Set the given user's preferences, e.g. metric/imperial units

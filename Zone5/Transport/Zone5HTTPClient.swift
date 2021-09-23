@@ -83,7 +83,7 @@ final public class Zone5HTTPClient {
 	///   - block: The function containing the work to perform. It receives a strong copy of the parent `Zone5` class, and the configured `baseURL`.
 	private func execute<T>(with completion: @escaping (_ result: Result<T, Zone5.Error>) -> Void, _ block: (_ zone5: Zone5) throws -> PendingRequest) -> PendingRequest? {
 		do {
-			guard let zone5 = zone5, zone5.isConfigured else {
+			guard let zone5 = zone5, zone5.baseURL != nil else {
 				throw Zone5.Error.invalidConfiguration
 			}
 

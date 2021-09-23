@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0F1C9F8725898C89000C12FD /* ResponseDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */; };
 		0F23B2F426FC08ED00516F79 /* TermsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F23B2F326FC08ED00516F79 /* TermsViewTests.swift */; };
+		0F23B2F626FC47FE00516F79 /* TestPasswordResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F23B2F526FC47FE00516F79 /* TestPasswordResponse.swift */; };
 		0F25411126E98D530043B7D0 /* TermsAndConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411026E98D530043B7D0 /* TermsAndConditions.swift */; };
 		0F25411326E98D650043B7D0 /* UpdatedTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F25411226E98D650043B7D0 /* UpdatedTerms.swift */; };
 		0F4A88CA2564A1ED005C20A2 /* URLProtocolProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */; };
@@ -198,6 +199,7 @@
 /* Begin PBXFileReference section */
 		0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseDecodingTests.swift; sourceTree = "<group>"; };
 		0F23B2F326FC08ED00516F79 /* TermsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsViewTests.swift; sourceTree = "<group>"; };
+		0F23B2F526FC47FE00516F79 /* TestPasswordResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPasswordResponse.swift; sourceTree = "<group>"; };
 		0F25411026E98D530043B7D0 /* TermsAndConditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsAndConditions.swift; sourceTree = "<group>"; };
 		0F25411226E98D650043B7D0 /* UpdatedTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedTerms.swift; sourceTree = "<group>"; };
 		0F4A88C92564A1ED005C20A2 /* URLProtocolProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolProperty.swift; sourceTree = "<group>"; };
@@ -455,6 +457,7 @@
 				0FB27F3E2406324900D7991B /* LoginResponse.swift */,
 				0FAA7567240CB88600CB3C73 /* NewPassword.swift */,
 				0FA1F1B5242AECB5005AD490 /* UsersPreferences.swift */,
+				0F23B2F526FC47FE00516F79 /* TestPasswordResponse.swift */,
 			);
 			path = Users;
 			sourceTree = "<group>";
@@ -487,7 +490,6 @@
 			children = (
 				A182D1BA2372AB0E00112501 /* Zone5HTTPClient.swift */,
 				A182D1C52372AB0F00112501 /* AccessToken.swift */,
-				A182D1BB2372AB0E00112501 /* Request.swift */,
 				A182D1B62372AB0E00112501 /* RequestEndpoint.swift */,
 				A182D1B92372AB0E00112501 /* RequestBody.swift */,
 				A182D1B72372AB0E00112501 /* URLEncodedBody.swift */,
@@ -495,6 +497,7 @@
 				A1EBDAD6237A1DE800834B21 /* MultipartEncodedBody.swift */,
 				0FAA75632408E56E00CB3C73 /* StringEncodedBody.swift */,
 				0F903483240692AA00051277 /* VoidReply.swift */,
+				A182D1BB2372AB0E00112501 /* Request.swift */,
 				0F95EB5624637DD2000B859D /* PendingRequest.swift */,
 				0F4A88CD2564ADC4005C20A2 /* URLRequestInterceptor.swift */,
 				0FD9D14D2583445A00028F5F /* Zone5DownloadDelegate.swift */,
@@ -997,6 +1000,7 @@
 				0FA1F1B6242AECB5005AD490 /* UsersPreferences.swift in Sources */,
 				0F25411126E98D530043B7D0 /* TermsAndConditions.swift in Sources */,
 				A10AB21F237D161900EBAC66 /* ActivityType.swift in Sources */,
+				0F23B2F626FC47FE00516F79 /* TestPasswordResponse.swift in Sources */,
 				0F7C8E69256CCBFD005CF025 /* Products.swift in Sources */,
 				A10AB21B237D110200EBAC66 /* UserWorkoutDetails.swift in Sources */,
 				A196035F23794DD200CEB121 /* TimeOfDay.swift in Sources */,
