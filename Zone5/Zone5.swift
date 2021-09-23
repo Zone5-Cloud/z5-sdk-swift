@@ -79,8 +79,6 @@ final public class Zone5 {
 	/// The user agent to set in the User-Agent header
 	public internal(set) var userAgent: String?
 
-	public var redirectURI: String = "https://localhost"
-	
 	public var notificationCenter: NotificationCenter = .default
 
 	/// Configures the SDK to use the application specified by the given `clientID` and `clientSecret`.
@@ -131,14 +129,8 @@ final public class Zone5 {
 			return false // Always require a `baseURL`
 		}
 
-		if accessToken != nil {
-			return true // Access token will happily represent the user all by itself
-		}
-		else if clientID != nil {
-			return true // For authentication purposes, we need a valid clientID
-		}
-
-		return false
+		// need either an accessToken or a clientID to be able to do anything
+		return accessToken != nil || clientID != nil
 	}
 
 	// MARK: Views

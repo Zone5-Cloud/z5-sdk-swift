@@ -32,8 +32,8 @@ public class OAuthView: APIView {
 	///	On success the returned access token is automatically saved and will be the access token used from here on.
 	///
 	/// Does not pass back a PendingRequest as this is not something that we want to cancel mid-request
-	public func accessToken(username: String, password: String, completion: @escaping (_ result: Result<OAuthToken, Zone5.Error>) -> Void) {
-		guard let zone5 = zone5, zone5.isConfigured else {
+	public func accessToken(username: String, password: String, redirectURI: String = "https://localhost", completion: @escaping (_ result: Result<OAuthToken, Zone5.Error>) -> Void) {
+		guard let zone5 = zone5, let clientID = zone5.clientID else {
 			completion(.failure(.invalidConfiguration))
 
 			return
@@ -42,10 +42,10 @@ public class OAuthView: APIView {
 		let body: URLEncodedBody = [
 			"username": username,
 			"password": password,
-			"client_id": zone5.clientID,
+			"client_id": clientID,
 			"client_secret": zone5.clientSecret,
 			"grant_type": "password",
-			"redirect_uri": zone5.redirectURI,
+			"redirect_uri": redirectURI,
 		]
 
 		_ = post(Endpoints.accessToken, body: body, expectedType: OAuthToken.self) { result in

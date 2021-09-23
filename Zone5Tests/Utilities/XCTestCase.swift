@@ -118,7 +118,6 @@ extension XCTestCase {
 extension Zone5 {
 
 	func configure(with configuration: XCTestCase.ConfigurationForTesting) {
-		redirectURI = configuration.redirectURI
 		accessToken = configuration.accessToken
 
 		if let baseURL = configuration.baseURL, let clientID = configuration.clientID, let clientSecret = configuration.clientSecret {
