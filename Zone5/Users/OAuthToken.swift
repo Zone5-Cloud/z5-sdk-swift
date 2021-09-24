@@ -76,7 +76,7 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 		case expiresIn = "expires_in"
 		case scope = "scope"
 		
-		// to file serialisation for saving
+		// file serialisation for saving
 		case username = "username"
 		case tokenExp = "token_exp"
 	}

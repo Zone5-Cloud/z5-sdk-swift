@@ -32,14 +32,14 @@ final public class Zone5 {
 	public internal(set) var accessToken: AccessToken? {
 		didSet {
 			if var token = accessToken {
+				// retain username
 				if token.username == nil, let oldUsername = oldValue?.username {
 					token.username = oldUsername
 				}
 				
 				token.calculateExpiry()
 				
-				// accessToken is a struct, so token is a copy of accessToken, not pointer to same
-				// so we need to set this again after change
+				// token is a copy of accessToken so we need to set this back again after changes
 				accessToken = token
 				
 				if !token.equals(oldValue) {
