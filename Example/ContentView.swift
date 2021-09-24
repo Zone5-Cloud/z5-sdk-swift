@@ -108,7 +108,7 @@ struct ContentView: View {
 						let firstname = "test"
 						let lastname = "person"
 						if !email.isEmpty, !password.isEmpty {
-							var registerUser = RegisterUser(email: email, password: password, firstname: firstname, lastname: lastname, accept: termsList.map { (t) -> String in return t.termsId })
+							var registerUser = RegisterUser(email: email, password: password, firstname: firstname, lastname: lastname, accept: termsList.map { (t) -> String in return t.alias ?? t.termsId })
 							registerUser.units = UnitMeasurement.imperial
 							client.users.register(user: registerUser) { value in
 								switch value {
@@ -129,7 +129,7 @@ struct ContentView: View {
 					}
 					EndpointLink<LoginResponse>("Login") { client, completion in
 						let userPassword: String = self.password.password
-						client.users.login(email: keyValueStore.userEmail, password: userPassword, accept: termsList.map { (t) -> String in return t.termsId }) { value in
+						client.users.login(email: keyValueStore.userEmail, password: userPassword, accept: termsList.map { (t) -> String in return t.alias ?? t.termsId }) { value in
 							switch(value) {
 							case .success(let response):
 								if let user = response.user, let id = user.id, id > 0 {
@@ -186,7 +186,7 @@ struct ContentView: View {
 						}
 					}
 					EndpointLink<OAuthToken>("Refresh OAuth Token") { client, completion in
-						client.oAuth.refreshAccessToken(accept: termsList.map { (t) -> String in return t.termsId }, completion: completion)
+						client.oAuth.refreshAccessToken(accept: termsList.map { (t) -> String in return t.alias ?? t.termsId }, completion: completion)
 					}
 					EndpointLink<OAuthToken>("Get Access Token") { client, completion in
 						client.oAuth.accessToken(username: keyValueStore.userEmail, password: self.password.password, completion: completion)

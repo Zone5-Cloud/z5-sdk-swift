@@ -92,7 +92,7 @@ public class OAuthView: APIView {
 			if case .success(let loginResponse) = result {
 				let token = zone5.setToken(to: OAuthToken(loginResponse: loginResponse))
 				
-				if let updatedTerms = loginResponse.updatedTerms {
+				if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
 					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
 						"updatedTerms": updatedTerms
 					])

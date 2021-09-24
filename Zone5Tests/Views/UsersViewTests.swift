@@ -84,9 +84,7 @@ class UsersViewTests: XCTestCase {
 					var lr = LoginResponse()
 					lr.user = user
 					lr.token = "1234567890"
-					var t = UpdatedTerms()
-					t.id = "terms123"
-					lr.updatedTerms = [t]
+					lr.updatedTerms = [UpdatedTerms(id: "terms123")]
 					return lr
 				}
 			),
@@ -285,11 +283,18 @@ class UsersViewTests: XCTestCase {
 
         var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
-			var newUser = RegisterUser()
-			newUser.email = "jame.smith@example.com"
-			newUser.firstname = "Jane"
-			newUser.units = UnitMeasurement.imperial
-			newUser.accept = ["termsid", "terms2id"]
+			let testDataTaskHandler = urlSession.dataTaskHandler
+			urlSession.dataTaskHandler = { request in
+				// add some checks before calling the deafult test handler
+				XCTAssertEqual(request.url?.path, "/rest/auth/register")
+				let register = (try? JSONDecoder().decode(RegisterUser.self, from: request.httpBody!))!
+				XCTAssertEqual(register.billingCountry, "AU")
+				XCTAssertEqual(register.accept, ["termsid", "terms2id"])
+				
+				return testDataTaskHandler?(request) ?? .success(test.json)
+			}
+			
+			let newUser = RegisterUser(email: "jame.smith@example.com", password: "password", firstname: "Jean", lastname: "Smith", accept: ["termsid", "terms2id"], billingCountry: "AU")
 
             let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)

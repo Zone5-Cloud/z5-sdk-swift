@@ -61,16 +61,19 @@ public struct RegisterUser: Codable, JSONEncodedBody {
 	public var tags: String?
 	
 	var accept: [String]?
+	
+	var billingCountry: String?
 
 	/// Optional - Custom registration directives
 	public var params: [String: String]?
 	
 	public init() { }
-	public init(email: String, password: String, firstname: String, lastname: String, accept: [String]? = nil) {
+	public init(email: String, password: String, firstname: String, lastname: String, accept: [String]? = nil, billingCountry: String? = nil) {
 		self.email = email
 		self.password = password
 		self.firstname = firstname
 		self.lastname = lastname
 		self.accept = accept
+		self.billingCountry = billingCountry
 	}
 }

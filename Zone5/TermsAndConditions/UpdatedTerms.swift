@@ -9,7 +9,7 @@
 import Foundation
 
 public struct UpdatedTerms: Codable, JSONEncodedBody {
-	public var id: String?
+	public var id: String
 	public var name: String?
 	public var alias: String?
 	public var version: Int?

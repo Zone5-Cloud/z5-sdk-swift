@@ -66,8 +66,8 @@ public class UsersView: APIView {
 			defer { completion(result) }
 			if case .success(let loginResponse) = result {
 				zone5.accessToken = OAuthToken(loginResponse: loginResponse)
-				if let updatedTerms = loginResponse.updatedTerms {
-					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: self, userInfo: [
+				if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
+					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
 						"updatedTerms": updatedTerms
 					])
 				}

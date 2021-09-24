@@ -75,7 +75,7 @@ extension XCTestCase {
 						XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer \(token.rawValue)")
 						return .success(parameter.json)
 					} else if let required = request.getMeta(key: .requiresAccessToken) as? Bool, required {
-						// missing required auth header
+						// missing required auth header, simulate an unauthorized server response
 						XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
 						return .failure("Unauthorized", statusCode: 401)
 					} else {
