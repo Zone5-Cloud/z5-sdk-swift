@@ -51,16 +51,14 @@ internal class URLRequestInterceptor: URLProtocol {
 		if let requiresAccessToken = request.getMeta(key: .requiresAccessToken) as? Bool, requiresAccessToken,
            let zone5 = request.getMeta(key: .zone5) as? Zone5,
 		   let token = zone5.accessToken, let refresh = token.refreshToken, !refresh.isEmpty,
-           let expiresAt = token.tokenExp,
-		   expiresAt < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
+           token.tokenExp ?? 0 < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
 			// our token expires in less than 30 seconds. Do a refresh before sending the request
 			// do these refresh requests synchronously so only one executes at a time and others wait for first refresh to complete - at which point duplicate refresh not necessary
 			URLRequestInterceptor.refreshDispatchQueue.async {
 				URLRequestInterceptor.refreshDispatchSemaphore.wait() // should let first 1 through
 				// recheck TTL once inside mutex block, cos it might have been updated by another refresh while we were waiting for mutex
 				if let token = zone5.accessToken, let refresh = token.refreshToken, !refresh.isEmpty,
-                   let expiresAt = token.tokenExp,
-				   expiresAt < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
+                   token.tokenExp ?? 0 < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
 					zone5.oAuth.refreshAccessToken() { result in
 						// note that refresh does not require auth so it will not cyclicly enter this path
 						URLRequestInterceptor.refreshDispatchSemaphore.signal()

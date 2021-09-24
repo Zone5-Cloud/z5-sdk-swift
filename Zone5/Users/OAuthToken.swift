@@ -66,14 +66,6 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 		return false
 	}
 	
-	private mutating func calculateExpiry() {
-		if expiresIn == nil, let exp = tokenExp {
-			self.expiresIn = Int((Double(exp) / 1000.0) - Date().timeIntervalSince1970)
-		} else if tokenExp == nil, let expiresIn = expiresIn {
-			self.tokenExp = (Date() + Double(expiresIn)).milliseconds.rawValue
-		}
-	}
-	
 	// MARK: Codable
 
 	private enum CodingKeys: String, CodingKey {

@@ -19,6 +19,8 @@ public struct OAuthTokenAlt: Codable, AccessToken {
 	/// timestamp of when this token expires, ms since epoch
 	public var tokenExp: Int?
 	
+	public var expiresIn: Int?
+	
 	public var username: String?
 	
 	public init(rawValue: String) {
@@ -36,7 +38,7 @@ public struct OAuthTokenAlt: Codable, AccessToken {
 	public var refreshToken: String? {
 		return nil
 	}
-	
+
 	public func equals(_ other: AccessToken?) -> Bool {
 		if let other = other as? OAuthTokenAlt, other.token == self.token, other.tokenExp == self.tokenExp {
 			return true

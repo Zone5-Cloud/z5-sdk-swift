@@ -83,10 +83,14 @@ class Zone5Tests: XCTestCase {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4))
 		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
+		XCTAssertEqual(4, z5.accessToken?.tokenExp)
+		XCTAssertNotNil(z5.accessToken?.expiresIn)
 	}
 	
 	func testAccessTokenOnChanged2() {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 4))
+		XCTAssertEqual(4, z5.accessToken?.tokenExp)
+		XCTAssertNotNil(z5.accessToken?.expiresIn)
 		
 		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
 		expectation.assertForOverFulfill = true
@@ -95,6 +99,8 @@ class Zone5Tests: XCTestCase {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 5))
 		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
+		XCTAssertEqual(5, z5.accessToken?.tokenExp)
+		XCTAssertNotNil(z5.accessToken?.expiresIn)
 	}
 	
 	func testAccessTokenOnChanged3() {
@@ -107,6 +113,8 @@ class Zone5Tests: XCTestCase {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc1", tokenExp: 4))
 		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
+		XCTAssertEqual(4, z5.accessToken?.tokenExp)
+		XCTAssertNotNil(z5.accessToken?.expiresIn)
 	}
 	
 	func testAccessTokenUpdatedOnNil() {
@@ -176,6 +184,8 @@ class Zone5Tests: XCTestCase {
 		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthTokenAlt(rawValue: "123"))
 		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
+		XCTAssertNil(z5.accessToken?.tokenExp)
+		XCTAssertNil(z5.accessToken?.expiresIn)
 	}
 	
 	func testAccessTokenOnChangedAlt2() {
@@ -263,5 +273,21 @@ class Zone5Tests: XCTestCase {
 		
 		XCTAssertEqual("newuser", z5.accessToken?.username)
 		XCTAssertEqual("1234", z5.accessToken?.rawValue)
+	}
+	
+	func testAccessTokenCalculateExpiry() {
+		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "xcv", refresh: "23", expiresIn: 3))
+		XCTAssertNotNil(z5.accessToken?.tokenExp)
+		var tokenExp = z5.accessToken?.tokenExp
+		
+		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "xcv", refresh: "23", expiresIn: 30))
+		XCTAssertNotNil(z5.accessToken?.tokenExp)
+		XCTAssertNotEqual(tokenExp, z5.accessToken?.tokenExp)
+		XCTAssertTrue(z5.accessToken!.tokenExp! > Date().milliseconds.rawValue)
+		
+		tokenExp = Date().milliseconds.rawValue
+		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "xcv", refresh: "23", tokenExp: tokenExp))
+		XCTAssertNotNil(z5.accessToken?.expiresIn)
+		XCTAssertTrue(z5.accessToken!.expiresIn! <= 0)
 	}
 }

@@ -34,10 +34,14 @@ final public class Zone5 {
 			if var token = accessToken {
 				if token.username == nil, let oldUsername = oldValue?.username {
 					token.username = oldUsername
-					// accessToken is a struct, so token is a copy of accessToken, not pointer to same
-					// so we need to set this again after change
-					accessToken = token
 				}
+				
+				token.calculateExpiry()
+				
+				// accessToken is a struct, so token is a copy of accessToken, not pointer to same
+				// so we need to set this again after change
+				accessToken = token
+				
 				if !token.equals(oldValue) {
 					// notify change of accessToken
 					notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
