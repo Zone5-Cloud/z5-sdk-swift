@@ -121,7 +121,8 @@ public class UsersView: APIView {
 		_ = post(Endpoints.changePassword, body: body, with: completion)
 	}
 	
-	/// Test if a given password passes comlpexity rules for the currently configured clientID
+	/// Test a password candidate.
+	/// This will test if a given password will pass comlpexity rules for the currently configured clientID
 	/// - Parameters:
 	/// 	- username: user to test password for
 	///		- password: password to test

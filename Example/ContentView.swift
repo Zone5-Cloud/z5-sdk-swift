@@ -169,7 +169,7 @@ struct ContentView: View {
 						client.users.resetPassword(email: keyValueStore.userEmail, completion: completion)
 					}
 					EndpointLink<TestPasswordResponse>("Test password candidate") { client, completion in
-						client.users.testPassword(username: keyValueStore.userEmail, password: "ComplexP@55word!", completion: completion)
+						client.users.testPassword(username: keyValueStore.userEmail, password: self.password.password, completion: completion)
 					}
 					EndpointLink<Zone5.VoidReply>("Change password") { client, completion in
 						let oldpass = self.me.password ?? self.password.password
