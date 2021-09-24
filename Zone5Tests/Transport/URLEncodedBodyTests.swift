@@ -50,4 +50,15 @@ final class URLEncodedBodyTests: XCTestCase {
 			XCTAssertEqual("https://this.com", test.get("url"))
 		}
 	}
+	
+	func testPut() {
+		var body: URLEncodedBody = ["key1": 1, "key2": "value2"]
+		body.put(name: "key3", value: 1.0)
+		
+		XCTAssertEqual("1", body.get("key1"))
+		XCTAssertEqual("value2", body.get("key2"))
+		XCTAssertEqual("1.0", body.get("key3"))
+		
+		XCTAssertEqual("key1=1&key2=value2&key3=1.0", body.description)
+	}
 }
