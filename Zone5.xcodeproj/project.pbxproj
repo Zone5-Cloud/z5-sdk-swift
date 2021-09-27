@@ -569,6 +569,7 @@
 				A18A52A1234C2D210016DDA5 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		A18A52A1234C2D210016DDA5 /* Products */ = {
 			isa = PBXGroup;
