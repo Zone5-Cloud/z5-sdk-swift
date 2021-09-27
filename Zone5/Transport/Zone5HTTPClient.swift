@@ -78,9 +78,16 @@ final public class Zone5HTTPClient {
 	private let decoder = JSONDecoder()
 
 	/// Validates the SDK configuration, and then calls the given `block` function, handling any thrown errors using the given `completion`.
+	///
 	/// - Parameters:
 	///   - completion: Function called with errors that are thrown in the `block`.
 	///   - block: The function containing the work to perform. It receives a strong copy of the parent `Zone5` class, and the configured `baseURL`.
+	///
+	/// - Throws:
+	///	  - Zone5.Error.invalidConfiguration If the Zone5 instance has not been configured with a url
+	///
+	/// - Note:
+	///	  - If neither clientID nor accessToken is configured, the server will respond with an appropriate 401 error
 	private func execute<T>(with completion: @escaping (_ result: Result<T, Zone5.Error>) -> Void, _ block: (_ zone5: Zone5) throws -> PendingRequest) -> PendingRequest? {
 		do {
 			guard let zone5 = zone5, zone5.baseURL != nil else {

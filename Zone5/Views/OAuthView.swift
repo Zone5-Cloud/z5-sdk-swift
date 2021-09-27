@@ -21,6 +21,8 @@ public class OAuthView: APIView {
 	/// This method requires that the SDK has been configured with a valid `clientID` and `clientSecret`, using
 	/// `Zone5.configure(baseURL:clientID:clientSecret)`.
 	///
+	/// If `clientID` and `clientSecret` requirements are not satisfied, the server will respond with an appropriate 401 response.
+	///
 	/// - Parameters:
 	///   - username: The user's username.
 	///   - password: The user's password.
@@ -65,9 +67,14 @@ public class OAuthView: APIView {
 	
 	/// Refresh the existing bearer token
 	///
-	/// This method requires that the SDK has been configured with a valid `clientID` and optionally `clientSecret`, using
-	/// `Zone5.configure(baseURL:clientID:clientSecret)`.
+	/// This method requires that the SDK has been configured with a valid `clientID` and optionally `clientSecret` depending on `clientID` settings,
+	/// Configure these values using `Zone5.configure(baseURL:clientID:clientSecret)`.
+	///
 	/// It also needs to be configured with a valid refreshable OAuthToken.
+	///
+	/// If `clientID` and `clientSecret` requirements are not satisfied, the server will respond with an appropriate 401 response.
+	///
+	/// If there is no token to refresh the method will call the completion with `Zone5.Error.invalidConfiguration`.
 	/// 
 	/// - Parameters:
 	/// 	- username: The user's username. If not passed, the configured username is used.
@@ -89,20 +96,18 @@ public class OAuthView: APIView {
 		}
 		
 		_ = post(Endpoints.refreshToken, body: LoginRequest(email: username, refreshToken: refreshToken, accept: accept, billingCountry: billingCountry), expectedType: LoginResponse.self) { result in
-			if case .success(let loginResponse) = result {
-				let token = zone5.setToken(to: OAuthToken(loginResponse: loginResponse))
-				
-				if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
-					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
-						"updatedTerms": updatedTerms
-					])
-				}
-				
-				completion(.success(token))
-			} else if case .failure(let error) = result {
-				completion(.failure(error))
-			} else {
-				completion(.failure(.unknown))
+			switch result {
+				case .success(let loginResponse):
+					let token = zone5.setToken(to: OAuthToken(loginResponse: loginResponse))
+					
+					if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
+						zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
+							"updatedTerms": updatedTerms
+						])
+					}
+						completion(.success(token))
+				case .failure(let error):
+					completion(.failure(error))
 			}
 		}
 	}

@@ -88,22 +88,19 @@ class URLRequestInterceptorTests: XCTestCase {
 		XCTAssertNil(interceptor.lastRequest)
 		XCTAssertEqual(request, interceptor.request)
 		
-		let tokenNotificationExpectation = self.expectation(description: "notification for token fired")
-		zone5.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: zone5, queue: nil) { notification in
+		let tokenNotificationExpectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: zone5) { notification in
 			let token = notification.userInfo?["accessToken"] as? OAuthToken
 			
 			XCTAssertEqual("123", token?.refreshToken)
 			XCTAssertEqual("testauth2", token?.accessToken)
 			XCTAssertEqual("user", token?.username)
 			XCTAssertEqual(30000, token?.tokenExp)
-			
-			tokenNotificationExpectation.fulfill()
+			return true
 		}
 		
-		let termsNotificationExpectation = self.expectation(description: "notification for terms fired")
-		zone5.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: zone5, queue: nil) { notification in
+		let termsNotificationExpectation = self.expectation(forNotification: Zone5.updatedTermsNotification, object: zone5) { notification in
 			XCTAssertEqual("xyz", (notification.userInfo?["updatedTerms"] as? [UpdatedTerms])![0].id)
-			termsNotificationExpectation.fulfill()
+			return true
 		}
 		
 		// the refresh should go through the test session and hit here
