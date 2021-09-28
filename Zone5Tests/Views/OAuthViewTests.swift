@@ -67,7 +67,7 @@ class OAuthViewTests: XCTestCase {
 		expectedAuthToken.scope = "things"
 		
 		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<OAuthToken>)] = [
-			(token:OAuthToken(token: "configured token", refresh: "refresh", username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
+			(token:OAuthToken(token: "configured token", refresh: "refresh", expiresAt: Date().addingTimeInterval(600), username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in

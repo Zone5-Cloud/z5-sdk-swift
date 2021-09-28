@@ -18,7 +18,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		// configure auth token that is not near expiry
 		var oauth = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: 30000, username: "testuser")
 		oauth.refreshToken = "refresh"
-		oauth.tokenExp = Date().milliseconds.rawValue + 100000
+		oauth.tokenExp = Date().milliseconds + 100000
 		zone5.configure(for: URL(string: "https://api-sp-staging.todaysplan.com.au")!, clientID: "CLIENT ID", clientSecret: "CLIENT SECRET", userAgent: "agent 123", accessToken: oauth)
 	}
 

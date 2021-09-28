@@ -53,6 +53,8 @@ public class UsersView: APIView {
 	}
 	
 	/// Login as a user and obtain a bearer token
+	///
+	/// Note that the configured access token is automatically updated with this call.
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
 	public func login(email: String, password: String, clientID: String? = nil, clientSecret: String? = nil, accept: [String]? = nil, billingCountry: String? = nil, completion: @escaping Zone5.ResultHandler<LoginResponse>) {
 		guard let zone5 = zone5 else {
@@ -76,6 +78,7 @@ public class UsersView: APIView {
 	}
 	
 	/// Logout - this will invalidate any active JSESSION and will also invalidate your bearer token
+	/// 
 	/// Don't pass back a PendingRequest as this is not something that we can cancel mid-request
 	public func logout(completion: @escaping Zone5.ResultHandler<Bool>) {
 		_ = get(Endpoints.logout, parameters: nil, expectedType: Bool.self)  { result in

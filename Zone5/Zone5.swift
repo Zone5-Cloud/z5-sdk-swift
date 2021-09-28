@@ -36,9 +36,7 @@ final public class Zone5 {
 				if token.username == nil, let oldUsername = oldValue?.username {
 					token.username = oldUsername
 				}
-				
-				token.calculateExpiry()
-				
+
 				// token is a copy of accessToken so we need to set this back again after changes
 				accessToken = token
 				

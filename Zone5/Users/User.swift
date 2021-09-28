@@ -43,12 +43,6 @@ public struct User: Searchable, JSONEncodedBody {
 	public var lastLogin: Int?
 	
 	public var metric: UnitMeasurement?
-	
-	public var attsMask: Int?
-	public var prefsMask: Int?
-	public var ridesMask: Int?
-	
-	
 
 	public init() { }
 	public init(email: String, password: String, firstname: String, lastname: String) {

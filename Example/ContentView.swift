@@ -58,7 +58,8 @@ struct ContentView: View {
 		}
 		
 		apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: apiClient, queue: nil) { notification in
-			print("There are updated terms that can be accepted")
+			let terms = notification.userInfo?["updatedTerms"] as? [UpdatedTerms]
+			print("There are updated terms that can be accepted \(terms)")
 		}
 	}
 	

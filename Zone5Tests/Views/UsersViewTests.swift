@@ -107,11 +107,8 @@ class UsersViewTests: XCTestCase {
 					lr.user = user
 					lr.token = "1234567890"
 					lr.refresh = "eyJjd"
-					lr.features = 0
-					lr.fs = "specialized"
 					lr.tokenExp = 1631074590000
 					lr.roles = [Roles.user, Roles.premium]
-					lr.identities = ["COGNITO":"123","GIGYA":"456"]
 					return lr
 				}
 			)
@@ -155,9 +152,6 @@ class UsersViewTests: XCTestCase {
 					XCTAssertEqual(try? result.get().refresh, try? test.expectedResult.get().refresh)
 					XCTAssertEqual(try? result.get().tokenExp, try? test.expectedResult.get().tokenExp)
 					XCTAssertEqual(try? result.get().roles, try? test.expectedResult.get().roles)
-					XCTAssertEqual(try? result.get().identities, try? test.expectedResult.get().identities)
-					XCTAssertEqual(try? result.get().fs, try? test.expectedResult.get().fs)
-					XCTAssertEqual(try? result.get().features, try? test.expectedResult.get().features)
 					XCTAssertEqual(try? result.get().updatedTerms?.count, try? test.expectedResult.get().updatedTerms?.count)
 					XCTAssertEqual(try? result.get().updatedTerms?[0].id, try? test.expectedResult.get().updatedTerms?[0].id)
                 }

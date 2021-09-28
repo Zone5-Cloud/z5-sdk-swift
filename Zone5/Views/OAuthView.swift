@@ -50,10 +50,7 @@ public class OAuthView: APIView {
 
 		_ = post(Endpoints.accessToken, body: body, expectedType: OAuthToken.self) { result in
 			if case .success(var token) = result {
-				if let expiresIn = token.expiresIn {
-					token.tokenExp = Date().addingTimeInterval(Double(expiresIn)).milliseconds.rawValue
-				}
-				
+								
 				// set the username to the passed in username that we authenticated with to get this token
 				token.username = username
 				

@@ -111,4 +111,10 @@ public enum Roles: String, Codable {
 	
 	/** has access to query for users, request tokens on behalf of users etc */
 	case useradmin
+	
+	case unknown = "__unknown"
+	
+	public init(from decoder: Decoder) throws {
+		self = (try? Self(rawValue: decoder.singleValueContainer().decode(RawValue.self))) ?? .unknown
+	}
 }

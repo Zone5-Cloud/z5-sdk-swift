@@ -3,10 +3,7 @@ import Foundation
 /// Token that can be used to sign relevant requests as the user it represents.
 public protocol AccessToken: Codable, CustomStringConvertible, CustomDebugStringConvertible {
 
-	/// The string value of the token.
-	var rawValue: String { get }
-	var tokenExp: Int? { get set }
-	var expiresIn: Int? { get set }
+	var tokenExp: Milliseconds? { get set }
 	var username: String? { get set }
 	var refreshToken: String? { get }
 	var accessToken: String { get }
@@ -15,11 +12,16 @@ public protocol AccessToken: Codable, CustomStringConvertible, CustomDebugString
 }
 
 extension AccessToken  {
+	
+	/// The string value of the token.
+	public var rawValue: String {
+		return accessToken
+	}
 
 	public var description: String {
 		return rawValue
 	}
-
+	
 }
 
 extension AccessToken {
@@ -31,11 +33,30 @@ extension AccessToken {
 }
 
 extension AccessToken {
-	internal mutating func calculateExpiry() {
-		if expiresIn == nil, let exp = tokenExp {
-			self.expiresIn = Int((Double(exp) / 1000.0) - Date().timeIntervalSince1970)
-		} else if tokenExp == nil, let expiresIn = expiresIn {
-			self.tokenExp = (Date() + Double(expiresIn)).milliseconds.rawValue
+	
+	public var expiresAt: Date? {
+		guard let tokenExp = tokenExp else {
+			return nil
 		}
+		
+		return Date(tokenExp)
 	}
+	
+	public var expiresIn: TimeInterval? {
+		return expiresAt?.timeIntervalSinceNow
+	}
+	
+	internal var requiresRefresh: Bool {
+		guard let refresh = refreshToken, !refresh.isEmpty else {
+			// we can only refresh ourself if we have a refresh token
+			return false
+		}
+		
+		// missing, nearing or past expiry
+		return expiresIn ?? 0 <= Zone5.refreshExpiresInThreshold
+	}
+}
+
+extension Zone5 {
+	static fileprivate let refreshExpiresInThreshold: TimeInterval = 30.0
 }

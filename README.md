@@ -36,10 +36,40 @@ let baseURL = URL(string: "https://your-zone5-server.com")!
 let clientID = "YOUR-CLIENT-IDENTIFIER"
 let clientSecret = "YOUR-CLIENT-SECRET"
 
+// for an unauthenticated session (not yet logged in)
 Zone5.shared.configure(for: baseURL, clientID: clientID, clientSecret: clientSecret)
+
+// for persisting a logged in session across App restarts. 
+let accessToken: OAuthToken? = <read json OAuthToken from a keystore>
+Zone5.shared.configure(for: baseURL, clientID: clientID, clientSecret: clientSecret, accessToken: accessToken)
+
 ```
 
-Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.oAuth`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html):
+A saved OAuthToken only needs to be passed in at startup. The state of the token is automatically updated on login, logout, accessToken, refreshAccessToken and automatic token refresh.
+Token refresh is handled automatically before all authenticated calls and then token updated accordingly.
+
+Whenever the accessToken is updated, either because you called login, logout, accessToken or refreshAccessToken or because of an automatic refresh, the Notification `Zone5.authTokenChangedNotification` is fired on the Zone5 instance with the updated OAuthToken in the userInfo.
+
+Observe this Notification so that you can save the updated Token to persist logged in sessions across App restarts. e.g.
+
+```swift
+apiClient.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: apiClient, queue: nil) { notification in
+	let token = notification.userInfo?["accessToken"] as? OAuthToken
+	keyValueStore.oauthToken = token
+}
+```
+
+If there are updated Terms and Conditions identified after a login or refresh, the Notification Zone5.updatedTermsNotification is fired with the list of updated terms in the userInfo. 
+Observe this Notification so that you can prompt users to re-accept updated Terms and Conditions. e.g.
+
+```swift		
+apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: apiClient, queue: nil) { notification in
+	let terms = notification.userInfo?["updatedTerms"] as? [UpdatedTerms]
+	print("There are updated terms that can be accepted")
+}
+```
+
+Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.oAuth and [`Zone5.shared.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):
 
 ```swift
 let username = "EXAMPLE-USERNAME"
@@ -51,13 +81,28 @@ Zone5.shared.oAuth.accessToken(username: username, password: password) { result 
 		// An error occurred and needs to be handled
 
 	case .success(let accessToken):
-		// The user was successfully authenticated. You should store this token securely
-		// so that you can allow the user to stay authenticated across multiple sessions.
+		// The user was successfully authenticated. 
+		// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire
 	}
 }
 ```
 
-Once the user successfully authenticates, these methods return an [`AccessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Structs/AccessToken.html) object, but also update the [`Zone5.shared.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/Zone5.html#/s:5Zone5AAC11accessTokenAA06AccessC0VSgvp) with the returned token, allowing access to methods that require this token to be set.
+or
+
+```swift
+Zone5.shared.users.login(email: username, password: password, accept: []) { result in
+	switch result {
+    case .failure(let error):
+        // An error occurred and needs to be handled
+
+    case .success(let loginResponse):
+        // The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc
+        // Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire
+    }
+}
+```
+
+Once authenticated you can make authenticated calls such as:
 
 ```swift
 Zone5.shared.users.me { result in
@@ -70,6 +115,8 @@ Zone5.shared.users.me { result in
 	}
 }
 ```
+
+Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword.
 
 ## Unit Tests
 
