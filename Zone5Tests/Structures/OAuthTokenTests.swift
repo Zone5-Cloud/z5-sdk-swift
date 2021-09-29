@@ -81,4 +81,61 @@ class OAuthTokenTests: XCTestCase {
 		XCTAssertTrue(token.expiresIn! < 0)
 		XCTAssertEqual(token.username, "test@user.com")
 	}
+	
+	func testOAuthFromLogin() {
+		let now = Date()
+		let expiry = (now + 10).milliseconds
+		var loginResponse = LoginResponse()
+		loginResponse.token = "abc"
+		loginResponse.refresh = "zxc"
+		loginResponse.tokenExp = expiry
+		
+		let oAuth = OAuthToken(loginResponse: loginResponse)
+		XCTAssertEqual(expiry, oAuth.tokenExp)
+		XCTAssertEqual(Date(expiry), oAuth.expiresAt)
+		XCTAssertEqual(oAuth.expiresIn!, 10, accuracy: 1)
+		XCTAssertEqual("abc", oAuth.accessToken)
+		XCTAssertEqual("zxc" ,oAuth.refreshToken)
+	}
+	
+	func testEquivalence() {
+		let date = Date()
+		let token1 = OAuthToken(token: "testtoken", refresh: "testrefresh", expiresAt: date, username: "user")
+		var token2 = OAuthToken(token: "testtoken", refresh: "testrefresh", expiresAt: date, username: "user")
+		
+		XCTAssertEqual(token1, token2)
+		
+		token2.scope = "scope"
+		XCTAssertNotEqual(token1, token2)
+		
+		token2 = token1
+		XCTAssertEqual(token1, token2)
+		
+		token2.refreshToken = "other"
+		XCTAssertNotEqual(token1, token2)
+		
+		token2 = token1
+		token2.expiresAt = Date() + 600
+		XCTAssertNotEqual(token1, token2)
+		
+		token2 = token1
+		token2.username = "other"
+		XCTAssertNotEqual(token1, token2)
+		
+		token2 = OAuthToken(token: "other", refresh: "testrefresh", expiresAt: date, username: "user")
+		XCTAssertNotEqual(token1, token2)
+	}
+	
+	func testExpiresAt() {
+		let date = Date()
+		var token = OAuthToken(token: "testtoken", refresh: "testrefresh", expiresAt: date, username: "user")
+		
+		XCTAssertEqual(date.milliseconds, token.expiresAt!.milliseconds)
+		
+		let newDate = date + 1
+		
+		token.expiresAt = newDate
+		
+		XCTAssertEqual(date.milliseconds + 1000, token.expiresAt!.milliseconds)
+	}
 }

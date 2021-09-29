@@ -35,11 +35,17 @@ extension AccessToken {
 extension AccessToken {
 	
 	public var expiresAt: Date? {
-		guard let tokenExp = tokenExp else {
-			return nil
+		get {
+			guard let tokenExp = tokenExp else {
+				return nil
+			}
+			
+			return Date(tokenExp)
 		}
 		
-		return Date(tokenExp)
+		set {
+			tokenExp = newValue?.milliseconds
+		}
 	}
 	
 	public var expiresIn: TimeInterval? {

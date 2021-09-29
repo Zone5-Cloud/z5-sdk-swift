@@ -66,7 +66,7 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 	}
 	
 	public func equals(_ other: AccessToken?) -> Bool {
-		if let other = other as? OAuthToken, other.accessToken == self.accessToken, other.refreshToken == self.refreshToken, other.tokenExp == self.tokenExp, other.username == self.username {
+		if let other = other as? OAuthToken, other.accessToken == self.accessToken, other.refreshToken == self.refreshToken, other.tokenExp == self.tokenExp, other.username == self.username, other.scope == self.scope, other.tokenType == self.tokenType {
 			return true
 		}
 		

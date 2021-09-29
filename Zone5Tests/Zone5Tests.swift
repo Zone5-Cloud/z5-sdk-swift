@@ -17,23 +17,6 @@ class Zone5Tests: XCTestCase {
 		z5 = createNewZone5()
 	}
 	
-	func testAccessTokenFromLogin() {
-		XCTAssertNil(z5.accessToken)
-		let now = Date()
-		let expiry = (now + 10).milliseconds
-		var loginResponse = LoginResponse()
-		loginResponse.token = "abc"
-		loginResponse.refresh = "zxc"
-		loginResponse.tokenExp = expiry
-		
-		let oAuth = OAuthToken(loginResponse: loginResponse)
-		XCTAssertEqual(expiry, oAuth.tokenExp)
-		XCTAssertEqual(Date(expiry), oAuth.expiresAt)
-		XCTAssertEqual(oAuth.expiresIn!, 10, accuracy: 1)
-		XCTAssertEqual("abc", oAuth.accessToken)
-		XCTAssertEqual("zxc" ,oAuth.refreshToken)
-	}
-	
 	func testAccessToken() {
 		XCTAssertNil(z5.accessToken)
 		let now = Date()
@@ -46,6 +29,10 @@ class Zone5Tests: XCTestCase {
 			XCTAssertTrue(expiresAt >= now.addingTimeInterval(300).milliseconds)
 			XCTAssertTrue(expiresAt <= Date().addingTimeInterval(300).milliseconds)
 		}
+		
+		z5.accessToken = oAuth
+		
+		XCTAssertTrue(oAuth.equals(z5.accessToken))
 	}
 	
 	func testFieldName() {
@@ -55,13 +42,20 @@ class Zone5Tests: XCTestCase {
 	}
 	
 	func testAccessTokenUpdated() {
-		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
+		let token = OAuthToken(token: "123")
+		
+		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5) { notification in
+			XCTAssertEqual(notification.userInfo?["accessToken"] as? OAuthToken, token)
+			return true
+		}
+		
 		expectation.assertForOverFulfill = true
 		expectation.expectedFulfillmentCount = 1
 		
-		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123"))
+		
+		z5.configure(for: URL(string: "http://test")!, accessToken: token)
 		wait(for: [expectation], timeout: 5)
-		XCTAssertEqual("123", z5.accessToken?.rawValue)
+		XCTAssertEqual(token, z5.accessToken as? OAuthToken)
 	}
 	
 	func testAccessTokenOnChanged() {
@@ -83,11 +77,15 @@ class Zone5Tests: XCTestCase {
 		XCTAssertEqual(4, z5.accessToken?.tokenExp)
 		XCTAssertNotNil(z5.accessToken?.expiresIn)
 		
-		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5, handler: nil)
+		let token = OAuthToken(token: "123", refresh: "zxc", tokenExp: 5, username: "")
+		let expectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: z5) { notification in
+			XCTAssertEqual(token, notification.userInfo?["accessToken"] as? OAuthToken)
+			return true
+		}
 		expectation.assertForOverFulfill = true
 		expectation.expectedFulfillmentCount = 1
 		
-		z5.configure(for: URL(string: "http://test")!, accessToken: OAuthToken(token: "123", refresh: "zxc", tokenExp: 5, username: ""))
+		z5.configure(for: URL(string: "http://test")!, accessToken: token)
 		wait(for: [expectation], timeout: 5)
 		XCTAssertEqual("123", z5.accessToken?.rawValue)
 		XCTAssertEqual(5, z5.accessToken?.tokenExp)
