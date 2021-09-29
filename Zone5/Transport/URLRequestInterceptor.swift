@@ -9,7 +9,6 @@
 import Foundation
 
 internal class URLRequestInterceptor: URLProtocol {
-	static private let refreshExpiresInThreshold = 30.0
 	
 	// synchronize auto refresh so that only 1 request at a time can issue a refresh
 	static private let refreshDispatchQueue = DispatchQueue(label: "URLRequestInterceptor.refreshDispatchQueue")
@@ -50,19 +49,14 @@ internal class URLRequestInterceptor: URLProtocol {
         // if we have a Cognito token with an expiry and this request requires auth token, check the expiry
 		if let requiresAccessToken = request.getMeta(key: .requiresAccessToken) as? Bool, requiresAccessToken,
            let zone5 = request.getMeta(key: .zone5) as? Zone5,
-		   let token = zone5.accessToken as? OAuthToken, let refresh = token.refreshToken, !refresh.isEmpty,
-           let expiresAt = token.tokenExp,
-		   expiresAt < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
+		   let token = zone5.accessToken, token.requiresRefresh {
 			// our token expires in less than 30 seconds. Do a refresh before sending the request
 			// do these refresh requests synchronously so only one executes at a time and others wait for first refresh to complete - at which point duplicate refresh not necessary
 			URLRequestInterceptor.refreshDispatchQueue.async {
 				URLRequestInterceptor.refreshDispatchSemaphore.wait() // should let first 1 through
 				// recheck TTL once inside mutex block, cos it might have been updated by another refresh while we were waiting for mutex
-				if let token = zone5.accessToken as? OAuthToken, let refresh = token.refreshToken, !refresh.isEmpty,
-                   let expiresAt = token.tokenExp,
-				   let username = token.username ?? self.extractUsername(from: token.accessToken),
-				   expiresAt < Date().addingTimeInterval(URLRequestInterceptor.refreshExpiresInThreshold).milliseconds.rawValue {
-					zone5.oAuth.refreshAccessToken(username: username) { result in
+				if let token = zone5.accessToken, token.requiresRefresh {
+					zone5.oAuth.refreshAccessToken() { result in
 						// note that refresh does not require auth so it will not cyclicly enter this path
 						URLRequestInterceptor.refreshDispatchSemaphore.signal()
 						self.decorateAndSendRequest()

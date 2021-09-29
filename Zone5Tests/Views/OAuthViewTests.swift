@@ -5,11 +5,6 @@ class OAuthViewTests: XCTestCase {
 
 	func testAccessToken() {
 		let tests: [(prepareConfiguration: (_ configuration: inout ConfigurationForTesting) -> Void, response: TestHTTPClientURLSession.Result<String>, expectedResult: Zone5.Result<OAuthToken>)] = [
-			( // Should complete with .invalidConfiguration when client is not configured correctly.
-				prepareConfiguration: { $0.accessToken = nil; $0.clientID = nil; $0.clientSecret = nil },
-				response: .message("{\"message\":\"UT010031: Login failed\"}", statusCode: 500),
-				expectedResult: .failure(.invalidConfiguration)
-			),
 			( // Should complete with .serverError(_:) if a message is transmitted.
 				prepareConfiguration: { $0.accessToken = nil },
 				response: .message("UT010031: Login failed", statusCode: 500),
@@ -27,18 +22,22 @@ class OAuthViewTests: XCTestCase {
 			),
 			( // Should succeed when a valid response is returned from the server.
 				prepareConfiguration: { $0.accessToken = nil },
-				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\",\"ignored_value\":\"that is dropped during decoding\"}"),
-				expectedResult: .success(OAuthToken(rawValue: "ACCESS_TOKEN_VALUE"))
+				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\",\"ignored_value\":\"that is dropped during decoding\", \"refresh_token\": \"REFRESH_TOKEN_VALUE\", \"expires_in\":600}"),
+				expectedResult: .success(OAuthToken(token: "ACCESS_TOKEN_VALUE", refresh: "REFRESH_TOKEN_VALUE", tokenExp: Date().addingTimeInterval(600).milliseconds, username: "username"))
 			),
-			( // Should succeed even if a valid AccessToken exists.
-				prepareConfiguration: { _ in },
-				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\"}"),
-				expectedResult: .success(OAuthToken(rawValue: "ACCESS_TOKEN_VALUE"))
+			( // Should succeed even if a valid AccessToken exists, and the new authenticated name should repplace the old username
+				prepareConfiguration: { $0.accessToken = OAuthToken(token: "original", refresh: "original", tokenExp: 0 as Milliseconds, username: "test-user-should-get-overwritten") },
+				response: .success("{\"access_token\":\"ACCESS_TOKEN_VALUE\", \"refresh_token\": \"REFRESH_TOKEN_VALUE\", \"expires_in\": 600}"),
+				expectedResult: .success(OAuthToken(token: "ACCESS_TOKEN_VALUE", refresh: "REFRESH_TOKEN_VALUE", tokenExp: Date().addingTimeInterval(600).milliseconds, username: "username"))
 			),
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
             XCTAssertEqual(lhs.accessToken, rhs.accessToken)
+			XCTAssertEqual(lhs.refreshToken, rhs.refreshToken)
+			XCTAssertEqual(lhs.expiresIn!, rhs.expiresIn!, accuracy: 50)
+			XCTAssertEqual(lhs.username, rhs.username)
+			XCTAssertEqual(lhs.tokenExp!, rhs.tokenExp!, accuracy: 2000)
         }
 
         var expectations: [XCTestExpectation] = []
@@ -64,32 +63,35 @@ class OAuthViewTests: XCTestCase {
 	}
 	
 	func testAdhocToken() {
-		var expectedAuthToken = OAuthToken(token: "test token", expiresIn: 123)
+		var expectedAuthToken = OAuthToken(token: "adhoc token", refresh: "refresh token", expiresIn: 123)
 		expectedAuthToken.scope = "things"
 		
 		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<OAuthToken>)] = [
-			(token:expectedAuthToken, json:"{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
+			(token:OAuthToken(token: "configured token", refresh: "refresh", expiresAt: Date().addingTimeInterval(600), username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh_token\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
             XCTAssertEqual(lhs.accessToken, rhs.accessToken)
-            XCTAssertEqual(lhs.expiresIn, rhs.expiresIn)
-            XCTAssertEqual(lhs.scope, rhs.scope)
+			XCTAssertEqual(lhs.refreshToken, rhs.refreshToken)
+			XCTAssertEqual(lhs.tokenExp!, rhs.tokenExp!, accuracy: 2000)
+			XCTAssertEqual(lhs.expiresIn!, rhs.expiresIn!, accuracy: 2.0)
+			XCTAssertEqual(lhs.scope, rhs.scope)
         }
 
         var expectations: [XCTestExpectation] = []
-		execute(with: tests) { client, _, urlSession, expected in
+		execute(with: tests) { client, _, urlSession, test in
 			urlSession.dataTaskHandler = { request in
-				XCTAssertEqual(request.url?.path, "/rest/oauth/access_token")
-				XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
+				XCTAssertEqual(request.url?.path, "/rest/oauth/newtoken/clientA")
+				XCTAssertNotNil(request.allHTTPHeaderFields?["Authorization"])
+				XCTAssertEqual("Bearer configured token", request.value(forHTTPHeaderField: "Authorization"))
 
-				return .success("{\"access_token\": \"test token\", \"scope\": \"things\", \"expires_in\":123}")
+				return .success(test.json)
 			}
 
-            let expectation = ResultExpectation(for: expected.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
 
-            client.oAuth.accessToken(username: "username", password: "password", completion: expectation.fulfill)
+            client.oAuth.adhocAccessToken(for: "clientA", completion: expectation.fulfill)
 		}
 
         wait(for: expectations, timeout: 5)

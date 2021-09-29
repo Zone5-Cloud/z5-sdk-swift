@@ -31,6 +31,10 @@ public struct URLEncodedBody: RequestBody, CustomStringConvertible, ExpressibleB
 	public func get(_ name: String) -> String? {
 		return queryItems.first(where: {$0.name == name})?.value
 	}
+	
+	public mutating func put(name: String, value: CustomStringConvertible?) {
+		queryItems.append(URLQueryItem(name: name, value: value?.description))
+	}
 
 	// MARK Custom string convertible
 

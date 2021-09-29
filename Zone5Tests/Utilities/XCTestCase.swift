@@ -13,7 +13,7 @@ extension XCTestCase {
 
 	struct ConfigurationForTesting {
 
-		var accessToken: AccessToken? = OAuthToken(rawValue: "ACCESS_TOKEN")
+		var accessToken: AccessToken? = OAuthToken(token: "ACCESS_TOKEN", refresh: "REFRESH_TOKEN", tokenExp: Date().addingTimeInterval(60000).milliseconds, username: "testuser")
 
 		var baseURL: URL? = URL(string: "http://localhost")!
 
@@ -75,7 +75,7 @@ extension XCTestCase {
 						XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer \(token.rawValue)")
 						return .success(parameter.json)
 					} else if let required = request.getMeta(key: .requiresAccessToken) as? Bool, required {
-						// missing required auth header
+						// missing required auth header, simulate an unauthorized server response
 						XCTAssertNil(request.allHTTPHeaderFields?["Authorization"])
 						return .failure("Unauthorized", statusCode: 401)
 					} else {
@@ -118,7 +118,6 @@ extension XCTestCase {
 extension Zone5 {
 
 	func configure(with configuration: XCTestCase.ConfigurationForTesting) {
-		redirectURI = configuration.redirectURI
 		accessToken = configuration.accessToken
 
 		if let baseURL = configuration.baseURL, let clientID = configuration.clientID, let clientSecret = configuration.clientSecret {

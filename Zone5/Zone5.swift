@@ -14,6 +14,7 @@ final public class Zone5 {
 	internal static let specializedStagingServer: String = "api-sp-staging.todaysplan.com.au"
 	
 	public static let authTokenChangedNotification = Notification.Name("authTokenChangedNotification")
+	public static let updatedTermsNotification = Notification.Name("updatedTermsNotification")
 	
 	init(httpClient: Zone5HTTPClient = .init()) {
 		self.httpClient = httpClient
@@ -30,20 +31,20 @@ final public class Zone5 {
 	/// during a previous session.
 	public internal(set) var accessToken: AccessToken? {
 		didSet {
-			if var token = accessToken, !token.equals(oldValue) {
-				if token.username == nil {
-					token.username = oldValue?.username
-					accessToken = token
+			if let token = accessToken {
+				if !token.equals(oldValue) {
+					// notify change of accessToken
+					notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
+						"accessToken": token
+					])
 				}
-				notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
-					"accessToken": token
-				])
 			} else if accessToken == nil && oldValue != nil {
+				// notify deletion of accessToken
 				notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self)
 			}
 		}
 	}
-    
+
     public var debugLogging: Bool = false
 
 	/// The root URL for the server that we want to communicate with.
@@ -61,8 +62,6 @@ final public class Zone5 {
 	/// The user agent to set in the User-Agent header
 	public internal(set) var userAgent: String?
 
-	public var redirectURI: String = "https://localhost"
-	
 	public var notificationCenter: NotificationCenter = .default
 
 	/// Configures the SDK to use the application specified by the given `clientID` and `clientSecret`.
@@ -113,26 +112,8 @@ final public class Zone5 {
 			return false // Always require a `baseURL`
 		}
 
-		if accessToken != nil {
-			return true // Access token will happily represent the user all by itself
-		}
-		else if clientID != nil && clientSecret != nil {
-			return true // For authentication purposes, we need a valid clientID and clientSecret
-		}
-		else if !requiresClientSecret {
-			return true // For some hosts, we don't need a valid clientID and clientSecret
-		}
-
-		return false
-	}
-	
-	/// Check to see whether this host requires authentication using clientID and clientSecret
-	public var requiresClientSecret: Bool {
-		if let server = self.baseURL, (server.host == Zone5.specializedServer || server.host == Zone5.specializedStagingServer) {
-			return false
-		}
-		
-		return true;
+		// need either an accessToken or a clientID to be able to do anything
+		return accessToken != nil || clientID != nil
 	}
 
 	// MARK: Views
@@ -175,6 +156,11 @@ final public class Zone5 {
 	/// A collection of API endpoints related to payments.
 	public lazy var payments: PaymentsView = {
 		return PaymentsView(zone5: self)
+	}()
+	
+	/// A collection of API endpoints related to Terms and Conditions
+	public lazy var terms: TermsView = {
+		return TermsView(zone5: self)
 	}()
 	
 	/// A collection of functions to call API endpoints to a server external to Zone5
@@ -246,10 +232,15 @@ final public class Zone5 {
 		/// Structure that represents a message produced by the server when an error occurs.
 		public struct ServerMessage: Swift.Error, Codable, Equatable {
 
+			public struct ErrorMeta: Codable, Equatable {
+				public var required: [String]?
+			}
+			
 			public struct ServerError: Codable, Equatable {
 				public var field: String?
 				public var message: String?
 				public var code: Int?
+				public var metadata: ErrorMeta?
 			}
 			
 			internal init(message: String, statusCode: Int? = nil) {

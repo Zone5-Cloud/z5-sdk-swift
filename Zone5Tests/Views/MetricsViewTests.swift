@@ -19,7 +19,7 @@ class MetricsViewTests: XCTestCase {
 				expectedResult: .failure(authFailure)
 			),
 			(
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refresh", tokenExp: 30000 as Milliseconds, username: "testuser"),
 				json: "{\"fields\":{},\"results\":[{\"user\":{\"id\":175,\"firstname\":\"John\",\"lastname\":\"Smith\"},\"name\":\"Series\",\"count\":1,\"bike\":{\"uuid\":\"d584c5cb-e81f-4fbe-bc0d-667e9bcd2c4c\"},\"sum\":{\"training\":7031,\"distance\":54737.949219,\"ascent\":692},\"max\":{\"maxSpeed\":63.684002},\"wavg\":{\"avgSpeed\":28.501199}}],\"keys\":[\"id\"]}",
 				expectedResult: .success {
 					var result = MappedResult<UserWorkoutResult>()

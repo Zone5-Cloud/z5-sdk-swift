@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Zone5",
 	platforms: [
-		.iOS(.v10),
+		.iOS(.v13),
 		.macOS(.v10_15),
 	],
     products: [

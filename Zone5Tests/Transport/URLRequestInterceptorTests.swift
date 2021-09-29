@@ -13,12 +13,12 @@ class URLRequestInterceptorTests: XCTestCase {
 	private var urlSession = TestHTTPClientURLSession()
 	private var zone5: Zone5!
 	
-	override func setUpWithError() throws {
+	override func setUp() {
 		zone5 = Zone5(httpClient: .init(urlSession: urlSession))
 		// configure auth token that is not near expiry
-		var oauth = OAuthToken(rawValue: "testauth")
+		var oauth = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: 30000 as Milliseconds, username: "testuser")
 		oauth.refreshToken = "refresh"
-		oauth.tokenExp = Date().milliseconds.rawValue + 100000
+		oauth.tokenExp = Date().milliseconds + 100000
 		zone5.configure(for: URL(string: "https://api-sp-staging.todaysplan.com.au")!, clientID: "CLIENT ID", clientSecret: "CLIENT SECRET", userAgent: "agent 123", accessToken: oauth)
 	}
 
@@ -78,10 +78,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		let request = createRequest("/rest/test", authRequired: true)
 		
 		// configure auth token that is near expiry
-		var oauth = OAuthToken(rawValue: "testauth")
-		oauth.refreshToken = "refresh"
-		oauth.tokenExp = Date().milliseconds.rawValue
-		zone5.accessToken = oauth
+		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds, username: "user")
 		
 		// refresh is asynchronous so we need to set up expectations and capture the intermediary step to test validity
 		let expectation = self.expectation(description: "sendRequest called")
@@ -91,42 +88,54 @@ class URLRequestInterceptorTests: XCTestCase {
 		XCTAssertNil(interceptor.lastRequest)
 		XCTAssertEqual(request, interceptor.request)
 		
+		let tokenNotificationExpectation = self.expectation(forNotification: Zone5.authTokenChangedNotification, object: zone5) { notification in
+			let token = notification.userInfo?["accessToken"] as? OAuthToken
+			
+			XCTAssertEqual("123", token?.refreshToken)
+			XCTAssertEqual("testauth2", token?.accessToken)
+			XCTAssertEqual("user", token?.username)
+			XCTAssertEqual(30000, token?.tokenExp)
+			return true
+		}
+		
+		let termsNotificationExpectation = self.expectation(forNotification: Zone5.updatedTermsNotification, object: zone5) { notification in
+			XCTAssertEqual("xyz", (notification.userInfo?["updatedTerms"] as? [UpdatedTerms])![0].id)
+			return true
+		}
+		
 		// the refresh should go through the test session and hit here
 		urlSession.dataTaskHandler = { request in
-			XCTAssertEqual(request.url?.path, "/rest/oauth/access_token")
+			XCTAssertEqual(request.url?.path, "/rest/auth/refresh")
 			// token refresh is an unauthenticated request that passes the refresh token. Should not have auth header
 			XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
 
-			return .success("{\"access_token\":\"testauth\", \"refresh_token\":\"123\", \"expires_in\":30000}")
+			return .success("{\"token\":\"testauth2\", \"refresh\":\"123\", \"tokenExp\":30000, \"updatedTerms\":[{\"id\":\"xyz\"}]}")
 		}
 		
 		// before refresh token updated
-		XCTAssertEqual("refresh", (zone5.accessToken as! OAuthToken).refreshToken)
+		XCTAssertEqual("refresh", zone5.accessToken!.refreshToken)
 		
 		// kick it off
 		interceptor.startLoading()
 		
 		// wait for async callbacks
-		wait(for: [expectation], timeout: 5)
+		wait(for: [expectation, tokenNotificationExpectation, termsNotificationExpectation], timeout: 5)
 		
 		// refresh should have triggered, our refresh token on the zone5 instance should've been updated and the original request should've fired
 		XCTAssertNotNil(interceptor.lastRequest)
 		XCTAssertEqual(request.url, interceptor.lastRequest!.url)
 		XCTAssertEqual(URLSessionTaskType.data, interceptor.lastRequest!.taskType)
-		XCTAssertEqual("123", (zone5.accessToken as! OAuthToken).refreshToken) // no longer "refresh"
-		// auth header should be added
+		XCTAssertEqual("123", zone5.accessToken!.refreshToken) // no longer "refresh"
+		// auth header should be added using the updated token
 		XCTAssertNil(interceptor.request.value(forHTTPHeaderField: "Authorization"))
-		XCTAssertEqual("Bearer testauth", interceptor.lastRequest!.value(forHTTPHeaderField: "Authorization"))
+		XCTAssertEqual("Bearer testauth2", interceptor.lastRequest!.value(forHTTPHeaderField: "Authorization"))
 		XCTAssertEqual(interceptor.lastRequest!.value(forHTTPHeaderField: "Api-Key"), "CLIENT ID")
 		XCTAssertEqual(interceptor.lastRequest!.value(forHTTPHeaderField: "Api-Key-Secret"), "CLIENT SECRET")
 	}
 	
 	func testAuthExpiredPipelineOnlyRefreshesOnce() {
 		// configure auth token that is near expiry
-		var oauth = OAuthToken(rawValue: "testauth")
-		oauth.refreshToken = "refresh"
-		oauth.tokenExp = Date().milliseconds.rawValue
-		zone5.accessToken = oauth
+		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds, username: "testuser")
 		
 		// refresh is asynchronous so we need to set up expectations and capture the intermediary step to test validity
 		let expectationSendRequest = self.expectation(description: "sendRequest called")
@@ -144,13 +153,24 @@ class URLRequestInterceptorTests: XCTestCase {
 		expectationRefresh.assertForOverFulfill = true
 		expectationRefresh.expectedFulfillmentCount = 1
 		urlSession.dataTaskHandler = { request in
-			XCTAssertEqual(request.url?.path, "/rest/oauth/access_token")
+			XCTAssertEqual(request.url?.path, "/rest/auth/refresh")
 			// token refresh is an unauthenticated request that passes the refresh token. Should not have auth header
 			XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
 
 			expectationRefresh.fulfill()
 			print("refresh called")
-			return .success("{\"access_token\":\"testauth\", \"refresh_token\":\"123\", \"expires_in\":30000}")
+			return .success("{\"token\":\"testauth2\", \"refresh\":\"123\", \"tokenExp\":\(Date().milliseconds.rawValue + 60000)}")
+		}
+		
+		let tokenNotificationExpectation = self.expectation(description: "notification for token fired")
+		zone5.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: zone5, queue: nil) { notification in
+			let token = notification.userInfo?["accessToken"] as? OAuthToken
+			
+			XCTAssertEqual("123", token?.refreshToken)
+			XCTAssertEqual("testauth2", token?.accessToken)
+			XCTAssertEqual("testuser", token?.username)
+			
+			tokenNotificationExpectation.fulfill()
 		}
 		
 		// before refresh token updated
@@ -161,7 +181,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		interceptors.forEach { let a = $0; queue.async { a.startLoading() } }
 		
 		// wait for async callbacks. all 5 requests should get called. Only one refresh (the first one).
-		wait(for: [expectationSendRequest, expectationRefresh], timeout: 5)
+		wait(for: [expectationSendRequest, expectationRefresh, tokenNotificationExpectation], timeout: 5)
 		
 		// refresh should have triggered, our refresh token on the zone5 instance should've been updated and the original request should've fired
 		interceptors.forEach {
@@ -171,7 +191,7 @@ class URLRequestInterceptorTests: XCTestCase {
 			
 			// the authorization header is added during startLoading
 			XCTAssertNil($0.request.value(forHTTPHeaderField: "Authorization"))
-			XCTAssertEqual("Bearer testauth", $0.lastRequest!.value(forHTTPHeaderField: "Authorization"))
+			XCTAssertEqual("Bearer testauth2", $0.lastRequest!.value(forHTTPHeaderField: "Authorization"))
 			XCTAssertEqual($0.lastRequest!.value(forHTTPHeaderField: "Api-Key"), "CLIENT ID")
 			XCTAssertEqual($0.lastRequest!.value(forHTTPHeaderField: "Api-Key-Secret"), "CLIENT SECRET")
 		}
