@@ -53,7 +53,7 @@ Whenever the accessToken is updated, either because you called login, logout, ac
 Observe this Notification so that you can save the updated Token to persist logged in sessions across App restarts. e.g.
 
 ```swift
-apiClient.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: apiClient, queue: nil) { notification in
+apiClient.notificationCenter.addObserver(forName: Zone5.authTokenChangedNotification, object: Zone5.shared, queue: nil) { notification in
 	let token = notification.userInfo?["accessToken"] as? OAuthToken
 	keyValueStore.oauthToken = token
 }
@@ -63,9 +63,9 @@ If there are updated Terms and Conditions identified after a login or refresh, t
 Observe this Notification so that you can prompt users to re-accept updated Terms and Conditions. e.g.
 
 ```swift		
-apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: apiClient, queue: nil) { notification in
+apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification, object: Zone5.shared, queue: nil) { notification in
 	let terms = notification.userInfo?["updatedTerms"] as? [UpdatedTerms]
-	print("There are updated terms that can be accepted")
+	// do something with terms
 }
 ```
 
