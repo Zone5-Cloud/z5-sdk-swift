@@ -67,26 +67,28 @@ class OAuthViewTests: XCTestCase {
 		expectedAuthToken.scope = "things"
 		
 		let tests: [(token: OAuthToken?, json: String, expectedResult: Zone5.Result<OAuthToken>)] = [
-			(token:OAuthToken(token: "configured token", refresh: "refresh", expiresAt: Date().addingTimeInterval(600), username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
+			(token:OAuthToken(token: "configured token", refresh: "refresh", expiresAt: Date().addingTimeInterval(600), username: "logged in user"), json:"{\"access_token\": \"adhoc token\", \"refresh_token\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}", expectedResult:.success(expectedAuthToken))
 		]
 
         let assertionsOnSuccess: Zone5.Result<OAuthToken>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
             XCTAssertEqual(lhs.accessToken, rhs.accessToken)
-            XCTAssertEqual(lhs.expiresIn, rhs.expiresIn)
-            XCTAssertEqual(lhs.scope, rhs.scope)
+			XCTAssertEqual(lhs.refreshToken, rhs.refreshToken)
+			XCTAssertEqual(lhs.tokenExp!, rhs.tokenExp!, accuracy: 2000)
+			XCTAssertEqual(lhs.expiresIn!, rhs.expiresIn!, accuracy: 2.0)
+			XCTAssertEqual(lhs.scope, rhs.scope)
         }
 
         var expectations: [XCTestExpectation] = []
-		execute(with: tests) { client, _, urlSession, expected in
+		execute(with: tests) { client, _, urlSession, test in
 			urlSession.dataTaskHandler = { request in
 				XCTAssertEqual(request.url?.path, "/rest/oauth/newtoken/clientA")
 				XCTAssertNotNil(request.allHTTPHeaderFields?["Authorization"])
 				XCTAssertEqual("Bearer configured token", request.value(forHTTPHeaderField: "Authorization"))
 
-				return .success("{\"access_token\": \"adhoc token\", \"refresh\": \"refresh token\", \"scope\": \"things\", \"expires_in\":123}")
+				return .success(test.json)
 			}
 
-            let expectation = ResultExpectation(for: expected.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
+            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
 
             client.oAuth.adhocAccessToken(for: "clientA", completion: expectation.fulfill)

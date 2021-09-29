@@ -31,15 +31,7 @@ final public class Zone5 {
 	/// during a previous session.
 	public internal(set) var accessToken: AccessToken? {
 		didSet {
-			if var token = accessToken {
-				// retain username
-				if token.username == nil, let oldUsername = oldValue?.username {
-					token.username = oldUsername
-				}
-
-				// token is a copy of accessToken so we need to set this back again after changes
-				accessToken = token
-				
+			if let token = accessToken {
 				if !token.equals(oldValue) {
 					// notify change of accessToken
 					notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self, userInfo: [
@@ -51,17 +43,6 @@ final public class Zone5 {
 				notificationCenter.post(name: Zone5.authTokenChangedNotification, object: self)
 			}
 		}
-	}
-	
-	/// convenience function to set token and return the token with username added
-	internal func setToken(to token: OAuthToken) -> OAuthToken {
-		var token = token
-		if token.username == nil {
-			token.username = accessToken?.username
-		}
-		
-		self.accessToken = token
-		return token
 	}
 
     public var debugLogging: Bool = false

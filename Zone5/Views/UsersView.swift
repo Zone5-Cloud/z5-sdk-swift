@@ -67,7 +67,13 @@ public class UsersView: APIView {
 		_ = post(Endpoints.login, body: body, expectedType: LoginResponse.self) { result in
 			defer { completion(result) }
 			if case .success(let loginResponse) = result {
-				zone5.accessToken = OAuthToken(loginResponse: loginResponse)
+				var token = OAuthToken(loginResponse: loginResponse)
+				// set the token username to the username we authenticated with
+				token.username = email
+				// save the token for future use (will trigger change notification)
+				zone5.accessToken = token
+				
+				//notify of any updated terms
 				if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
 					zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
 						"updatedTerms": updatedTerms

@@ -50,11 +50,10 @@ public class OAuthView: APIView {
 
 		_ = post(Endpoints.accessToken, body: body, expectedType: OAuthToken.self) { result in
 			if case .success(var token) = result {
-								
 				// set the username to the passed in username that we authenticated with to get this token
 				token.username = username
-				
-				token = zone5.setToken(to: token)
+				// save token for future use (will trigger change notification)
+				zone5.accessToken = token
 				completion(Zone5.Result.success(token))
 			} else {
 				completion(result)
@@ -95,8 +94,13 @@ public class OAuthView: APIView {
 		_ = post(Endpoints.refreshToken, body: LoginRequest(email: username, refreshToken: refreshToken, accept: accept, billingCountry: billingCountry), expectedType: LoginResponse.self) { result in
 			switch result {
 				case .success(let loginResponse):
-					let token = zone5.setToken(to: OAuthToken(loginResponse: loginResponse))
+					var token = OAuthToken(loginResponse: loginResponse)
+					// set the username on the token to the username we authenticated with
+					token.username = username
+					// save token for future use (will trigger change notification)
+					zone5.accessToken = token
 					
+					// notify any change in terms
 					if let updatedTerms = loginResponse.updatedTerms, !updatedTerms.isEmpty {
 						zone5.notificationCenter.post(name: Zone5.updatedTermsNotification, object: zone5, userInfo: [
 							"updatedTerms": updatedTerms

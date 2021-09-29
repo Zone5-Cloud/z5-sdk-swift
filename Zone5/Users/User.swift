@@ -73,9 +73,6 @@ public struct User: Searchable, JSONEncodedBody {
 		case createdTime
 		case lastLogin
 		case metric		
-		case attsMask
-		case prefsMask
-		case ridesMask
 	}
 
 	public static func fields(_ fields: [CodingKeys] = CodingKeys.allCases, prefix: String? = nil) -> [String] {
