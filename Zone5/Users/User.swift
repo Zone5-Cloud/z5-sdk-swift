@@ -33,14 +33,12 @@ public struct User: Searchable, JSONEncodedBody {
 	
 	public var gender: String?
 	
-	public var validated: Bool?
+	public var isValidated: Bool?
 	
-	public var suspended: Bool?
+	public var isSuspended: Bool?
 	
-	public var optInMask: Int?
-	
-	public var createdTime: Int?
-	public var lastLogin: Int?
+	public var createdTime: Milliseconds?
+	public var lastLogin: Milliseconds?
 	
 	public var metric: UnitMeasurement?
 
@@ -67,9 +65,8 @@ public struct User: Searchable, JSONEncodedBody {
 		case identities
 		case weight
 		case gender
-		case validated
-		case suspended
-		case optInMask
+		case isValidated = "validated"
+		case isSuspended = "suspended"
 		case createdTime
 		case lastLogin
 		case metric		

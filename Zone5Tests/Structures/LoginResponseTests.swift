@@ -35,6 +35,19 @@ class LoginResponseTests: XCTestCase {
 		
 		XCTAssertNotNil(loginResponse.user)
     }
+	
+	func testBoolsAndDates() throws {
+		let ts = Date().milliseconds
+		let response = "{\"hasFriends\":false,\"roles\":[\"user\",\"premium\"], \"user\":{\"validated\":true, \"suspended\":true, \"createdTime\":\(ts.rawValue), \"lastLogin\":\((ts + 1000).rawValue)}}".data(using: .utf8)!
+		let loginResponse = try JSONDecoder().decode(LoginResponse.self, from: response)
+		
+		XCTAssertNotNil(loginResponse.user)
+		XCTAssertEqual(ts, loginResponse.user!.createdTime)
+		XCTAssertEqual(ts + 1000, loginResponse.user!.lastLogin)
+		XCTAssertTrue(loginResponse.user!.isValidated!)
+		XCTAssertTrue(loginResponse.user!.isSuspended!)
+		
+	}
 
 
 }
