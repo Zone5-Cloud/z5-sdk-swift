@@ -98,6 +98,21 @@ class OAuthTokenTests: XCTestCase {
 		XCTAssertEqual("zxc" ,oAuth.refreshToken)
 	}
 	
+	func testEncodeDecode() throws {
+		let tokenExp = Date().milliseconds
+		let token = OAuthToken(token: "12345", refresh: "67890", tokenExp: tokenExp, username: "username@gmail.com")
+		
+		let json = try JSONEncoder().encode(token)
+		
+		let decoded = try JSONDecoder().decode(OAuthToken.self, from: json)
+		
+		XCTAssertEqual(token, decoded)
+		XCTAssertEqual("12345", decoded.accessToken)
+		XCTAssertEqual("67890", decoded.refreshToken)
+		XCTAssertEqual("username@gmail.com", decoded.username)
+		XCTAssertEqual(tokenExp, decoded.tokenExp)
+	}
+	
 	func testEquivalence() {
 		let date = Date()
 		let token1 = OAuthToken(token: "testtoken", refresh: "testrefresh", expiresAt: date, username: "user")
