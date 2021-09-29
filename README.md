@@ -69,7 +69,7 @@ apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification
 }
 ```
 
-Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.oAuth and [`Zone5.shared.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):
+Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.oAuth.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):
 
 ```swift
 let username = "EXAMPLE-USERNAME"
@@ -82,7 +82,7 @@ Zone5.shared.oAuth.accessToken(username: username, password: password) { result 
 
 	case .success(let accessToken):
 		// The user was successfully authenticated. 
-		// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire
+		// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired
 	}
 }
 ```
@@ -97,7 +97,7 @@ Zone5.shared.users.login(email: username, password: password, accept: []) { resu
 
     case .success(let loginResponse):
         // The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc
-        // Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire
+        // Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired
     }
 }
 ```
