@@ -28,6 +28,19 @@ public struct User: Searchable, JSONEncodedBody {
 	public var timezone: String?
 	
 	public var identities: [String: String]?
+	
+	public var weight: Int?
+	
+	public var gender: String?
+	
+	public var isValidated: Bool?
+	
+	public var isSuspended: Bool?
+	
+	public var createdTime: Milliseconds?
+	public var lastLogin: Milliseconds?
+	
+	public var metric: UnitMeasurement?
 
 	public init() { }
 	public init(email: String, password: String, firstname: String, lastname: String) {
@@ -50,6 +63,13 @@ public struct User: Searchable, JSONEncodedBody {
 		case locale
 		case timezone
 		case identities
+		case weight
+		case gender
+		case isValidated = "validated"
+		case isSuspended = "suspended"
+		case createdTime
+		case lastLogin
+		case metric		
 	}
 
 	public static func fields(_ fields: [CodingKeys] = CodingKeys.allCases, prefix: String? = nil) -> [String] {

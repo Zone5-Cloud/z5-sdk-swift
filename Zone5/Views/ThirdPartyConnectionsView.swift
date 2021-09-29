@@ -12,6 +12,7 @@ public class ThirdPartyConnectionsView: APIView {
 	private enum Endpoints: String, InternalRequestEndpoint {
 		case initializePairing = "/rest/users/connections/pair/{connectionType}"
 		case confirmConnection = "/rest/files/{connectionType}/confirm"
+		case connectService = "/rest/users/connections/service/{connectionType}"
 		case userConnections = "/rest/users/connections"
 		case removeThirdPartyConnection = "/rest/users/connections/rem/{connectionType}"
 		case registerDeviceWithThirdParty = "/rest/users/scheduled/activities/api/v1/push_registrations"
@@ -35,17 +36,15 @@ public class ThirdPartyConnectionsView: APIView {
 		return delete(endpoint, with: completion)
 	}
 
-	/// Initialize a connection for the current user for the given 3rd party type
-	/// - Parameters
 	@discardableResult
+	@available(*, deprecated, message: "Use `pairThirdPartyConnection(type:redirect:completion)` instead.")
 	public func initializeThirdPartyConnection(type: UserConnectionType, completion: @escaping Zone5.ResultHandler<ThirdPartyInitializeResponse>) -> PendingRequest? {
 		let endpoint = Endpoints.initializePairing.replacingTokens(["connectionType": type.connectionName])
 		return post(endpoint, body: EmptyBody(), with: completion)
 	}
-	
-	/// Set an access token for the current user for the given 3rd party type
-	/// - Parameters
+
 	@discardableResult
+	@available(*, deprecated, message: "Use `pairThirdPartyConnection(type:redirect:completion)` instead.")
 	public func setThirdPartyToken(type: UserConnectionType, parameters: URLEncodedBody, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
 		let endpoint = Endpoints.confirmConnection.replacingTokens(["connectionType": type.connectionName])
 		
@@ -54,6 +53,17 @@ public class ThirdPartyConnectionsView: APIView {
 		
 		let encodedParameters = URLEncodedBody(queryItems: queryItems)
 		return get(endpoint, parameters: encodedParameters, expectedType: Zone5.VoidReply.self, with: completion)
+	}
+	
+	/// pair a connection for the current user for the given 3rd party type
+	/// - Parameters
+	/// - type: third party to connect to. e.g. garminconnect | garmintraining | wahoo | strava
+	/// - redirect: the URL that the user will be redirected back to on completion of third party authentication
+	/// - Returns a reponse containing a thrid party authentication URL. Open this link in a browser so the user can authenticate with the third party. On completion the user will be redirected back to the passed in redirect URL
+	@discardableResult
+	public func pairThirdPartyConnection(type: UserConnectionType, redirect: URL, completion: @escaping Zone5.ResultHandler<String>) -> PendingRequest? {
+		let endpoint = Endpoints.connectService.replacingTokens(["connectionType": type.connectionName])
+		return get(endpoint, parameters: ["redirect-uri": redirect.absoluteString], with: completion)
 	}
 	
 	/// Checks if a connection type is enabled or not

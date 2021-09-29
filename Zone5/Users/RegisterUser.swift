@@ -59,15 +59,21 @@ public struct RegisterUser: Codable, JSONEncodedBody {
 
 	/// Optional - Use this to request association with a specific company based on the company nic
 	public var tags: String?
+	
+	var accept: [String]?
+	
+	var billingCountry: String?
 
 	/// Optional - Custom registration directives
 	public var params: [String: String]?
 	
 	public init() { }
-	public init(email: String, password: String, firstname: String, lastname: String) {
+	public init(email: String, password: String, firstname: String, lastname: String, accept: [String]? = nil, billingCountry: String? = nil) {
 		self.email = email
 		self.password = password
 		self.firstname = firstname
 		self.lastname = lastname
+		self.accept = accept
+		self.billingCountry = billingCountry
 	}
 }

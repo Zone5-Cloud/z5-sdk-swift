@@ -9,10 +9,10 @@
 import Foundation
 
 struct NewPassword: JSONEncodedBody {
-	var oldPassword: String
+	var oldPassword: String?
 	var newPassword: String
 	
-	public init(old: String, new: String) {
+	public init(old: String? = nil, new: String) {
 		oldPassword = old
 		newPassword = new
 	}

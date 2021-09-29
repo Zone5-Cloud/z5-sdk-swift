@@ -45,52 +45,27 @@ class KeyValueStore {
 		}
 	}
 	
-	var token: String {
-		get { return userDefaults.string(forKey: "Zone5_token") ?? "" }
-		set {
-			if !newValue.isEmpty {
-				userDefaults.set(newValue, forKey: "Zone5_token")
+	var oauthToken: OAuthToken? {
+		get {
+			if let data = userDefaults.data(forKey: "Zone5_oauth_token"), let token = try? JSONDecoder().decode(OAuthToken.self, from: data) {
+				return token
+			} else {
+				return nil
 			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token")
+		}
+		set {
+			if let newValue = newValue, !newValue.accessToken.isEmpty, let data = try? JSONEncoder().encode(newValue) {
+				userDefaults.set(data, forKey: "Zone5_oauth_token")
+			} else {
+				userDefaults.removeObject(forKey: "Zone5_oauth_token")
 			}
 		}
 	}
 	
-	var refresh: String {
-		get { return userDefaults.string(forKey: "Zone5_token_refresh") ?? "" }
+	var clientID: String? {
+		get { return userDefaults.string(forKey: "Zone5_clientID") }
 		set {
-			if !newValue.isEmpty {
-				userDefaults.set(newValue, forKey: "Zone5_token_refresh")
-			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token_refresh")
-			}
-		}
-	}
-	
-	var tokenExp: Int {
-		get { return userDefaults.integer(forKey: "Zone5_token_expiry") }
-		set {
-			if newValue > 0 {
-				userDefaults.set(newValue, forKey: "Zone5_token_expiry")
-			}
-			else {
-				userDefaults.removeObject(forKey: "Zone5_token_expiry")
-			}
-		}
-	}
-	
-	func updateToken(_ accessToken: AccessToken?) {
-		token = accessToken?.rawValue ?? ""
-		tokenExp = accessToken?.tokenExp ?? 0
-		refresh = (accessToken as? OAuthToken)?.refreshToken ?? ""
-	}
-	
-	var clientID: String {
-		get { return userDefaults.string(forKey: "Zone5_clientID") ?? "" }
-		set {
-			if !newValue.isEmpty {
+			if let newValue = newValue, !newValue.isEmpty {
 				userDefaults.set(newValue, forKey: "Zone5_clientID")
 			}
 			else {
@@ -99,10 +74,10 @@ class KeyValueStore {
 		}
 	}
 
-	var clientSecret: String {
-		get { return userDefaults.string(forKey: "Zone5_clientSecret") ?? "" }
+	var clientSecret: String? {
+		get { return userDefaults.string(forKey: "Zone5_clientSecret") }
 		set {
-			if !newValue.isEmpty {
+			if let newValue = newValue, !newValue.isEmpty {
 				userDefaults.set(newValue, forKey: "Zone5_clientSecret")
 			}
 			else {
@@ -111,10 +86,10 @@ class KeyValueStore {
 		}
 	}
 	
-	var userAgent: String {
-		get { return userDefaults.string(forKey: "Zone5_userAgent") ?? "" }
+	var userAgent: String? {
+		get { return userDefaults.string(forKey: "Zone5_userAgent") }
 		set {
-			if !newValue.isEmpty {
+			if let newValue = newValue, !newValue.isEmpty {
 				userDefaults.set(newValue, forKey: "Zone5_userAgent")
 			}
 			else {

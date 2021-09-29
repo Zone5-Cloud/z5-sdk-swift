@@ -19,7 +19,7 @@ class UsersViewTests: XCTestCase {
 				expectedResult: .failure(authFailure)
 			),
 			(
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}",
 				expectedResult: .success {
 					var user = User()
@@ -58,16 +58,6 @@ class UsersViewTests: XCTestCase {
 		
 		let tests: [(token: AccessToken?, host: String, clientId: String?, secret: String?, accept: [String]?, json: String, expectedResult: Result<LoginResponse, Zone5.Error>)] = [
 			(
-				// this test is for a host that requires client and secret, which is not set, so this should fail
-				token: nil,
-				host: "http://google.com",
-				clientId: nil,
-				secret: nil,
-				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .failure(.invalidConfiguration)
-			),
-			(
 				// simulate a server error
 				token: nil,
 				host: "http://google.com",
@@ -78,33 +68,13 @@ class UsersViewTests: XCTestCase {
 				expectedResult: .failure(.serverError(serverMessage))
 			),
 			(
-				// this test is for a host that does NOT require client and secret, which is not set, and should pass without them
+				// this test has should pass, it also includes accept strings
 				token: nil,
 				host: "http://\(Zone5.specializedStagingServer)",
-				clientId: nil,
-				secret: nil,
-				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .success {
-					var user = User()
-					user.id = 12345678
-					user.email = "jame.smith@example.com"
-					user.firstName = "Jane"
-					user.lastName = "Smith"
-					var lr = LoginResponse()
-					lr.user = user
-					lr.token = "1234567890"
-					return lr
-				}
-			),
-			(
-				// this test is the same as above but includes accept strings
-				token: nil,
-				host: "http://\(Zone5.specializedStagingServer)",
-				clientId: nil,
+				clientId: "CLIENT",
 				secret: nil,
 				accept: ["id1", "id2"],
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
+				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\", \"updatedTerms\":[{\"id\":\"terms123\"}]}",
 				expectedResult: .success {
 					var user = User()
 					user.id = 12345678
@@ -114,18 +84,19 @@ class UsersViewTests: XCTestCase {
 					var lr = LoginResponse()
 					lr.user = user
 					lr.token = "1234567890"
+					lr.updatedTerms = [UpdatedTerms(id: "terms123")]
 					return lr
 				}
 			),
 			(
-				// this test is for a host that requires client and secret, and it is provided, so should succeed.
+				// this test should pass.
 				// also, sticking in a bogus AccessToken which should get overwritten
-				token: OAuthToken(rawValue: UUID().uuidString),
+				token: OAuthToken(token: UUID().uuidString, refresh: "refreshtoken", tokenExp: 300000000 as Milliseconds, username: "testuser"),
 				host: "http://google.com",
 				clientId: "CLIENT",
 				secret: "SECRET",
 				accept: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
+				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\", \"tokenExp\": 1631074590000, \"features\": 0, \"identities\": { \"COGNITO\": \"123\", \"GIGYA\": \"456\"},\"roles\": [\"user\", \"premium\"], \"refresh\": \"eyJjd\", \"fs\":\"specialized\"}",
 				expectedResult: .success {
 					var user = User()
 					user.id = 12345678
@@ -135,6 +106,9 @@ class UsersViewTests: XCTestCase {
 					var lr = LoginResponse()
 					lr.user = user
 					lr.token = "1234567890"
+					lr.refresh = "eyJjd"
+					lr.tokenExp = 1631074590000
+					lr.roles = [Roles.user, Roles.premium]
 					return lr
 				}
 			)
@@ -166,12 +140,20 @@ class UsersViewTests: XCTestCase {
             let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
 
+			client.clientID = test.clientId
+			client.clientSecret = test.secret
             client.users.login(email: "jane.smith@example.com", password: "pword", clientID: test.clientId, clientSecret: test.secret, accept: test.accept) { result in
                 if case .failure = result, case .failure = test.expectedResult {
                     XCTAssertNil(client.accessToken)
                 }
                 else if case .success = result, case .success = test.expectedResult {
                     XCTAssertEqual(client.accessToken?.rawValue, "1234567890")
+					XCTAssertEqual(try? result.get().token, try? test.expectedResult.get().token)
+					XCTAssertEqual(try? result.get().refresh, try? test.expectedResult.get().refresh)
+					XCTAssertEqual(try? result.get().tokenExp, try? test.expectedResult.get().tokenExp)
+					XCTAssertEqual(try? result.get().roles, try? test.expectedResult.get().roles)
+					XCTAssertEqual(try? result.get().updatedTerms?.count, try? test.expectedResult.get().updatedTerms?.count)
+					XCTAssertEqual(try? result.get().updatedTerms?[0].id, try? test.expectedResult.get().updatedTerms?[0].id)
                 }
 
                 expectation.fulfill(with: result)
@@ -191,13 +173,13 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set. Let's give false from server
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "false",
 				expectedResult: .success(false)
 			),
 			(
 				// token set. Let's give true from server
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true",
 				expectedResult: .success(true)
 			)
@@ -229,13 +211,13 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set. Let's give true from server
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true", // this should fail json decode
 				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
 			),
 			(
 				// token set. Let's give true from server
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "",
 				expectedResult: .success(Zone5.VoidReply())
 			)
@@ -271,7 +253,7 @@ class UsersViewTests: XCTestCase {
 				expectedResult: .failure(authFailure)
 			),
 			(
-				token: OAuthToken(rawValue: "123"),
+				token: OAuthToken(token: "123", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}",
 				expectedResult: .success {
 					var user = User()
@@ -295,10 +277,18 @@ class UsersViewTests: XCTestCase {
 
         var expectations: [XCTestExpectation] = []
 		execute(with: tests) { client, _, urlSession, test in
-			var newUser = RegisterUser()
-			newUser.email = "jame.smith@example.com"
-			newUser.firstname = "Jane"
-			newUser.units = UnitMeasurement.imperial
+			let testDataTaskHandler = urlSession.dataTaskHandler
+			urlSession.dataTaskHandler = { request in
+				// add some checks before calling the deafult test handler
+				XCTAssertEqual(request.url?.path, "/rest/auth/register")
+				let register = (try? JSONDecoder().decode(RegisterUser.self, from: request.httpBody!))!
+				XCTAssertEqual(register.billingCountry, "AU")
+				XCTAssertEqual(register.accept, ["termsid", "terms2id"])
+				
+				return testDataTaskHandler?(request) ?? .success(test.json)
+			}
+			
+			let newUser = RegisterUser(email: "jame.smith@example.com", password: "password", firstname: "Jean", lastname: "Smith", accept: ["termsid", "terms2id"], billingCountry: "AU")
 
             let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
             expectations.append(expectation)
@@ -319,7 +309,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// test exists does not require authentication, token will get ignored
-				token: OAuthToken(rawValue: "123"),
+				token: OAuthToken(token: "123", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true",
 				expectedResult: .success(true)
 			),
@@ -354,7 +344,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// test exists does not require authentication but can have
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true",
 				expectedResult: .success {
 					return true
@@ -402,13 +392,13 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
-				json: "true",
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
+				json: "",
 				expectedResult: .success(Zone5.VoidReply())
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "should fail decode",
 				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -432,6 +422,58 @@ class UsersViewTests: XCTestCase {
         wait(for: expectations, timeout: 5)
 	}
 	
+	func testTestPassword() {
+		let expectation = self.expectation(description: "request returned")
+		
+		execute(with: ["{\"error\":true,\"message\":\"This password can not be used. It does not meet the complexity requirements\",\"reason\":\"complexity\"}"]) { z5, _, urlSession, test in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/rest/auth/test-password")
+				
+				return .success(test)
+			}
+			
+			z5.users.testPassword(username: "user@gmail.com", password: "password") { result in
+				if case .success(let msg) = result {
+					XCTAssertNotNil(msg.error)
+					XCTAssertNotNil(msg.message)
+					XCTAssertNotNil(msg.reason)
+				} else {
+					XCTAssert(false, "unexpected failure")
+				}
+				
+				expectation.fulfill()
+			}
+		}
+		
+		wait(for: [expectation], timeout: 5.0)
+	}
+	
+	func testTestPasswordNoError() {
+		let expectation = self.expectation(description: "request returned")
+		
+		execute(with: ["{\"error\":false}"]) { z5, _, urlSession, test in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/rest/auth/test-password")
+				
+				return .success(test)
+			}
+			
+			z5.users.testPassword(username: "user@gmail.com", password: "password") { result in
+				if case .success(let msg) = result {
+					XCTAssertNotNil(msg.error)
+					XCTAssertNil(msg.message)
+					XCTAssertNil(msg.reason)
+				} else {
+					XCTAssert(false, "unexpected failure")
+				}
+				
+				expectation.fulfill()
+			}
+		}
+		
+		wait(for: [expectation], timeout: 5.0)
+	}
+	
 	func testChangePasswordSpecialized() {
 		var config = ConfigurationForTesting()
 		config.baseURL = URL(string: "https://api-sp-staging.todaysplan.com.au")
@@ -445,7 +487,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "",
 				expectedResult: .success {
 					return Zone5.VoidReply()
@@ -453,7 +495,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "should fail decode",
 				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -485,19 +527,19 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true",
 				expectedResult: .success(true)
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "false",
 				expectedResult: .success(false)
 			),
 			(
 				// token set.
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "should fail decode",
 				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -519,58 +561,6 @@ class UsersViewTests: XCTestCase {
         wait(for: expectations, timeout: 5)
 	}
 	
-	/// Test Gigya refresh, which does not need a refresh token, but does need an auth token in the header
-	func testRefreshToken() {
-		let tests: [(token: AccessToken?, json: String, expectedResult: Result<OAuthTokenAlt, Zone5.Error>)] = [
-			(
-				// this test requires a token, so this should fail
-				token: nil,
-				json: "{\"user\": {\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}, \"token\": \"1234567890\"}",
-				expectedResult: .failure(authFailure)
-			),
-			(
-				// this test is valid and should pass
-				token: OAuthToken(rawValue: "1234567890"),
-				json: "{\"token\": \"0987654321\", \"tokenExp\": 1234}",
-				expectedResult: .success {
-					var token = OAuthTokenAlt(rawValue: "0987654321")
-					token.tokenExp = 1234
-					return token
-				}
-			),
-			(
-				// this test should fail decode because compulsory token is not included
-				token: OAuthToken(rawValue: "1234567890"),
-				json: "{\"tokenExp\": 1234}",
-				expectedResult: .failure(.failedDecodingResponse(Zone5.Error.unknown))
-			)
-		]
-
-        let assertionsOnSuccess: Zone5.Result<OAuthTokenAlt>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
-            XCTAssertEqual(lhs.tokenExp, rhs.tokenExp)
-            XCTAssertEqual(lhs.token, rhs.token)
-        }
-
-        var expectations: [XCTestExpectation] = []
-		execute(with: tests) { client, _, urlSession, test in
-            let expectation = ResultExpectation(for: test.expectedResult, assertionsOnSuccess: assertionsOnSuccess)
-            expectations.append(expectation)
-
-			client.users.refreshToken { result in
-                if case .failure = result, case .failure = test.expectedResult {
-                    XCTAssertEqual(client.accessToken?.rawValue, test.token?.rawValue)
-                }
-                else if case .success = result, case .success = test.expectedResult {
-                    XCTAssertEqual(client.accessToken?.rawValue, "0987654321")
-                }
-
-                expectation.fulfill(with: result)
-			}
-		}
-
-        wait(for: expectations, timeout: 5)
-	}
-	
 	func testGetPrefs() {
 		let tests: [(token: AccessToken?, json: String, expectedResult: Result<UsersPreferences, Zone5.Error>)] = [
 			(
@@ -581,7 +571,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// success
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"metric\": \"metric\"}",
 				expectedResult: .success {
 					var prefs = UsersPreferences()
@@ -591,7 +581,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// success
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"metric\": \"imperial\"}",
 				expectedResult: .success {
 					var prefs = UsersPreferences()
@@ -601,7 +591,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// invalid json
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"metric\": \"imperiall\"}", // type should fail deserialisation
 				expectedResult: .failure(Zone5.Error.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -638,7 +628,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// success
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "true",
 				expectedResult: .success {
 					return true
@@ -646,7 +636,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// false from server
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "false",
 				expectedResult: .success {
 					return false
@@ -654,7 +644,7 @@ class UsersViewTests: XCTestCase {
 			),
 			(
 				// invalid json
-				token: OAuthToken(rawValue: "1234567890"),
+				token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"),
 				json: "{\"metric\": \"imperiall\"}", // type should fail deserialisation
 				expectedResult: .failure(Zone5.Error.failedDecodingResponse(Zone5.Error.unknown))
 			)
@@ -683,7 +673,7 @@ class UsersViewTests: XCTestCase {
 	func testPasswordComplexity() {
 		let expected = #"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"#
 		let tests: [(token: AccessToken?,json: String, expectedResult: Result<String, Zone5.Error>)] = [
-			(token: OAuthToken(rawValue: "1234567890"), json: expected, expectedResult: .success(expected))
+			(token: OAuthToken(token: "1234567890", refresh: "resfresh", tokenExp: 3000000 as Milliseconds, username: "testuser"), json: expected, expectedResult: .success(expected))
 		]
 
         let assertionsOnSuccess: Zone5.Result<String>.Expectation.SuccessAssertionsHandler = { lhs, rhs in
