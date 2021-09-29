@@ -16,7 +16,7 @@ class URLRequestInterceptorTests: XCTestCase {
 	override func setUp() {
 		zone5 = Zone5(httpClient: .init(urlSession: urlSession))
 		// configure auth token that is not near expiry
-		var oauth = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: 30000, username: "testuser")
+		var oauth = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: 30000 as Milliseconds, username: "testuser")
 		oauth.refreshToken = "refresh"
 		oauth.tokenExp = Date().milliseconds + 100000
 		zone5.configure(for: URL(string: "https://api-sp-staging.todaysplan.com.au")!, clientID: "CLIENT ID", clientSecret: "CLIENT SECRET", userAgent: "agent 123", accessToken: oauth)
@@ -78,7 +78,7 @@ class URLRequestInterceptorTests: XCTestCase {
 		let request = createRequest("/rest/test", authRequired: true)
 		
 		// configure auth token that is near expiry
-		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds.rawValue, username: "user")
+		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds, username: "user")
 		
 		// refresh is asynchronous so we need to set up expectations and capture the intermediary step to test validity
 		let expectation = self.expectation(description: "sendRequest called")
@@ -135,7 +135,7 @@ class URLRequestInterceptorTests: XCTestCase {
 	
 	func testAuthExpiredPipelineOnlyRefreshesOnce() {
 		// configure auth token that is near expiry
-		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds.rawValue, username: "testuser")
+		zone5.accessToken = OAuthToken(token: "testauth", refresh: "refresh", tokenExp: Date().milliseconds, username: "testuser")
 		
 		// refresh is asynchronous so we need to set up expectations and capture the intermediary step to test validity
 		let expectationSendRequest = self.expectation(description: "sendRequest called")

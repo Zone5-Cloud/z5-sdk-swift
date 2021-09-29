@@ -25,10 +25,6 @@ public struct OAuthTokenAlt: Codable, AccessToken {
 		token = rawValue
 	}
 	
-	public var rawValue: String {
-		return token
-	}
-	
 	public var accessToken: String {
 		return token
 	}
