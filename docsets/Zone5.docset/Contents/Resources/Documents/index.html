@@ -77,6 +77,12 @@
                 <a class="nav-group-task-link" href="Classes/RoutesView.html">RoutesView</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/TermsView.html">TermsView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes.html#/s:5Zone520TestPasswordResponseC">TestPasswordResponse</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Classes/ThirdPartyConnectionsView.html">ThirdPartyConnectionsView</a>
               </li>
               <li class="nav-group-task">
@@ -343,10 +349,16 @@
                 <a class="nav-group-task-link" href="Structs/StringEncodedBody.html">StringEncodedBody</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TermsAndConditions.html">TermsAndConditions</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/ThirdPartyInitializeResponse.html">ThirdPartyInitializeResponse</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/URLEncodedBody.html">URLEncodedBody</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UpdatedTerms.html">UpdatedTerms</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/UpgradeAvailableResponse.html">UpgradeAvailableResponse</a>
@@ -545,10 +557,36 @@
 <span class="k">let</span> <span class="nv">clientID</span> <span class="o">=</span> <span class="s">"YOUR-CLIENT-IDENTIFIER"</span>
 <span class="k">let</span> <span class="nv">clientSecret</span> <span class="o">=</span> <span class="s">"YOUR-CLIENT-SECRET"</span>
 
+<span class="c1">// for an unauthenticated session (not yet logged in)</span>
 <span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="nf">configure</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="n">baseURL</span><span class="p">,</span> <span class="nv">clientID</span><span class="p">:</span> <span class="n">clientID</span><span class="p">,</span> <span class="nv">clientSecret</span><span class="p">:</span> <span class="n">clientSecret</span><span class="p">)</span>
+
+<span class="c1">// for persisting a logged in session across App restarts. </span>
+<span class="k">let</span> <span class="nv">accessToken</span><span class="p">:</span> <span class="kt">OAuthToken</span><span class="p">?</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">read</span> <span class="n">json</span> <span class="kt">OAuthToken</span> <span class="n">from</span> <span class="n">a</span> <span class="n">keystore</span><span class="o">&gt;</span>
+<span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="nf">configure</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="n">baseURL</span><span class="p">,</span> <span class="nv">clientID</span><span class="p">:</span> <span class="n">clientID</span><span class="p">,</span> <span class="nv">clientSecret</span><span class="p">:</span> <span class="n">clientSecret</span><span class="p">,</span> <span class="nv">accessToken</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+
 </code></pre>
 
-<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html"><code>Zone5.shared.oAuth</code></a>:</p>
+<p>A saved OAuthToken only needs to be passed in at startup. The state of the token is automatically updated on login, logout, accessToken, refreshAccessToken and automatic token refresh.
+Token refresh is handled automatically before all authenticated calls and then token updated accordingly.</p>
+
+<p>Whenever the accessToken is updated, either because you called login, logout, accessToken or refreshAccessToken or because of an automatic refresh, the Notification <code><a href="Classes/Zone5.html#/s:5Zone5AAC28authTokenChangedNotificationSo18NSNotificationNameavpZ">Zone5.authTokenChangedNotification</a></code> is fired on the Zone5 instance with the updated OAuthToken in the userInfo.</p>
+
+<p>Observe this Notification so that you can save the updated Token to persist logged in sessions across App restarts. e.g.</p>
+<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">authTokenChangedNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="n">apiClient</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
+    <span class="k">let</span> <span class="nv">token</span> <span class="o">=</span> <span class="n">notification</span><span class="o">.</span><span class="n">userInfo</span><span class="p">?[</span><span class="s">"accessToken"</span><span class="p">]</span> <span class="k">as?</span> <span class="kt">OAuthToken</span>
+    <span class="n">keyValueStore</span><span class="o">.</span><span class="n">oauthToken</span> <span class="o">=</span> <span class="n">token</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>If there are updated Terms and Conditions identified after a login or refresh, the Notification Zone5.updatedTermsNotification is fired with the list of updated terms in the userInfo. 
+Observe this Notification so that you can prompt users to re-accept updated Terms and Conditions. e.g.</p>
+<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">updatedTermsNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="n">apiClient</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
+    <span class="k">let</span> <span class="nv">terms</span> <span class="o">=</span> <span class="n">notification</span><span class="o">.</span><span class="n">userInfo</span><span class="p">?[</span><span class="s">"updatedTerms"</span><span class="p">]</span> <span class="k">as?</span> <span class="p">[</span><span class="kt">UpdatedTerms</span><span class="p">]</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"There are updated terms that can be accepted"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through [<code>Zone5.shared.oAuth and [</code>Zone5.shared.accessToken<code>](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [</code>Zone5.shared.users.login`](<a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):">https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):</a></p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">username</span> <span class="o">=</span> <span class="s">"EXAMPLE-USERNAME"</span>
 <span class="k">let</span> <span class="nv">password</span> <span class="o">=</span> <span class="s">"EXAMPLE-PASSWORD"</span>
 
@@ -558,13 +596,26 @@
         <span class="c1">// An error occurred and needs to be handled</span>
 
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">accessToken</span><span class="p">):</span>
-        <span class="c1">// The user was successfully authenticated. You should store this token securely</span>
-        <span class="c1">// so that you can allow the user to stay authenticated across multiple sessions.</span>
+        <span class="c1">// The user was successfully authenticated. </span>
+        <span class="c1">// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
-<p>Once the user successfully authenticates, these methods return an <a href="https://zone5-cloud.github.io/z5-sdk-swift/Structs/AccessToken.html"><code><a href="Protocols/AccessToken.html">AccessToken</a></code></a> object, but also update the <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/Zone5.html#/s:5Zone5AAC11accessTokenAA06AccessC0VSgvp"><code>Zone5.shared.accessToken</code></a> with the returned token, allowing access to methods that require this token to be set.</p>
+<p>or</p>
+<pre class="highlight swift"><code><span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="nv">accept</span><span class="p">:</span> <span class="p">[])</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+        <span class="c1">// An error occurred and needs to be handled</span>
+
+    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">loginResponse</span><span class="p">):</span>
+        <span class="c1">// The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc</span>
+        <span class="c1">// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Once authenticated you can make authenticated calls such as:</p>
 <pre class="highlight swift"><code><span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">me</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
@@ -575,6 +626,8 @@
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+
+<p>Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword.</p>
 <h2 id='unit-tests' class='heading'>Unit Tests</h2>
 
 <p>Unit tests are included and can be run from both the Swift CLI and via Xcode. There may be some slight differences in how these two sources run tests, so if tests are failing in one, but not the other, this may be the cause. Tests are run automatically on push (of any branch) using the Swift CLI, via a <a href="https://github.com/Zone5-Cloud/z5-sdk-swift/blob/master/.github/workflows/unit-tests.yml">GitHub Action</a>, the result of which can be browsed via <a href="https://github.com/Zone5-Cloud/z5-sdk-swift/actions?query=workflow%3A%22Unit+Tests%22">the Actions tab</a>.</p>
@@ -597,7 +650,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-09-07)</p>
+      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-09-29)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

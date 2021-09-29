@@ -78,6 +78,12 @@
                 <a class="nav-group-task-link" href="../Classes/RoutesView.html">RoutesView</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/TermsView.html">TermsView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes.html#/s:5Zone520TestPasswordResponseC">TestPasswordResponse</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/ThirdPartyConnectionsView.html">ThirdPartyConnectionsView</a>
               </li>
               <li class="nav-group-task">
@@ -344,10 +350,16 @@
                 <a class="nav-group-task-link" href="../Structs/StringEncodedBody.html">StringEncodedBody</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TermsAndConditions.html">TermsAndConditions</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/ThirdPartyInitializeResponse.html">ThirdPartyInitializeResponse</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/URLEncodedBody.html">URLEncodedBody</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UpdatedTerms.html">UpdatedTerms</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/UpgradeAvailableResponse.html">UpgradeAvailableResponse</a>
@@ -618,9 +630,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept10completionySS_S2SSgAKSaySSGSgys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF"></a>
-                    <a name="//apple_ref/swift/Method/login(email:password:clientID:clientSecret:accept:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept10completionySS_S2SSgAKSaySSGSgys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF">login(email:password:clientID:clientSecret:accept:completion:)</a>
+                    <a name="/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept14billingCountry10completionySS_S2SSgALSaySSGSgALys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/login(email:password:clientID:clientSecret:accept:billingCountry:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept14billingCountry10completionySS_S2SSgALSaySSGSgALys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF">login(email:password:clientID:clientSecret:accept:billingCountry:completion:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -628,7 +640,9 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Login as a user and obtain a bearer token - clientId and clientSecret are not required in Specialized featureset
+                        <p>Login as a user and obtain a bearer token</p>
+
+<p>Note that the configured access token is automatically updated with this call.
 Don&rsquo;t pass back a PendingRequest as this is not something that we can cancel mid-request</p>
 
                       </div>
@@ -636,7 +650,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">clientID</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">clientSecret</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">accept</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/LoginResponse.html">LoginResponse</a></span><span class="o">&gt;</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">clientID</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">clientSecret</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">accept</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">billingCountry</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/LoginResponse.html">LoginResponse</a></span><span class="o">&gt;</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -656,8 +670,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Logout - this will invalidate any active JSESSION and will also invalidate your bearer token
-Don&rsquo;t pass back a PendingRequest as this is not something that we can cancel mid-request</p>
+                        <p>Logout - this will invalidate any active JSESSION and will also invalidate your bearer token</p>
+
+<p>Don&rsquo;t pass back a PendingRequest as this is not something that we can cancel mid-request</p>
 
                       </div>
                       <div class="declaration">
@@ -768,7 +783,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Change a user&rsquo;s password - oldPassword is only required in Specialized environment</p>
+                        <p>Change a user&rsquo;s password - oldPassword is only required in Specialized environment so is optional</p>
 
                       </div>
                       <div class="declaration">
@@ -785,9 +800,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC12refreshToken10completionyys6ResultOyAA05OAuthE3AltVA2AC5ErrorOGc_tF"></a>
-                    <a name="//apple_ref/swift/Method/refreshToken(completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC12refreshToken10completionyys6ResultOyAA05OAuthE3AltVA2AC5ErrorOGc_tF">refreshToken(completion:)</a>
+                    <a name="/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequestCSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/testPassword(username:password:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequestCSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF">testPassword(username:password:completion:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -795,16 +810,49 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Refresh a bearer token - get a new token if the current one is nearing expiry</p>
+                        <p>Test a password candidate.
+This will test if a given password will pass comlpexity rules for the currently configured clientID</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">refreshToken</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/OAuthTokenAlt.html">OAuthTokenAlt</a></span><span class="o">&gt;</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">testPassword</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes.html#/s:5Zone520TestPasswordResponseC">TestPasswordResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>username</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>user to test password for</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>password to test</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -957,7 +1005,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-09-07)</p>
+      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-09-29)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
