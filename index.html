@@ -572,7 +572,7 @@ Token refresh is handled automatically before all authenticated calls and then t
 <p>Whenever the accessToken is updated, either because you called login, logout, accessToken or refreshAccessToken or because of an automatic refresh, the Notification <code><a href="Classes/Zone5.html#/s:5Zone5AAC28authTokenChangedNotificationSo18NSNotificationNameavpZ">Zone5.authTokenChangedNotification</a></code> is fired on the Zone5 instance with the updated OAuthToken in the userInfo.</p>
 
 <p>Observe this Notification so that you can save the updated Token to persist logged in sessions across App restarts. e.g.</p>
-<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">authTokenChangedNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="n">apiClient</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
+<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">authTokenChangedNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
     <span class="k">let</span> <span class="nv">token</span> <span class="o">=</span> <span class="n">notification</span><span class="o">.</span><span class="n">userInfo</span><span class="p">?[</span><span class="s">"accessToken"</span><span class="p">]</span> <span class="k">as?</span> <span class="kt">OAuthToken</span>
     <span class="n">keyValueStore</span><span class="o">.</span><span class="n">oauthToken</span> <span class="o">=</span> <span class="n">token</span>
 <span class="p">}</span>
@@ -580,13 +580,13 @@ Token refresh is handled automatically before all authenticated calls and then t
 
 <p>If there are updated Terms and Conditions identified after a login or refresh, the Notification Zone5.updatedTermsNotification is fired with the list of updated terms in the userInfo. 
 Observe this Notification so that you can prompt users to re-accept updated Terms and Conditions. e.g.</p>
-<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">updatedTermsNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="n">apiClient</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
+<pre class="highlight swift"><code><span class="n">apiClient</span><span class="o">.</span><span class="n">notificationCenter</span><span class="o">.</span><span class="nf">addObserver</span><span class="p">(</span><span class="nv">forName</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">updatedTermsNotification</span><span class="p">,</span> <span class="nv">object</span><span class="p">:</span> <span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="p">,</span> <span class="nv">queue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
     <span class="k">let</span> <span class="nv">terms</span> <span class="o">=</span> <span class="n">notification</span><span class="o">.</span><span class="n">userInfo</span><span class="p">?[</span><span class="s">"updatedTerms"</span><span class="p">]</span> <span class="k">as?</span> <span class="p">[</span><span class="kt">UpdatedTerms</span><span class="p">]</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">"There are updated terms that can be accepted"</span><span class="p">)</span>
+    <span class="c1">// do something with terms</span>
 <span class="p">}</span>
 </code></pre>
 
-<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through [<code>Zone5.shared.oAuth and [</code>Zone5.shared.accessToken<code>](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [</code>Zone5.shared.users.login`](<a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):">https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):</a></p>
+<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html"><code>Zone5.shared.oAuth.accessToken</code></a> and <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView"><code>Zone5.shared.users.login</code></a>:</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">username</span> <span class="o">=</span> <span class="s">"EXAMPLE-USERNAME"</span>
 <span class="k">let</span> <span class="nv">password</span> <span class="o">=</span> <span class="s">"EXAMPLE-PASSWORD"</span>
 
@@ -597,7 +597,7 @@ Observe this Notification so that you can prompt users to re-accept updated Term
 
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">accessToken</span><span class="p">):</span>
         <span class="c1">// The user was successfully authenticated. </span>
-        <span class="c1">// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire</span>
+        <span class="c1">// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -610,7 +610,7 @@ Observe this Notification so that you can prompt users to re-accept updated Term
 
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">loginResponse</span><span class="p">):</span>
         <span class="c1">// The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc</span>
-        <span class="c1">// Your configured accessToken will automatically be updated and the `Zone5.authTokenChangedNotification` Notification will fire</span>
+        <span class="c1">// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
