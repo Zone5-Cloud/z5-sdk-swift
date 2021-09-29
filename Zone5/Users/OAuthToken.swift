@@ -54,7 +54,7 @@ public struct OAuthToken: Codable, Equatable, AccessToken {
 		self.username = username
 	}
 	
-	// internal, only used in unit tests to simulate expected decoded tokens
+	/// internal, only used in unit tests to simulate expected decoded tokens
 	internal init(token: String, refresh: String? = nil, expiresIn: TimeInterval? = nil) {
 		self.accessToken = token
 		self.refreshToken = refresh
