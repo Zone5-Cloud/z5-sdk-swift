@@ -10207,27 +10207,6 @@
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/TermsAndConditions/TermsAndConditions.swift",
-      "line": 22,
-      "symbol": "TermsAndConditions.entityType",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/TermsAndConditions/TermsAndConditions.swift",
-      "line": 23,
-      "symbol": "TermsAndConditions.active",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/TermsAndConditions/TermsAndConditions.swift",
-      "line": 24,
-      "symbol": "TermsAndConditions.status",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/TermsAndConditions/UpdatedTerms.swift",
       "line": 11,
       "symbol": "UpdatedTerms",
