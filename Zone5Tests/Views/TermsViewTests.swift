@@ -35,7 +35,6 @@ class TermsViewTests: XCTestCase {
 					XCTAssertEqual(terms[0].version, 1)
 					XCTAssertEqual(terms[0].displayVersion, "v1")
 					XCTAssertEqual(terms[0].displayName, "Specialized Terms and Conditions")
-					XCTAssertEqual(terms[0].status, "active")
 					XCTAssertEqual(terms[0].companyId, "4ad6d516-3f3f-4efb-a9b0-3e81a5d4745d")
 					XCTAssertEqual(terms[0].url, URL(string: "https://www.specialized.com/au/en/terms-and-conditions")!)
 					
@@ -44,7 +43,6 @@ class TermsViewTests: XCTestCase {
 					XCTAssertEqual(terms[1].version, 2)
 					XCTAssertEqual(terms[1].displayVersion, "v2")
 					XCTAssertEqual(terms[1].displayName, "Specialized Terms of Use")
-					XCTAssertEqual(terms[1].status, "active")
 					XCTAssertEqual(terms[1].companyId, "4ad6d516-3f3f-4efb-a9b0-3e81a5d4745d")
 					XCTAssertEqual(terms[1].url, URL(string: "https://www.specialized.com/au/en/terms-of-use")!)
 					

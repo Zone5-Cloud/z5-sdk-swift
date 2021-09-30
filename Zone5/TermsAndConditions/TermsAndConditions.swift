@@ -19,7 +19,4 @@ public struct TermsAndConditions: Codable, JSONEncodedBody {
 	public var url: URL?
 	public var version: Int?
 	public var displayVersion: String?
-	public var entityType: String?
-	public var active: Bool?
-	public var status: String?
 }
