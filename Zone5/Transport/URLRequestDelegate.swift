@@ -90,7 +90,7 @@ final internal class URLRequestDelegate: NSObject, URLSessionDataDelegate, URLSe
 		}
 
 		if let uploadTask = task as? URLSessionUploadTask {
-			if let mutableData = receivedData[uploadTask] {
+			if let mutableData = receivedData.removeValue(forKey: uploadTask) {
 				userInfo["data"] = Data(mutableData)
 			}
 

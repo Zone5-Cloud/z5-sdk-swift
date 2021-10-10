@@ -168,7 +168,7 @@ internal class URLRequestInterceptor: URLProtocol {
 			completionObserver = NotificationCenter.default.addObserver(forName: URLRequestDelegate.uploadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
 				// remove observers.
 				if let completionObserver = completionObserver {
-					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.downloadCompleteNotification, object: currentTask)
+					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.uploadCompleteNotification, object: currentTask)
 				}
 
 				let data = notification.userInfo?["data"] as? Data
