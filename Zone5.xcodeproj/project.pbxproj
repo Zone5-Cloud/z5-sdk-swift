@@ -391,13 +391,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0F23B2FB2702CDDC00516F79 /* OptionSets */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = OptionSets;
-			sourceTree = "<group>";
-		};
 		0F25410F26E98CF70043B7D0 /* TermsAndConditions */ = {
 			isa = PBXGroup;
 			children = (
@@ -711,7 +704,6 @@
 				A190FFE7237938BA0059561D /* Search */,
 				0F7C8E67256CCBBB005CF025 /* Payments */,
 				A190FFE6237938810059561D /* Enums */,
-				0F23B2FB2702CDDC00516F79 /* OptionSets */,
 				A182D1B52372AB0E00112501 /* Transport */,
 				A182D1BD2372AB0F00112501 /* Views */,
 				A1F059002372A3A80034C7D0 /* Supporting Files */,
