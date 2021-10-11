@@ -14,8 +14,18 @@ final internal class URLRequestDelegate: NSObject, URLSessionDataDelegate, URLSe
 
 	let notificationCenter: NotificationCenter
 
+	let operationQueue: OperationQueue
+
 	init(notificationCenter: NotificationCenter = .default) {
 		self.notificationCenter = notificationCenter
+
+		// Default operation queues have a QoS of `.utility`. This can result in poor performance for user-initiated
+		// requests like ours. Increase the QoS to `.userInitiated`.
+		// Also the doco for `URLSession` states that the operation queue must be serial.
+		let operationQueue = OperationQueue()
+		operationQueue.qualityOfService = .userInitiated
+		operationQueue.maxConcurrentOperationCount = 1
+		self.operationQueue = operationQueue
 	}
 
 	// MARK: Notifications posted by this delegate
