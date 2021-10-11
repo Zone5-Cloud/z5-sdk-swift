@@ -8,31 +8,89 @@
 
 import Foundation
 
-public class PendingRequest: NSObject {
+public protocol PendingRequest: NSObjectProtocol {
 
-	private let task: URLSessionTask
+	func cancel()
 	
-	init(_ task: URLSessionTask) {
-		self.task = task
-	}
+	var isComplete: Bool { get }
 	
-	public func cancel() {
-		self.task.cancel()
+	var isCancelled: Bool { get }
+
+}
+
+internal class PendingRequestOperation: Operation, PendingRequest {
+
+	/// The task being performed by the operation.
+	/// - Note: The operation will not be considered ready if no task is assigned.
+	internal var task: URLSessionTask? {
+		willSet { willChangeValue(for: \.isReady) }
+		didSet { didChangeValue(for: \.isReady) }
 	}
-	
-	public var isComplete: Bool {
-		if #available(iOS 11.0, macOS 13.0, *) {
-			return self.task.progress.isFinished
-		} else {
-			return self.task.state == .completed
-		}
+
+	// MARK: Cancelling operations
+
+	/// Starts the underlying `URLSessionTask` and marks the operation as executing.
+	internal override func start() {
+		guard isReady, let task = task else { return }
+
+		willChangeValue(for: \.isExecuting)
+		self._isExecuting = true
+		didChangeValue(for: \.isFinished)
+
+		task.resume()
 	}
-	
-	public var isCancelled: Bool {
-		if #available(iOS 11.0, macOS 13.0, *) {
-			return self.task.progress.isCancelled
-		} else {
-			return self.task.state == .canceling
-		}
+
+	/// Marks the operation as cancelled, and cancels the underlying `URLSessionTask` (if available).
+	internal override func cancel() {
+		task?.cancel()
+
+		willChangeValue(for: \.isCancelled)
+		_isCancelled = true
+		didChangeValue(for: \.isCancelled)
 	}
+
+	/// Marks the operation as finished, allowing pending operations in the queue to start.
+	internal func finish() {
+		guard isReady else { return }
+
+		willChangeValue(for: \.isExecuting)
+		willChangeValue(for: \.isFinished)
+		self._isExecuting = false
+		self._isFinished = true
+		didChangeValue(for: \.isExecuting)
+		didChangeValue(for: \.isFinished)
+	}
+
+	// MARK: Getting the operation status
+
+	private var _isCancelled: Bool = false
+
+	internal override var isCancelled: Bool {
+		return _isCancelled
+	}
+
+	private var _isExecuting: Bool = false
+
+	internal override var isExecuting: Bool {
+		return _isExecuting
+	}
+
+	private var _isFinished: Bool = false
+
+	internal var isComplete: Bool {
+		return _isFinished
+	}
+
+	internal override var isFinished: Bool {
+		return _isFinished
+	}
+
+	internal override var isAsynchronous: Bool {
+		return true // URLRequestTask instances always run asynchronously
+	}
+
+	internal override var isReady: Bool {
+		return task != nil
+	}
+
 }

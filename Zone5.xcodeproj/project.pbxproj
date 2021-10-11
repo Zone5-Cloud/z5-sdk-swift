@@ -658,6 +658,7 @@
 			isa = PBXGroup;
 			children = (
 				A167D6D023838F0000507276 /* HTTPClientPerformRequestTests.swift */,
+				A167D6D42383DBAB00507276 /* HTTPClientUploadRequestTests.swift */,
 				A1C42B6523850CF2004E33B9 /* HTTPClientDownloadRequestTests.swift */,
 				A196032D2379445200CEB121 /* RequestTests.swift */,
 				A1713CBB2386060F0084BDDC /* RequestEndpointTests.swift */,
@@ -665,7 +666,6 @@
 				A1EBDAD8237A21DD00834B21 /* MultipartEncodedBodyTests.swift */,
 				0F7C8E59256C9743005CF025 /* URLRequestInterceptorTests.swift */,
 				0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */,
-				A167D6D42383DBAB00507276 /* HTTPClientUploadRequestTests.swift */,
 			);
 			path = Transport;
 			sourceTree = "<group>";

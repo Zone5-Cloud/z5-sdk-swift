@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 final internal class Zone5HTTPClient {
 
@@ -47,6 +48,29 @@ final internal class Zone5HTTPClient {
 		return downloadURL
 	}()
 
+	// MARK: Rate-limiting
+
+	internal static let dataQueue: OperationQueue = {
+		let operationQueue = OperationQueue()
+		operationQueue.qualityOfService = .userInitiated
+		operationQueue.maxConcurrentOperationCount = 4
+		return operationQueue
+	}()
+
+	internal static let uploadQueue: OperationQueue = {
+		let operationQueue = OperationQueue()
+		operationQueue.qualityOfService = .userInitiated
+		operationQueue.maxConcurrentOperationCount = 1
+		return operationQueue
+	}()
+
+	internal static let downloadQueue: OperationQueue = {
+		let operationQueue = OperationQueue()
+		operationQueue.qualityOfService = .userInitiated
+		operationQueue.maxConcurrentOperationCount = 1
+		return operationQueue
+	}()
+
 	// MARK: Performing requests
 
 	/// The decoder used to convert raw response data into a structure of the expected type.
@@ -64,11 +88,17 @@ final internal class Zone5HTTPClient {
 	///   - block: The closure containing the work to perform. It receives a strong copy of the parent `Zone5` class, and the provided `completion`.
 	/// - Throws: `Zone5.Error.invalidConfiguration` if the Zone5 instance has not been configured with a url
 	/// - Note: If neither `clientID` nor `accessToken` is configured, the server will respond with an appropriate 401 error.
-	private func execute<T>(with completion: @escaping CompletionHandler<T>, _ block: (_ zone5: Zone5, _ completion: @escaping CompletionHandler<T>) throws -> PendingRequest) -> PendingRequest? {
+	private func execute<T>(
+		on operationQueue: OperationQueue,
+		with completion: @escaping CompletionHandler<T>,
+		_ block: (_ zone5: Zone5, _ completion: @escaping CompletionHandler<T>) throws -> URLSessionTask
+	) -> PendingRequest? {
 		do {
 			guard let zone5 = zone5, zone5.baseURL != nil else {
 				throw Zone5.Error.invalidConfiguration
 			}
+
+			let operation = PendingRequestOperation()
 
 			/// Wrap the provided completion handler in a dispatch call.
 			/// Do this synchronously so that tasks performed afterwards (like deleting files) are handled correctly.
@@ -76,9 +106,14 @@ final internal class Zone5HTTPClient {
 				Zone5HTTPClient.completionHandlerQueue.sync {
 					completion(result)
 				}
+
+				operation.finish()
 			}
 
-			return try block(zone5, dispatchedCompletion)
+			operation.task = try block(zone5, dispatchedCompletion)
+
+			operationQueue.addOperation(operation)
+			return operation
 		}
 		catch {
 			Zone5HTTPClient.completionHandlerQueue.sync {
@@ -102,10 +137,10 @@ final internal class Zone5HTTPClient {
 		_ request: Request,
 		completion: @escaping CompletionHandler<(Data?, URLResponse)>
 	) -> PendingRequest? {
-		return execute(with: completion) { zone5, completion in
+		return execute(on: Zone5HTTPClient.dataQueue, with: completion) { zone5, completion in
 			let urlRequest = try request.urlRequest(zone5: zone5, taskType: .data)
 
-			let task = urlSession.dataTask(with: urlRequest) { data, response, error in
+			return urlSession.dataTask(with: urlRequest) { data, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 				}
@@ -116,15 +151,13 @@ final internal class Zone5HTTPClient {
 					completion(.failure(.unknown))
 				}
 			}
-			task.resume()
-			return PendingRequest(task)
 		}
 	}
 
 	/// Perform a data task using the given `request`, calling the completion with the result.
 	/// - Parameters:
 	///   - request: A request that defines the endpoint, method and body used.
-	///   - keyDecodingStrategy: The strategy to be used when decoding the response's keys. Defaults to `.useDefaultKeys`.
+	///   - keyDecodingStrategy: The strategy to use when decoding the response's keys. Defaults to `.useDefaultKeys`.
 	///   - expectedType: The expected, `Decodable` type that is used to decode the response data.
 	///   - completion: Closure called with the result of the download. If successful, the response data is returned,
 	///   		decoded as the given `expectedType`, otherwise the error that was encountered.
@@ -134,13 +167,13 @@ final internal class Zone5HTTPClient {
 		expectedType: T.Type,
 		completion: @escaping CompletionHandler<T>
 	) -> PendingRequest? {
-		return execute(with: completion) { zone5, completion in
+		return execute(on: Zone5HTTPClient.dataQueue, with: completion) { zone5, completion in
 			let urlRequest = try request.urlRequest(zone5: zone5, taskType: .data)
 			
 			let decoder = self.decoder
             decoder.keyDecodingStrategy = keyDecodingStrategy
             
-			let task = urlSession.dataTask(with: urlRequest) { data, response, error in
+			return urlSession.dataTask(with: urlRequest) { data, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 				}
@@ -151,9 +184,6 @@ final internal class Zone5HTTPClient {
 					completion(.failure(.unknown))
 				}
 			}
-			
-			task.resume()
-			return PendingRequest(task)
 		}
 	}
     
@@ -166,7 +196,7 @@ final internal class Zone5HTTPClient {
 	/// - Parameters:
 	///   - fileURL: The URL for the file to be uploaded.
 	///   - request: A request that defines the endpoint, method and body used.
-	///   - keyDecodingStrategy: The strategy to be used when decoding the response's keys. Defaults to `.useDefaultKeys`.
+	///   - keyDecodingStrategy: The strategy to use when decoding the response's keys. Defaults to `.useDefaultKeys`.
 	///   - expectedType: The expected, `Decodable` type that is used to decode the response data.
 	///   - completion: Closure called with the result of the upload. If successful, the response data is returned,
 	///   		decoded as the given `expectedType`, otherwise the error that was encountered.
@@ -177,7 +207,7 @@ final internal class Zone5HTTPClient {
 		expectedType: T.Type,
 		completion: @escaping CompletionHandler<T>
 	) -> PendingRequest? {
-		return execute(with: completion) { zone5, completion in
+		return execute(on: Zone5HTTPClient.uploadQueue, with: completion) { zone5, completion in
 			var (urlRequest, multipartData) = try request.urlRequest(toUpload: fileURL, zone5: zone5)
 			let cacheURL = Zone5HTTPClient.uploadsDirectory.appendingPathComponent(fileURL.lastPathComponent).appendingPathExtension("multipart")
 
@@ -194,7 +224,7 @@ final internal class Zone5HTTPClient {
 			let decoder = self.decoder
             decoder.keyDecodingStrategy = keyDecodingStrategy
 			
-			let task = urlSession.uploadTask(with: urlRequest, fromFile: cacheURL) { data, response, error in
+			return urlSession.uploadTask(with: urlRequest, fromFile: cacheURL) { data, response, error in
 				defer { try? FileManager.default.removeItem(at: cacheURL) }
 
 				if let error = error {
@@ -207,9 +237,6 @@ final internal class Zone5HTTPClient {
 					completion(.failure(.unknown))
 				}
 			}
-
-			task.resume()
-			return PendingRequest(task)
 		}
 	}
 
@@ -224,7 +251,7 @@ final internal class Zone5HTTPClient {
 		progress: ((_ bytesWritten: Int64, _ totalBytesWritten: Int64, _ totalBytesExpectedToWrite: Int64) -> Void)? = nil,
 		completion: @escaping CompletionHandler<URL>
 	) -> PendingRequest? {
-		return execute(with: completion) { zone5, completion in
+		return execute(on: Zone5HTTPClient.downloadQueue, with: completion) { zone5, completion in
 			var urlRequest = try request.urlRequest(zone5: zone5, taskType: .download)
 			
 			if let progress = progress {
@@ -235,7 +262,7 @@ final internal class Zone5HTTPClient {
 			decoder.keyDecodingStrategy = .useDefaultKeys
 			
 			// create with no completion handler. This will force delegate to be used so that we can capture progress
-			let task = urlSession.downloadTask(with: urlRequest) { location, response, error in
+			return urlSession.downloadTask(with: urlRequest) { location, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 					return
@@ -270,10 +297,6 @@ final internal class Zone5HTTPClient {
 					return
 				}
 			}
-			
-			task.resume()
-			
-			return PendingRequest(task)
 		}
 	}
 
