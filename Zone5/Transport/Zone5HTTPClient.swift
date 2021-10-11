@@ -209,7 +209,7 @@ final internal class Zone5HTTPClient {
 	) -> PendingRequest? {
 		return execute(on: Zone5HTTPClient.uploadQueue, with: completion) { zone5, completion in
 			var (urlRequest, multipartData) = try request.urlRequest(toUpload: fileURL, zone5: zone5)
-			let cacheURL = Zone5HTTPClient.uploadsDirectory.appendingPathComponent(fileURL.lastPathComponent).appendingPathExtension("multipart")
+			let cacheURL = Zone5HTTPClient.uploadsDirectory.appendingPathComponent("\(fileURL.lastPathComponent).\(UUID().uuidString).multipart")
 
 			// save URL against the request (needed to create actual uploadTask in interceptor)
 			urlRequest = urlRequest.setMeta(key: .fileURL, value: cacheURL)
