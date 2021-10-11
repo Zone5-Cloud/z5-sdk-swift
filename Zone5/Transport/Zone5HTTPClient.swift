@@ -140,7 +140,7 @@ final internal class Zone5HTTPClient {
 		return execute(on: Zone5HTTPClient.dataQueue, with: completion) { zone5, completion in
 			let urlRequest = try request.urlRequest(zone5: zone5, taskType: .data)
 
-			return urlSession.dataTask(with: urlRequest) { data, response, error in
+			let task = urlSession.dataTask(with: urlRequest) { data, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 				}
@@ -151,6 +151,9 @@ final internal class Zone5HTTPClient {
 					completion(.failure(.unknown))
 				}
 			}
+
+			task.priority = URLSessionTask.highPriority
+			return task
 		}
 	}
 
@@ -173,7 +176,7 @@ final internal class Zone5HTTPClient {
 			let decoder = self.decoder
             decoder.keyDecodingStrategy = keyDecodingStrategy
             
-			return urlSession.dataTask(with: urlRequest) { data, response, error in
+			let task = urlSession.dataTask(with: urlRequest) { data, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 				}
@@ -184,6 +187,9 @@ final internal class Zone5HTTPClient {
 					completion(.failure(.unknown))
 				}
 			}
+
+			task.priority = URLSessionTask.highPriority
+			return task
 		}
 	}
     
