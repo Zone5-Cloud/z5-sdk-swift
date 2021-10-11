@@ -44,7 +44,7 @@
 		0FB27F3F2406324900D7991B /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB27F3E2406324900D7991B /* LoginResponse.swift */; };
 		0FB27F41240634B900D7991B /* Roles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB27F40240634B900D7991B /* Roles.swift */; };
 		0FB27F442406389C00D7991B /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB27F432406389C00D7991B /* Company.swift */; };
-		0FD9D14E2583445A00028F5F /* Zone5DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD9D14D2583445A00028F5F /* Zone5DownloadDelegate.swift */; };
+		0FD9D14E2583445A00028F5F /* URLRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD9D14D2583445A00028F5F /* URLRequestDelegate.swift */; };
 		0FE9E2D0257DD6520036B44A /* Zone5HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE9E2CF257DD6520036B44A /* Zone5HttpHeader.swift */; };
 		0FE9E2D6257DDCFE0036B44A /* UserAgentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE9E2D5257DDCFE0036B44A /* UserAgentView.swift */; };
 		0FE9E2EE257F0CF90036B44A /* Method.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE9E2ED257F0CF90036B44A /* Method.swift */; };
@@ -236,7 +236,7 @@
 		0FB27F3E2406324900D7991B /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
 		0FB27F40240634B900D7991B /* Roles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Roles.swift; sourceTree = "<group>"; };
 		0FB27F432406389C00D7991B /* Company.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
-		0FD9D14D2583445A00028F5F /* Zone5DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone5DownloadDelegate.swift; sourceTree = "<group>"; };
+		0FD9D14D2583445A00028F5F /* URLRequestDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestDelegate.swift; sourceTree = "<group>"; };
 		0FE9E2CF257DD6520036B44A /* Zone5HttpHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone5HttpHeader.swift; sourceTree = "<group>"; };
 		0FE9E2D5257DDCFE0036B44A /* UserAgentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentView.swift; sourceTree = "<group>"; };
 		0FE9E2ED257F0CF90036B44A /* Method.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Method.swift; sourceTree = "<group>"; };
@@ -391,13 +391,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0F23B2FB2702CDDC00516F79 /* OptionSets */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = OptionSets;
-			sourceTree = "<group>";
-		};
 		0F25410F26E98CF70043B7D0 /* TermsAndConditions */ = {
 			isa = PBXGroup;
 			children = (
@@ -511,7 +504,7 @@
 				A182D1BB2372AB0E00112501 /* Request.swift */,
 				0F95EB5624637DD2000B859D /* PendingRequest.swift */,
 				0F4A88CD2564ADC4005C20A2 /* URLRequestInterceptor.swift */,
-				0FD9D14D2583445A00028F5F /* Zone5DownloadDelegate.swift */,
+				0FD9D14D2583445A00028F5F /* URLRequestDelegate.swift */,
 			);
 			path = Transport;
 			sourceTree = "<group>";
@@ -711,7 +704,6 @@
 				A190FFE7237938BA0059561D /* Search */,
 				0F7C8E67256CCBBB005CF025 /* Payments */,
 				A190FFE6237938810059561D /* Enums */,
-				0F23B2FB2702CDDC00516F79 /* OptionSets */,
 				A182D1B52372AB0E00112501 /* Transport */,
 				A182D1BD2372AB0F00112501 /* Views */,
 				A1F059002372A3A80034C7D0 /* Supporting Files */,
@@ -1038,7 +1030,7 @@
 				0FAA75602407531900CB3C73 /* OAuthTokenAlt.swift in Sources */,
 				A196035C23794DD200CEB121 /* UserDelegateState.swift in Sources */,
 				A10AB238237E147E00EBAC66 /* UserWorkoutResultTurbo.swift in Sources */,
-				0FD9D14E2583445A00028F5F /* Zone5DownloadDelegate.swift in Sources */,
+				0FD9D14E2583445A00028F5F /* URLRequestDelegate.swift in Sources */,
 				0F9D70FE2445723E0053C6FD /* MetricsView.swift in Sources */,
 				A167D6C723821FD900507276 /* SearchInputReport.swift in Sources */,
 				A182D1DB2372AB0F00112501 /* SearchResult.swift in Sources */,

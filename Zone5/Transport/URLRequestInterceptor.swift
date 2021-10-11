@@ -18,14 +18,15 @@ internal class URLRequestInterceptor: URLProtocol {
 	private var currentTask: URLSessionTask? = nil
 	
 	override init(request: URLRequest, cachedResponse: CachedURLResponse?, client: URLProtocolClient?) {
-		// assign session. Requests are split into file operations and other. This is so file operations
-		// cannot hog all the resources and prevent basic requests from executing
-		let taskType: URLSessionTaskType = request.getMeta(key: .taskType) as? URLSessionTaskType ?? .data
-		switch taskType {
+		// Assign the session based on the type of task handling the request. Each type needs to be handled differently,
+		// to ensure that uploads may complete if the app is backgrounded, and that file transfers don't hog bandwidth.
+		switch request.taskType {
 		case .data:
-			session = Zone5.shared.httpClient.interceptorUrlSession
-		default:
-			session = Zone5.shared.httpClient.interceptorUrlSessionFiles
+			session = Zone5HTTPClient.interceptorDataSession
+		case .download:
+			session = Zone5HTTPClient.interceptorDownloadSession
+		case .upload:
+			session = Zone5HTTPClient.interceptorUploadSession
 		}
 		
 		super.init(request: request, cachedResponse: cachedResponse, client: client)
@@ -148,20 +149,39 @@ internal class URLRequestInterceptor: URLProtocol {
 		
 		// now we are finished with the request meta. Clear it before we continue
 		let request = request.clearMeta()
+		let currentTask: URLSessionTask
 		
 		switch type {
 		case .data:
-			self.currentTask = session.dataTask(with: request, completionHandler: onComplete)
+			currentTask = session.dataTask(with: request, completionHandler: onComplete)
+
 		case .upload:
-			if let url = url {
-				self.currentTask = session.uploadTask(with: request, fromFile: url, completionHandler: onComplete)
-			} else {
+			guard let url = url else {
 				onComplete(data: nil, response: nil, error: Zone5.Error.invalidParameters)
+
+				return
 			}
+
+			currentTask = session.uploadTask(with: request, fromFile: url)
+
+			var completionObserver : NSObjectProtocol? = nil
+			completionObserver = NotificationCenter.default.addObserver(forName: URLRequestDelegate.uploadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
+				// remove observers.
+				if let completionObserver = completionObserver {
+					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.uploadCompleteNotification, object: currentTask)
+				}
+
+				let data = notification.userInfo?["data"] as? Data
+				let response = notification.userInfo?["response"] as? URLResponse
+				let error = notification.userInfo?["error"] as? Error
+
+				self?.onComplete(data: data, response: response, error: error)
+			}
+
 		case .download:
-			let currentTask = session.downloadTask(with: request)
+			currentTask = session.downloadTask(with: request)
 		
-			let progressObserver: NSObjectProtocol? = NotificationCenter.default.addObserver(forName: Zone5DownloadDelegate.downloadProgressNotification, object: currentTask, queue: nil) { notification in
+			let progressObserver: NSObjectProtocol? = NotificationCenter.default.addObserver(forName: URLRequestDelegate.downloadProgressNotification, object: currentTask, queue: nil) { notification in
 				if let bytesWritten = notification.userInfo?["bytesWritten"] as? Int64,
 				   let totalBytesWritten = notification.userInfo?["totalBytesWritten"] as? Int64,
 				   let totalBytesExpectedToWrite = notification.userInfo?["totalBytesExpectedToWrite"] as? Int64 {
@@ -170,21 +190,19 @@ internal class URLRequestInterceptor: URLProtocol {
 			}
 			
 			var completionObserver : NSObjectProtocol? = nil
-			completionObserver = NotificationCenter.default.addObserver(forName: Zone5DownloadDelegate.downloadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
+			completionObserver = NotificationCenter.default.addObserver(forName: URLRequestDelegate.downloadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
 				// remove observers.
 				if let progressObserver = progressObserver {
-					NotificationCenter.default.removeObserver(progressObserver, name: Zone5DownloadDelegate.downloadProgressNotification, object: currentTask)
+					NotificationCenter.default.removeObserver(progressObserver, name: URLRequestDelegate.downloadProgressNotification, object: currentTask)
 				}
 				if let completionObserver = completionObserver {
-					NotificationCenter.default.removeObserver(completionObserver, name: Zone5DownloadDelegate.downloadCompleteNotification, object: currentTask)
+					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.downloadCompleteNotification, object: currentTask)
 				}
 				
-				//url, response, error in
-				let error = notification.userInfo?["error"] as? Error
 				let response = notification.userInfo?["response"] as? URLResponse
-				
-				if let location = notification.userInfo?["location"] as? URL,
-				   let filename = (response as? HTTPURLResponse)?.suggestedFilename {
+				let error = notification.userInfo?["error"] as? Error
+
+				if let location = notification.userInfo?["location"] as? URL, let filename = (response as? HTTPURLResponse)?.suggestedFilename {
 					// attempt to copy this file to another location because it will be deleted on return of this function
 					let cacheURL = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(filename)
 					try? FileManager.default.removeItem(at: cacheURL)
@@ -193,12 +211,10 @@ internal class URLRequestInterceptor: URLProtocol {
 				
 				self?.onComplete(data: nil, response: response, error: error)
 			}
-			
-			self.currentTask = currentTask
 		}
-	
-		
-		currentTask?.resume()
+
+		self.currentTask = currentTask
+		currentTask.resume()
 	}
 	
 	/// Decode the Cognito token to get the username out of it. It is required for the cognito refresh

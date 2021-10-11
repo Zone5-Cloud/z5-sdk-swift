@@ -11,10 +11,29 @@ final public class Zone5HTTPClient {
 	/// - Note: This is defined as a custom protocol to allow injection of a mock instance used in unit testing.
 	private let urlSession: HTTPClientURLSession
 	
-	/// URLSessions used by the interceptor - this is where the requests are sent out to the server
-	internal let interceptorUrlSession: URLSession
-	internal let interceptorUrlSessionFiles: URLSession
-	
+	/// URLSession used by the `URLRequestInterceptor` for standard API requests.
+	internal static let interceptorDataSession: URLSession = {
+		return URLSession(configuration: .default, delegate: nil, delegateQueue: Zone5HTTPClient.operationQueue())
+	}()
+
+	/// URLSession used by the `URLRequestInterceptor` for file downloads.
+	/// To stop downloads from hogging bandwidth, the session is configured to allow a single HTTP connection at a time.
+	internal static let interceptorDownloadSession: URLSession = {
+		let configuration: URLSessionConfiguration = .default
+		configuration.httpMaximumConnectionsPerHost = 1
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: Zone5HTTPClient.operationQueue())
+	}()
+
+	/// URLSession used by the `URLRequestInterceptor` for file uploads.
+	/// To stop uploads from hogging bandwidth, the session is configured to allow a single HTTP connection at a time.
+	internal static let interceptorUploadSession: URLSession = {
+		let configuration: URLSessionConfiguration = .background(withIdentifier: "Zone5HttpClient.interceptorUploadSession")
+		configuration.httpMaximumConnectionsPerHost = 1
+		configuration.sessionSendsLaunchEvents = true
+		configuration.isDiscretionary = false
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: Zone5HTTPClient.operationQueue())
+	}()
+
 	/// Initializes a new instance of the `HTTPClient` that uses the URLRequestInterceptor to process requests
 	public convenience init() {
 		let configuration: URLSessionConfiguration = .default
@@ -28,13 +47,6 @@ final public class Zone5HTTPClient {
 	/// - Note: For testing purposes _only_.
 	init(urlSession: HTTPClientURLSession) {
 		self.urlSession = urlSession
-		
-		// for the interceptor, seperate tasks into file opertions and other. Limit the file operations to 1. Other is default (4)
-		// use a delegate for file operations so that we can track progress callbacks
-		self.interceptorUrlSession = URLSession(configuration: .default, delegate: nil, delegateQueue: Zone5HTTPClient.operationQueue())
-		let fileConfiguration: URLSessionConfiguration = .default
-		fileConfiguration.httpMaximumConnectionsPerHost = 1
-		self.interceptorUrlSessionFiles = URLSession(configuration: fileConfiguration, delegate: Zone5DownloadDelegate(), delegateQueue: Zone5HTTPClient.operationQueue())
 	}
 	
 	/// Default operation queues have a qos of utility. This can result in poor performance for user initiated requests like ours. Increase the qos.
