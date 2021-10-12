@@ -206,10 +206,19 @@ final internal class HTTPClient {
 		expectedType: T.Type,
 		completion: @escaping CompletionHandler<T>
 	) -> PendingRequest? {
-		return execute(on: HTTPClient.uploadQueue, with: completion) { zone5, completion in
-			var (urlRequest, multipartData) = try request.urlRequest(toUpload: fileURL, zone5: zone5)
-			let cacheURL = HTTPClient.uploadsDirectory.appendingPathComponent("\(fileURL.lastPathComponent).\(UUID().uuidString).multipart")
+		let cacheURL = HTTPClient.uploadsDirectory.appendingPathComponent("\(fileURL.lastPathComponent).\(UUID().uuidString).multipart")
 
+		// We want to delete the cached file after the given completion handler is called (but before the underlying
+		// operation is marked as finished by the `execute(on:with:_:)` method), so we'll just wrap the completion in
+		// our own closure which makes things nice and easy.
+		let completeAndDelete: CompletionHandler<T> = { result in
+			completion(result)
+
+			try? FileManager.default.removeItem(at: cacheURL)
+		}
+
+		return execute(on: HTTPClient.uploadQueue, with: completeAndDelete) { zone5, completion in
+			var (urlRequest, multipartData) = try request.urlRequest(toUpload: fileURL, zone5: zone5)
 			// save URL against the request (needed to create actual uploadTask in interceptor)
 			urlRequest = urlRequest.setMeta(key: .fileURL, value: cacheURL)
 			
@@ -224,8 +233,6 @@ final internal class HTTPClient {
             decoder.keyDecodingStrategy = keyDecodingStrategy
 			
 			return urlSession.uploadTask(with: urlRequest, fromFile: cacheURL) { data, response, error in
-				defer { try? FileManager.default.removeItem(at: cacheURL) }
-
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 				}
@@ -250,7 +257,18 @@ final internal class HTTPClient {
 		progress: ((_ bytesWritten: Int64, _ totalBytesWritten: Int64, _ totalBytesExpectedToWrite: Int64) -> Void)? = nil,
 		completion: @escaping CompletionHandler<URL>
 	) -> PendingRequest? {
-		return execute(on: HTTPClient.downloadQueue, with: completion) { zone5, completion in
+		// We want to delete the cached file after the given completion handler is called (but before the underlying
+		// operation is marked as finished by the `execute(on:with:_:)` method), so we'll just wrap the completion in
+		// our own closure which makes things nice and easy.
+		let completeAndDelete: CompletionHandler<URL> = { result in
+			completion(result)
+
+			if case .success(let cacheURL) = result {
+				try? FileManager.default.removeItem(at: cacheURL)
+			}
+		}
+
+		return execute(on: HTTPClient.downloadQueue, with: completeAndDelete) { zone5, completion in
 			var urlRequest = try request.urlRequest(zone5: zone5, taskType: .download)
 			
 			if let progress = progress {
@@ -260,25 +278,26 @@ final internal class HTTPClient {
 			let decoder = self.decoder
 			decoder.keyDecodingStrategy = .useDefaultKeys
 			
-			// create with no completion handler. This will force delegate to be used so that we can capture progress
-			return urlSession.downloadTask(with: urlRequest) { location, response, error in
+			return urlSession.downloadTask(with: urlRequest) { _, response, error in
 				if let error = error {
 					completion(.failure(.transportFailure(error)))
 					return
 				}
-				
+
 				guard let response = response as? HTTPURLResponse, let filename = response.suggestedFilename else {
 					completion(.failure(.unknown))
 					return
 				}
-				
+
+				// The location passed to this closure is a red herring because the download is typically handled by
+				// the `URLRequestInterceptor`, so we need to rebuild the path to the actual downloaded file the same
+				// way the interceptor does.
 				let cacheURL = HTTPClient.downloadsDirectory.appendingPathComponent(filename)
-				
+
 				if (200..<400).contains(response.statusCode) {
 					if let resources = try? cacheURL.resourceValues(forKeys:[.fileSizeKey]), resources.fileSize! > 0 {
 						// success case - the file is the download
 						completion(.success(cacheURL))
-						try? FileManager.default.removeItem(at: cacheURL)
 						return
 					} else {
 						// supposed to be success but can't find file
