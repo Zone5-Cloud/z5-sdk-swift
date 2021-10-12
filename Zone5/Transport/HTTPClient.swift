@@ -79,9 +79,6 @@ final internal class HTTPClient {
 	/// A closure that receives the result of a request.
 	internal typealias CompletionHandler<T> = (_ result: Result<T, Zone5.Error>) -> Void
 
-	/// Concurrent queue used to call the completion handlers.
-	private static let completionHandlerQueue = DispatchQueue(label: "Zone5HttpClient.callback.queue", qos: .userInitiated, attributes: .concurrent)
-
 	/// Validates the SDK configuration, and then calls the given `block` closure, handling any thrown errors using the given `completion`.
 	/// - Parameters:
 	///   - completion: Closure called with errors that are thrown in the `block`.
@@ -103,9 +100,7 @@ final internal class HTTPClient {
 			/// Wrap the provided completion handler in a dispatch call.
 			/// Do this synchronously so that tasks performed afterwards (like deleting files) are handled correctly.
 			let dispatchedCompletion: CompletionHandler<T> = { result in
-				HTTPClient.completionHandlerQueue.sync {
-					completion(result)
-				}
+				completion(result)
 
 				operation.finish()
 			}
@@ -116,13 +111,11 @@ final internal class HTTPClient {
 			return operation
 		}
 		catch {
-			HTTPClient.completionHandlerQueue.sync {
-				if let error = error as? Zone5.Error {
-					completion(.failure(error))
-				}
-				else {
-					completion(.failure(.unknown))
-				}
+			if let error = error as? Zone5.Error {
+				completion(.failure(error))
+			}
+			else {
+				completion(.failure(.unknown))
 			}
 
 			return nil
