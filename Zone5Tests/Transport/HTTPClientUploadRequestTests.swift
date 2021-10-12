@@ -249,7 +249,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			urlSession.uploadTaskHandler = { urlRequest, uploadedURL in
 				DispatchQueue.main.async {
 					tasksInProgress += 1
-					XCTAssertTrue(tasksInProgress <= Zone5HTTPClient.downloadQueue.maxConcurrentOperationCount)
+					XCTAssertTrue(tasksInProgress <= HTTPClient.downloadQueue.maxConcurrentOperationCount)
 				}
 
 				usleep(.random(in: 1000...10000)) // Give the tasks a chance to back up
@@ -263,7 +263,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
 				DispatchQueue.main.async {
 					tasksInProgress -= 1
-					XCTAssertTrue(tasksInProgress <= Zone5HTTPClient.downloadQueue.maxConcurrentOperationCount)
+					XCTAssertTrue(tasksInProgress <= HTTPClient.downloadQueue.maxConcurrentOperationCount)
 				}
 
 				expectation.fulfill()

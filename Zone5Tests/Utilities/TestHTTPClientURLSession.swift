@@ -146,7 +146,7 @@ class TestHTTPClientURLSession: HTTPClientURLSession {
 					"Content-Type": "application/json",
 				])!
 				
-				let tempURL = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(response.suggestedFilename!)
+				let tempURL = HTTPClient.downloadsDirectory.appendingPathComponent(response.suggestedFilename!)
 				let json = "{\"message\": \"\(message)\"}"
 				try! json.write(to: tempURL, atomically: true, encoding: .utf8)
 
@@ -172,7 +172,7 @@ class TestHTTPClientURLSession: HTTPClientURLSession {
 					"Content-Type": "application/octet-stream",
 				])!
 				
-				let copy = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(response.suggestedFilename!)
+				let copy = HTTPClient.downloadsDirectory.appendingPathComponent(response.suggestedFilename!)
 				try? FileManager.default.copyItem(at: url, to: copy)
 
 				completionHandler(url, response, nil)

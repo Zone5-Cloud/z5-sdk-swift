@@ -211,7 +211,7 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			urlSession.downloadTaskHandler = { urlRequest in
 				DispatchQueue.main.async {
 					tasksInProgress += 1
-					XCTAssertTrue(tasksInProgress <= Zone5HTTPClient.uploadQueue.maxConcurrentOperationCount)
+					XCTAssertTrue(tasksInProgress <= HTTPClient.uploadQueue.maxConcurrentOperationCount)
 				}
 
 				usleep(.random(in: 1000...10000)) // Give the tasks a chance to back up
@@ -225,7 +225,7 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 			_ = httpClient.download(request) { result in
 				DispatchQueue.main.async {
 					tasksInProgress -= 1
-					XCTAssertTrue(tasksInProgress <= Zone5HTTPClient.uploadQueue.maxConcurrentOperationCount)
+					XCTAssertTrue(tasksInProgress <= HTTPClient.uploadQueue.maxConcurrentOperationCount)
 				}
 
 				expectation.fulfill()

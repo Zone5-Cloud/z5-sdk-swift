@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-final internal class Zone5HTTPClient {
+final internal class HTTPClient {
 
 	/// The parent instance of the `Zone5` SDK.
 	internal weak var zone5: Zone5?
@@ -103,7 +103,7 @@ final internal class Zone5HTTPClient {
 			/// Wrap the provided completion handler in a dispatch call.
 			/// Do this synchronously so that tasks performed afterwards (like deleting files) are handled correctly.
 			let dispatchedCompletion: CompletionHandler<T> = { result in
-				Zone5HTTPClient.completionHandlerQueue.sync {
+				HTTPClient.completionHandlerQueue.sync {
 					completion(result)
 				}
 
@@ -116,7 +116,7 @@ final internal class Zone5HTTPClient {
 			return operation
 		}
 		catch {
-			Zone5HTTPClient.completionHandlerQueue.sync {
+			HTTPClient.completionHandlerQueue.sync {
 				if let error = error as? Zone5.Error {
 					completion(.failure(error))
 				}
@@ -137,7 +137,7 @@ final internal class Zone5HTTPClient {
 		_ request: Request,
 		completion: @escaping CompletionHandler<(Data?, URLResponse)>
 	) -> PendingRequest? {
-		return execute(on: Zone5HTTPClient.dataQueue, with: completion) { zone5, completion in
+		return execute(on: HTTPClient.dataQueue, with: completion) { zone5, completion in
 			let urlRequest = try request.urlRequest(zone5: zone5, taskType: .data)
 
 			let task = urlSession.dataTask(with: urlRequest) { data, response, error in
@@ -170,7 +170,7 @@ final internal class Zone5HTTPClient {
 		expectedType: T.Type,
 		completion: @escaping CompletionHandler<T>
 	) -> PendingRequest? {
-		return execute(on: Zone5HTTPClient.dataQueue, with: completion) { zone5, completion in
+		return execute(on: HTTPClient.dataQueue, with: completion) { zone5, completion in
 			let urlRequest = try request.urlRequest(zone5: zone5, taskType: .data)
 			
 			let decoder = self.decoder
@@ -213,9 +213,9 @@ final internal class Zone5HTTPClient {
 		expectedType: T.Type,
 		completion: @escaping CompletionHandler<T>
 	) -> PendingRequest? {
-		return execute(on: Zone5HTTPClient.uploadQueue, with: completion) { zone5, completion in
+		return execute(on: HTTPClient.uploadQueue, with: completion) { zone5, completion in
 			var (urlRequest, multipartData) = try request.urlRequest(toUpload: fileURL, zone5: zone5)
-			let cacheURL = Zone5HTTPClient.uploadsDirectory.appendingPathComponent("\(fileURL.lastPathComponent).\(UUID().uuidString).multipart")
+			let cacheURL = HTTPClient.uploadsDirectory.appendingPathComponent("\(fileURL.lastPathComponent).\(UUID().uuidString).multipart")
 
 			// save URL against the request (needed to create actual uploadTask in interceptor)
 			urlRequest = urlRequest.setMeta(key: .fileURL, value: cacheURL)
@@ -257,7 +257,7 @@ final internal class Zone5HTTPClient {
 		progress: ((_ bytesWritten: Int64, _ totalBytesWritten: Int64, _ totalBytesExpectedToWrite: Int64) -> Void)? = nil,
 		completion: @escaping CompletionHandler<URL>
 	) -> PendingRequest? {
-		return execute(on: Zone5HTTPClient.downloadQueue, with: completion) { zone5, completion in
+		return execute(on: HTTPClient.downloadQueue, with: completion) { zone5, completion in
 			var urlRequest = try request.urlRequest(zone5: zone5, taskType: .download)
 			
 			if let progress = progress {
@@ -279,7 +279,7 @@ final internal class Zone5HTTPClient {
 					return
 				}
 				
-				let cacheURL = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(filename)
+				let cacheURL = HTTPClient.downloadsDirectory.appendingPathComponent(filename)
 				
 				if (200..<400).contains(response.statusCode) {
 					if let resources = try? cacheURL.resourceValues(forKeys:[.fileSizeKey]), resources.fileSize! > 0 {

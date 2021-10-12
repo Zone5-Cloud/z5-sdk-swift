@@ -232,7 +232,7 @@ internal class URLRequestInterceptor: URLProtocol {
 
 				if let location = notification.userInfo?["location"] as? URL, let filename = (response as? HTTPURLResponse)?.suggestedFilename {
 					// attempt to copy this file to another location because it will be deleted on return of this function
-					let cacheURL = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(filename)
+					let cacheURL = HTTPClient.downloadsDirectory.appendingPathComponent(filename)
 					try? FileManager.default.removeItem(at: cacheURL)
 					try? FileManager.default.copyItem(at: location, to: cacheURL)
 				}
