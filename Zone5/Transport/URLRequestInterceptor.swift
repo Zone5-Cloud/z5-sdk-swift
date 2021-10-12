@@ -79,12 +79,9 @@ internal class URLRequestInterceptor: URLProtocol {
 
 	// MARK: Shared URL sessions
 
-	/// A shared delegate for handling events related to uploads and downloads.
-	private static let urlRequestDelegate = URLRequestDelegate()
-
 	/// URLSession used by the `URLRequestInterceptor` for standard API requests.
 	private static let sharedDataSession: URLSession = {
-		return URLSession(configuration: .default, delegate: nil, delegateQueue: urlRequestDelegate.operationQueue)
+		return URLSession(configuration: .default, delegate: nil, delegateQueue: URLRequestDelegate.OperationQueue())
 	}()
 
 	/// URLSession used by the `URLRequestInterceptor` for file downloads.
@@ -92,7 +89,7 @@ internal class URLRequestInterceptor: URLProtocol {
 	private static let sharedDownloadSession: URLSession = {
 		let configuration: URLSessionConfiguration = .default
 		configuration.httpMaximumConnectionsPerHost = 1
-		return URLSession(configuration: configuration, delegate: urlRequestDelegate, delegateQueue: urlRequestDelegate.operationQueue)
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: URLRequestDelegate.OperationQueue())
 	}()
 
 	/// URLSession used by the `URLRequestInterceptor` for file uploads.
@@ -102,7 +99,7 @@ internal class URLRequestInterceptor: URLProtocol {
 		configuration.httpMaximumConnectionsPerHost = 1
 		configuration.sessionSendsLaunchEvents = true
 		configuration.isDiscretionary = false
-		return URLSession(configuration: configuration, delegate: urlRequestDelegate, delegateQueue: urlRequestDelegate.operationQueue)
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: URLRequestDelegate.OperationQueue())
 	}()
 
 	// MARK: Handling intercepted requests

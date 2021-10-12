@@ -15,11 +15,7 @@ final internal class HTTPClient {
 		let configuration: URLSessionConfiguration = .default
 		configuration.protocolClasses = [ URLRequestInterceptor.self ]
 
-		let operationQueue = OperationQueue()
-		operationQueue.qualityOfService = .userInitiated // Default operation queues have a QoS of `.utility` which can result in poor performance.
-		operationQueue.maxConcurrentOperationCount = 1 // Operation queues for URLSessions must be serial.
-
-		self.init(urlSession: URLSession(configuration: configuration, delegate: nil, delegateQueue: operationQueue))
+		self.init(urlSession: URLSession(configuration: configuration, delegate: nil, delegateQueue: URLRequestDelegate.OperationQueue()))
 	}
 
 	/// Initializes a new instance of the `HTTPClient` with the given `URLSession`.
