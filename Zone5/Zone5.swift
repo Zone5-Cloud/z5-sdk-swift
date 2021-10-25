@@ -8,7 +8,7 @@ final public class Zone5 {
 	public static let shared = Zone5()
 
 	/// A light wrapper of the URLSession API, which enables communication with the server endpoints.
-	internal let httpClient: Zone5HTTPClient
+	internal let httpClient: HTTPClient
 
 	internal static let specializedServer: String = "api-sp.todaysplan.com.au"
 	internal static let specializedStagingServer: String = "api-sp-staging.todaysplan.com.au"
@@ -16,7 +16,7 @@ final public class Zone5 {
 	public static let authTokenChangedNotification = Notification.Name("authTokenChangedNotification")
 	public static let updatedTermsNotification = Notification.Name("updatedTermsNotification")
 	
-	init(httpClient: Zone5HTTPClient = .init()) {
+	init(httpClient: HTTPClient = .init()) {
 		self.httpClient = httpClient
 
 		httpClient.zone5 = self

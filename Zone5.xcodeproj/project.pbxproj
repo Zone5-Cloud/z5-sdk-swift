@@ -92,7 +92,7 @@
 		A182D1CD2372AB0F00112501 /* URLEncodedBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1B72372AB0E00112501 /* URLEncodedBody.swift */; };
 		A182D1CE2372AB0F00112501 /* JSONEncodedBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1B82372AB0E00112501 /* JSONEncodedBody.swift */; };
 		A182D1CF2372AB0F00112501 /* RequestBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1B92372AB0E00112501 /* RequestBody.swift */; };
-		A182D1D02372AB0F00112501 /* Zone5HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1BA2372AB0E00112501 /* Zone5HTTPClient.swift */; };
+		A182D1D02372AB0F00112501 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1BA2372AB0E00112501 /* HTTPClient.swift */; };
 		A182D1D12372AB0F00112501 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1BB2372AB0E00112501 /* Request.swift */; };
 		A182D1D32372AB0F00112501 /* ActivitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1BE2372AB0F00112501 /* ActivitiesView.swift */; };
 		A182D1D42372AB0F00112501 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182D1BF2372AB0F00112501 /* View.swift */; };
@@ -285,7 +285,7 @@
 		A182D1B72372AB0E00112501 /* URLEncodedBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLEncodedBody.swift; sourceTree = "<group>"; };
 		A182D1B82372AB0E00112501 /* JSONEncodedBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONEncodedBody.swift; sourceTree = "<group>"; };
 		A182D1B92372AB0E00112501 /* RequestBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestBody.swift; sourceTree = "<group>"; };
-		A182D1BA2372AB0E00112501 /* Zone5HTTPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zone5HTTPClient.swift; sourceTree = "<group>"; };
+		A182D1BA2372AB0E00112501 /* HTTPClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		A182D1BB2372AB0E00112501 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		A182D1BE2372AB0F00112501 /* ActivitiesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivitiesView.swift; sourceTree = "<group>"; };
 		A182D1BF2372AB0F00112501 /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
@@ -492,7 +492,7 @@
 		A182D1B52372AB0E00112501 /* Transport */ = {
 			isa = PBXGroup;
 			children = (
-				A182D1BA2372AB0E00112501 /* Zone5HTTPClient.swift */,
+				A182D1BA2372AB0E00112501 /* HTTPClient.swift */,
 				A182D1C52372AB0F00112501 /* AccessToken.swift */,
 				A182D1B62372AB0E00112501 /* RequestEndpoint.swift */,
 				A182D1B92372AB0E00112501 /* RequestBody.swift */,
@@ -658,6 +658,7 @@
 			isa = PBXGroup;
 			children = (
 				A167D6D023838F0000507276 /* HTTPClientPerformRequestTests.swift */,
+				A167D6D42383DBAB00507276 /* HTTPClientUploadRequestTests.swift */,
 				A1C42B6523850CF2004E33B9 /* HTTPClientDownloadRequestTests.swift */,
 				A196032D2379445200CEB121 /* RequestTests.swift */,
 				A1713CBB2386060F0084BDDC /* RequestEndpointTests.swift */,
@@ -665,7 +666,6 @@
 				A1EBDAD8237A21DD00834B21 /* MultipartEncodedBodyTests.swift */,
 				0F7C8E59256C9743005CF025 /* URLRequestInterceptorTests.swift */,
 				0F1C9F8625898C89000C12FD /* ResponseDecodingTests.swift */,
-				A167D6D42383DBAB00507276 /* HTTPClientUploadRequestTests.swift */,
 			);
 			path = Transport;
 			sourceTree = "<group>";
@@ -936,7 +936,7 @@
 				A196035923794DD200CEB121 /* UserWorkoutFailedReason.swift in Sources */,
 				0FB27F3D24060BFA00D7991B /* UserWorkoutResultBike.swift in Sources */,
 				0F4A88CA2564A1ED005C20A2 /* URLProtocolProperty.swift in Sources */,
-				A182D1D02372AB0F00112501 /* Zone5HTTPClient.swift in Sources */,
+				A182D1D02372AB0F00112501 /* HTTPClient.swift in Sources */,
 				0F7ED32825708B1200452C13 /* PaymentVerification.swift in Sources */,
 				0F7D4722253D4998005B21A9 /* PushRegistrationResponse.swift in Sources */,
 				0FAA7566240CA34300CB3C73 /* LoginRequest.swift in Sources */,

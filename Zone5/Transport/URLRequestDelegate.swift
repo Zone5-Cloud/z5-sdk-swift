@@ -18,6 +18,21 @@ final internal class URLRequestDelegate: NSObject, URLSessionDataDelegate, URLSe
 		self.notificationCenter = notificationCenter
 	}
 
+	// MARK: Delegate queue
+
+	/// Operation queue subclass that provides the defaults we like for our `URLSession` instances.
+	/// - Note: The delegate queue provided to a `URLSession` is used regardless of whether a custom delegate is
+	/// 	provided actually provided: completion handlers are called on the provided delegate queue.
+	final internal class OperationQueue: Foundation.OperationQueue {
+
+		override init() {
+			super.init()
+			qualityOfService = .userInitiated // Default operation queues have a QoS of `.utility` which can result in poor performance.
+			maxConcurrentOperationCount = 1 // Operation queues for URLSessions must be serial.
+		}
+
+	}
+
 	// MARK: Notifications posted by this delegate
 
 	internal static let uploadProgressNotification = Notification.Name("URLRequestDelegate.uploadProgressNotification")
