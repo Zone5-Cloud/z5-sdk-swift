@@ -586,30 +586,30 @@ Observe this Notification so that you can prompt users to re-accept updated Term
 <span class="p">}</span>
 </code></pre>
 
-<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html"><code>Zone5.shared.oAuth.accessToken</code></a> and <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView"><code>Zone5.shared.users.login</code></a>:</p>
+<p>Once configured, you&rsquo;ll be able to authenticate users via the methods available through <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView"><code>Zone5.shared.users.login</code></a> and <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html"><code>Zone5.shared.oAuth.accessToken</code></a>:</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">username</span> <span class="o">=</span> <span class="s">"EXAMPLE-USERNAME"</span>
 <span class="k">let</span> <span class="nv">password</span> <span class="o">=</span> <span class="s">"EXAMPLE-PASSWORD"</span>
 
-<span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">oAuth</span><span class="o">.</span><span class="nf">accessToken</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-        <span class="c1">// An error occurred and needs to be handled</span>
-
-    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">accessToken</span><span class="p">):</span>
-        <span class="c1">// The user was successfully authenticated. </span>
-        <span class="c1">// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>or</p>
-<pre class="highlight swift"><code><span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="nv">accept</span><span class="p">:</span> <span class="p">[])</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+<span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="nv">accept</span><span class="p">:</span> <span class="p">[])</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
         <span class="c1">// An error occurred and needs to be handled</span>
 
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">loginResponse</span><span class="p">):</span>
         <span class="c1">// The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc</span>
+        <span class="c1">// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>or</p>
+<pre class="highlight swift"><code><span class="kt">Zone5</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">oAuth</span><span class="o">.</span><span class="nf">accessToken</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+        <span class="c1">// An error occurred and needs to be handled</span>
+
+    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">accessToken</span><span class="p">):</span>
+        <span class="c1">// The user was successfully authenticated. </span>
         <span class="c1">// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -627,7 +627,34 @@ Observe this Notification so that you can prompt users to re-accept updated Term
 <span class="p">}</span>
 </code></pre>
 
-<p>Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword.</p>
+<p>Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword. See <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView">https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView</a> and <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/TermsView">https://zone5-cloud.github.io/z5-sdk-swift/Classes/TermsView</a> for details on using these methods.</p>
+
+<p>A basic usage for a registration screen may be:</p>
+
+<ul>
+<li>Call Zone5.shared.terms.required to retrieve the required Terms and Conditions. If the Terms are hosted at an external URL (such as the Specialized Terms of Use), then the response will include the URL of the Terms Content.</li>
+<li>Call Zone5.shared.users.isEmailRegistered once a user has entered a registration email so that the UI can provide feedback that this user already exists.</li>
+<li>Offer an option for the user to reset their existing password that calls Zone5.shared.users.resetPassword</li>
+<li>Call Zone5.shared.users.register to register a new user in the system. Don&rsquo;t let the user register until they have accepted terms and conditions. Make sure you pass the list of accepted Terms and Conditions ids into register</li>
+</ul>
+
+<p>A basic usahe for a login screen may be:</p>
+
+<ul>
+<li>Offer an option for the user to reset their existing password that calls Zone5.shared.users.resetPassword</li>
+<li>Call the above mentioned <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView"><code>Zone5.shared.users.login</code></a> with the user&rsquo;s credentials</li>
+<li>If the login fails due to there being new, unaccepted Terms and Conditions
+
+<ul>
+<li>call Zone5.shared.terms.required and present new terms (by URL or by calling Zone5.shared.terms.download (SBC terms are by URL)</li>
+<li>retry <a href="https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView"><code>Zone5.shared.users.login</code></a>, passing in new accepted terms</li>
+</ul></li>
+<li>If the login succeeds but the login response includes updated terms, present new terms (SBC terms are by URL)
+
+<ul>
+<li>call Zone5.shared.terms.accept to accept the updated terms</li>
+</ul></li>
+</ul>
 <h2 id='unit-tests' class='heading'>Unit Tests</h2>
 
 <p>Unit tests are included and can be run from both the Swift CLI and via Xcode. There may be some slight differences in how these two sources run tests, so if tests are failing in one, but not the other, this may be the cause. Tests are run automatically on push (of any branch) using the Swift CLI, via a <a href="https://github.com/Zone5-Cloud/z5-sdk-swift/blob/master/.github/workflows/unit-tests.yml">GitHub Action</a>, the result of which can be browsed via <a href="https://github.com/Zone5-Cloud/z5-sdk-swift/actions?query=workflow%3A%22Unit+Tests%22">the Actions tab</a>.</p>
@@ -650,7 +677,7 @@ Observe this Notification so that you can prompt users to re-accept updated Term
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-10-05)</p>
+      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-11-23)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
