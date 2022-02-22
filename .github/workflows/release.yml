@@ -1,0 +1,97 @@
+name: Release
+
+# This workflow only runs when a prerelease or release is created, if a prerelease or release is updated
+# (with changes to the releases title or notes AND a different commit), or if a prerelease is updated to a
+# release (the prerelease checkbox is disabled).
+#
+# The `xcframework` and `documentation` jobs will not run if the release already has an asset with the same
+# name as the one they generate.
+
+on:
+  release:
+    types: [published, edited]
+
+jobs:
+  xcframework:
+    if: ${{ !contains(github.event.release.assets.*.name, 'Zone5.xcframework.zip') }}
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Build XCFramework
+      run: carthage build --verbose --use-xcframeworks --no-skip-current
+
+    - name: Create Archive
+      run: |
+        cd ./Carthage/Build
+        rm -rf "../../Zone5.xcframework.zip"
+        zip -qry "../../Zone5.xcframework.zip" "Zone5.xcframework"
+
+    - name: Upload Artifacts
+      uses: nanoufo/action-upload-artifacts-and-release-assets@v1.4
+      with:
+        path: Zone5.xcframework.zip
+        upload-release-files: true
+        release-upload-url: ${{ github.event.release.upload_url }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  documentation:
+    if: ${{ !contains(github.event.release.assets.*.name, 'Documentation.zip') }}
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Cache RubyGems
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: ${{ runner.os }}-gem-
+
+    - name: "Set up SSH Agent"
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: "Add GitHub to SSH Known Hosts"
+      run: |
+        for ip in $(dig @8.8.8.8 github.com +short); do \
+          ssh-keyscan github.com,$ip; \
+          ssh-keyscan $ip; \
+        done 2>/dev/null >> ~/.ssh/known_hosts
+
+    - name: Build Documentation
+      run: make documentation
+
+    - name: Create Archive
+      run: |
+        cd ./docs
+        rm -rf "../Documentation.zip"
+        zip -qry "../Documentation.zip" . -i "*"      
+
+    - name: Upload Artifacts
+      uses: nanoufo/action-upload-artifacts-and-release-assets@v1.4
+      with:
+        path: Documentation.zip
+        upload-release-files: true
+        release-upload-url: ${{ github.event.release.upload_url }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Update the hosted documentation if this is not a prerelease.
+    - name: Deploy
+      if: ${{ !github.event.release.prerelease }}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        

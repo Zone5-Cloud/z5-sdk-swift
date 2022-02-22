@@ -1,4 +1,9 @@
-name: Build
+name: Unit Tests
+
+# This workflow will run for pull requests that are opened or updated with new commits, as well as when
+# commits are pushed directly to the master or develop branches (including when pull requests are merged).
+#
+# The `build-and-test` job will run every time the workflow does.
 
 on:
   pull_request:
@@ -20,8 +25,66 @@ jobs:
       id: cache-derived-data
       uses: actions/cache@v2
       with:
-        path: "${GITHUB_WORKSPACE}/DerivedData"
+        path: |
+          "${GITHUB_WORKSPACE}/../DerivedDataSwift"
+          "${GITHUB_WORKSPACE}/../DerivedDataXcode"
         key: ${{ runner.os }}-derived-data
+
+    - name: Run Tests
+      run: |
+        DEVELOPER_PATH=$(xcode-select --print-path)
+        PLATFORM=$(ls -1 "${DEVELOPER_PATH}/Platforms/iPhoneOS.platform/DeviceSupport/" | sort -gr | head -n 1)
+        DEVICE=$(xcrun simctl list devices "iOS ${PLATFORM}" | grep "iPhone" | head -n 1 | sed -Ee 's/^.*\(([A-Z0-9\-]+)\).*$/\1/g')
+
+        xcodebuild test \
+          -workspace "Package.xcworkspace" \
+          -scheme "Zone5" \
+          -destination "platform=iOS Simulator,id=${DEVICE}" \
+          -enableCodeCoverage YES \
+          -derivedDataPath "${GITHUB_WORKSPACE}/../DerivedDataSwift" \
+          -resultBundlePath "SwiftPackage" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY=""
+
+        xcodebuild test \
+          -project "Zone5.xcodeproj" \
+          -scheme "Zone5" \
+          -destination "platform=iOS Simulator,id=${DEVICE}" \
+          -enableCodeCoverage YES \
+          -derivedDataPath "${GITHUB_WORKSPACE}/../DerivedDataXcode" \
+          -resultBundlePath "XcodeProject" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY=""
+
+    - name: Capture Results
+      if: success() || failure()
+      uses: kishikawakatsumi/xcresulttool@v1.3.1
+      with:
+        path: |
+          XcodeProject.xcresult
+          SwiftPackage.xcresult
+        show-passed-tests: false
+        show-code-coverage: false
+
+    - name: Merge Profile Data
+      run: |
+        PROFDATA_INPUT="${GITHUB_WORKSPACE}/../DerivedDataSwift/Build/ProfileData/*/*.profdata"
+        PROFDATA_OUTPUT="${GITHUB_WORKSPACE}/merged.profdata"
+        COVERAGE_OUTPUT="${GITHUB_WORKSPACE}/merged.lcov"
+        PRODUCTS_PATH="${GITHUB_WORKSPACE}/../DerivedDataSwift/Build/Products"
+
+        xcrun llvm-profdata merge ${PROFDATA_INPUT[@]} -output "${PROFDATA_OUTPUT}"
+
+        while IFS= read -r BINARY_PATH; do
+            (xcrun --run llvm-cov show "${BINARY_PATH}" --instr-profile "${PROFDATA_OUTPUT}") >> "${COVERAGE_OUTPUT}" || true
+        done <<< "$(find "${PRODUCTS_PATH}" -type f -name "*.o")"
+
+    - name: Capture Coverage Map
+      uses: actions/upload-artifact@v2
+      with:
+        name: Coverage.lcov
+        path: merged.lcov
+        if-no-files-found: warn
 
     - name: Select Java Release
       uses: actions/setup-java@v2
@@ -31,54 +94,6 @@ jobs:
 
     - name: Install Sonar Scanner
       run: brew install sonar-scanner
-
-    - name: Run Tests
-      run: |
-        DEVELOPER_PATH=$(xcode-select --print-path)
-        PLATFORM=$(ls -1 "${DEVELOPER_PATH}/Platforms/iPhoneOS.platform/DeviceSupport/" | sort -gr | head -n 1)
-        DEVICE=$(xcrun simctl list devices "iOS ${PLATFORM}" | grep "iPhone" | head -n 1 | sed -Ee 's/^.*\(([A-Z0-9\-]+)\).*$/\1/g')
-
-        xcodebuild test \
-          -project "Zone5.xcodeproj" \
-          -scheme "Zone5" \
-          -destination "platform=iOS Simulator,id=${DEVICE}" \
-          -enableCodeCoverage YES \
-          -derivedDataPath "${GITHUB_WORKSPACE}/DerivedData" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGN_IDENTITY=""
-
-    - name: Capture Logs
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: Results
-        path: DerivedData/Logs/Test/*.xcresult
-        if-no-files-found: warn
-
-    - name: Merge Profile Data
-      run: |
-        PROFDATA_INPUT="${GITHUB_WORKSPACE}/DerivedData/Build/ProfileData/*/*.profdata"
-        PROFDATA_OUTPUT="${GITHUB_WORKSPACE}/merged.profdata"
-        xcrun llvm-profdata merge ${PROFDATA_INPUT[@]} -output "${PROFDATA_OUTPUT}"
-
-    - name: Prepare Coverage Report
-      run: |
-        PROFDATA_INPUT="${GITHUB_WORKSPACE}/merged.profdata"
-        COVERAGE_OUTPUT="${GITHUB_WORKSPACE}/merged.lcov"
-        BUNDLES="${GITHUB_WORKSPACE}/DerivedData/Build/Products/Debug-*/*"
-
-        for BUNDLE_PATH in ${BUNDLES}; do
-          if [[ -e "${BUNDLE_PATH}/Info.plist" ]]; then
-            PLIST_PATH="${BUNDLE_PATH}/Info.plist"
-          elif [[ -e "${BUNDLE_PATH}/Resources/Info.plist" ]]; then
-            PLIST_PATH="${BUNDLE_PATH}/Resources/Info.plist"
-          else
-            continue
-          fi
-
-          BINARY_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "${PLIST_PATH}")
-          (xcrun --run llvm-cov show "${BUNDLE_PATH}/${BINARY_NAME}" --instr-profile "${PROFDATA_INPUT}" || true) >> "${COVERAGE_OUTPUT}"
-        done
 
     - name: SonarCloud (Push)
       if: ${{ github.event_name == 'push' }}
