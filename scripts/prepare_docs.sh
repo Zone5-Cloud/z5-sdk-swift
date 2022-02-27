@@ -9,8 +9,9 @@ fi
 
 bundle exec jazzy \
 	--module Zone5 \
+    --swift-build-tool xcodebuild \
+    --build-tool-arguments -scheme,Zone5,-destination,'generic/platform=iOS Simulator' \
 	--min-acl public \
-	--swift-build-tool spm \
 	--hide-documentation-coverage \
 	--title "Zone5 SDK for Swift" \
 	--author_url https://zone5ventures.com \
