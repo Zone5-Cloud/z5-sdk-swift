@@ -69,27 +69,12 @@ apiClient.notificationCenter.addObserver(forName: Zone5.updatedTermsNotification
 }
 ```
 
-Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.oAuth.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html) and [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView):
+Once configured, you'll be able to authenticate users via the methods available through [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView) and [`Zone5.shared.oAuth.accessToken`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/OAuthView.html):
 
 ```swift
 let username = "EXAMPLE-USERNAME"
 let password = "EXAMPLE-PASSWORD"
 
-Zone5.shared.oAuth.accessToken(username: username, password: password) { result in
-	switch result {
-	case .failure(let error):
-		// An error occurred and needs to be handled
-
-	case .success(let accessToken):
-		// The user was successfully authenticated. 
-		// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired
-	}
-}
-```
-
-or
-
-```swift
 Zone5.shared.users.login(email: username, password: password, accept: []) { result in
 	switch result {
     case .failure(let error):
@@ -99,6 +84,21 @@ Zone5.shared.users.login(email: username, password: password, accept: []) { resu
         // The user was successfully authenticated. loginResponse contains some user data including roles, identities, updatedTerms etc
         // Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired
     }
+}
+```
+
+or
+
+```swift
+Zone5.shared.oAuth.accessToken(username: username, password: password) { result in
+	switch result {
+	case .failure(let error):
+		// An error occurred and needs to be handled
+
+	case .success(let accessToken):
+		// The user was successfully authenticated. 
+		// Your configured accessToken has automatically been updated and the `Zone5.authTokenChangedNotification` Notification fired
+	}
 }
 ```
 
@@ -116,7 +116,23 @@ Zone5.shared.users.me { result in
 }
 ```
 
-Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword.
+Unauthenticated calls do not require the user to be logged in. These calls include things like Zone5.shared.terms.required, Zone5.shared.users.isEmailRegistered, Zone5.shared.users.register, Zone5.shared.users.resetPassword. See https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView and https://zone5-cloud.github.io/z5-sdk-swift/Classes/TermsView for details on using these methods.
+
+A basic usage for a registration screen may be:
+* Call Zone5.shared.terms.required to retrieve the required Terms and Conditions. If the Terms are hosted at an external URL (such as the Specialized Terms of Use), then the response will include the URL of the Terms Content.
+* Call Zone5.shared.users.isEmailRegistered once a user has entered a registration email so that the UI can provide feedback that this user already exists.
+* Offer an option for the user to reset their existing password that calls Zone5.shared.users.resetPassword
+* Call Zone5.shared.users.register to register a new user in the system. Don't let the user register until they have accepted terms and conditions. Make sure you pass the list of accepted Terms and Conditions ids into register
+
+A basic usahe for a login screen may be:
+* Offer an option for the user to reset their existing password that calls Zone5.shared.users.resetPassword
+* Call the above mentioned [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView) with the user's credentials
+* If the login fails due to there being new, unaccepted Terms and Conditions
+    * call Zone5.shared.terms.required and present new terms (by URL or by calling Zone5.shared.terms.download (SBC terms are by URL)
+    * retry [`Zone5.shared.users.login`](https://zone5-cloud.github.io/z5-sdk-swift/Classes/UsersView), passing in new accepted terms
+* If the login succeeds but the login response includes updated terms, present new terms (SBC terms are by URL)
+    * call Zone5.shared.terms.accept to accept the updated terms
+
 
 ## Unit Tests
 
