@@ -198,4 +198,41 @@ final class Zone5HTTPClientDownloadRequestTests: XCTestCase {
 		}
 	}
 
+	func testRateLimiting() {
+		let parameters = [Zone5.Method](repeating: .get, count: 100)
+
+		var tasksInProgress = 0
+		var expectations: [XCTestExpectation] = []
+		execute(with: parameters) { zone5, httpClient, urlSession, method in
+			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method, body: nil)
+
+			let fileURL = developmentAssets.randomElement()!
+
+			urlSession.downloadTaskHandler = { urlRequest in
+				DispatchQueue.main.async {
+					tasksInProgress += 1
+					XCTAssertTrue(tasksInProgress <= HTTPClient.uploadQueue.maxConcurrentOperationCount)
+				}
+
+				usleep(.random(in: 1000...10000)) // Give the tasks a chance to back up
+
+				return .success(fileURL)
+			}
+
+			let expectation = XCTestExpectation()
+			expectations.append(expectation)
+
+			_ = httpClient.download(request) { result in
+				DispatchQueue.main.async {
+					tasksInProgress -= 1
+					XCTAssertTrue(tasksInProgress <= HTTPClient.uploadQueue.maxConcurrentOperationCount)
+				}
+
+				expectation.fulfill()
+			}
+		}
+
+		wait(for: expectations, timeout: 5)
+	}
+
 }

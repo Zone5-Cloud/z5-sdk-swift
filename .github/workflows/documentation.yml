@@ -1,35 +1,33 @@
-name: Generate Documentation
+name: Deploy Documentation
+
+# This workflow only runs when a release is created, if a draft is published as a release, or if a prerelease
+# is updated to a release (the prerelease checkbox is disabled).
+#
+# The `deploy-documentation` job also requires that the release has an asset named `Documentation.zip`,
+# otherwise the workflow itself will run, but the job will not.
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [released]
 
 jobs:
-  build:
-
-    runs-on: macOS-latest
+  deploy-documentation:
+    if: ${{ contains(github.event.release.assets.*.name, 'Documentation.zip') }}
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    
-    - name: Cache RubyGems
-      uses: actions/cache@v1
+    - name: Download Documentation
+      uses: dsaltares/fetch-gh-release-asset@master
       with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: ${{ runner.os }}-gem-
+        file: Documentation.zip
+        version: ${{ github.event.release.id }}
+        target: ./Documentation.zip
 
-    - name: Generate Documentation
-      run: make documentation
+    - name: Decompress
+      run: unzip -o ./Documentation.zip -d ./docs
 
     - name: Deploy
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./docs
-        SCRIPT_MODE: true
-      run: |
-        wget https://raw.githubusercontent.com/peaceiris/actions-gh-pages/v2.5.0/entrypoint.sh
-        bash ./entrypoint.sh
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs

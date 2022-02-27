@@ -9,46 +9,45 @@
 import Foundation
 
 internal class URLRequestInterceptor: URLProtocol {
-	
-	// synchronize auto refresh so that only 1 request at a time can issue a refresh
-	static private let refreshDispatchQueue = DispatchQueue(label: "URLRequestInterceptor.refreshDispatchQueue")
-	static private let refreshDispatchSemaphore = DispatchSemaphore(value: 1) // allow 1 through at a time
-	
-	private let session: URLSession
-	private var currentTask: URLSessionTask? = nil
-	
-	override init(request: URLRequest, cachedResponse: CachedURLResponse?, client: URLProtocolClient?) {
-		// assign session. Requests are split into file operations and other. This is so file operations
-		// cannot hog all the resources and prevent basic requests from executing
-		let taskType: URLSessionTaskType = request.getMeta(key: .taskType) as? URLSessionTaskType ?? .data
-		switch taskType {
+
+	/// The `URLSession` instance used to handle the intercepted request.
+	/// - Note: This is dynamically determined based on the request's `taskType` value.
+	private lazy var session: URLSession = {
+		// Assign the session based on the type of task handling the request. Each type needs to be handled differently,
+		// to ensure that uploads may complete if the app is backgrounded, and that file transfers don't hog bandwidth.
+		switch request.taskType {
 		case .data:
-			session = Zone5.shared.httpClient.interceptorUrlSession
-		default:
-			session = Zone5.shared.httpClient.interceptorUrlSessionFiles
+			return URLRequestInterceptor.sharedDataSession
+		case .download:
+			return URLRequestInterceptor.sharedDownloadSession
+		case .upload:
+			return URLRequestInterceptor.sharedUploadSession
 		}
-		
-		super.init(request: request, cachedResponse: cachedResponse, client: client)
-	}
-	
-	/// intercept all requests, alter them and send them out the local shared session
+	}()
+
+	/// The task used to perform the intercepted request.
+	private var currentTask: URLSessionTask? = nil
+
 	override class func canInit(with task: URLSessionTask) -> Bool {
-		return true
+		return true	// intercept all requests, alter them and send them out the local shared session
 	}
-	
-	/// intercept all requests, alter them and send them out the local shared session
+
 	override class func canInit(with request: URLRequest) -> Bool {
-		return true
+		return true // intercept all requests, alter them and send them out the local shared session
 	}
-	
+
 	override class func canonicalRequest(for request: URLRequest) -> URLRequest {
 		return request
 	}
 
+	// synchronize auto refresh so that only 1 request at a time can issue a refresh
+	static private let refreshDispatchQueue = DispatchQueue(label: "URLRequestInterceptor.refreshDispatchQueue")
+	static private let refreshDispatchSemaphore = DispatchSemaphore(value: 1) // allow 1 through at a time
+
 	override func startLoading() {
-        // if we have a Cognito token with an expiry and this request requires auth token, check the expiry
+		// if we have a Cognito token with an expiry and this request requires auth token, check the expiry
 		if let requiresAccessToken = request.getMeta(key: .requiresAccessToken) as? Bool, requiresAccessToken,
-           let zone5 = request.getMeta(key: .zone5) as? Zone5,
+		   let zone5 = request.getMeta(key: .zone5) as? Zone5,
 		   let token = zone5.accessToken, token.requiresRefresh {
 			// our token expires in less than 30 seconds. Do a refresh before sending the request
 			// do these refresh requests synchronously so only one executes at a time and others wait for first refresh to complete - at which point duplicate refresh not necessary
@@ -73,11 +72,38 @@ internal class URLRequestInterceptor: URLProtocol {
 			decorateAndSendRequest()
 		}
 	}
-	
+
 	override func stopLoading() {
 		self.currentTask?.cancel()
 	}
-	
+
+	// MARK: Shared URL sessions
+
+	/// URLSession used by the `URLRequestInterceptor` for standard API requests.
+	private static let sharedDataSession: URLSession = {
+		return URLSession(configuration: .default, delegate: nil, delegateQueue: URLRequestDelegate.OperationQueue())
+	}()
+
+	/// URLSession used by the `URLRequestInterceptor` for file downloads.
+	/// To stop downloads from hogging bandwidth, the session is configured to allow a single HTTP connection at a time.
+	private static let sharedDownloadSession: URLSession = {
+		let configuration: URLSessionConfiguration = .default
+		configuration.httpMaximumConnectionsPerHost = 1
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: URLRequestDelegate.OperationQueue())
+	}()
+
+	/// URLSession used by the `URLRequestInterceptor` for file uploads.
+	/// To stop uploads from hogging bandwidth, the session is configured to allow a single HTTP connection at a time.
+	private static let sharedUploadSession: URLSession = {
+		let configuration: URLSessionConfiguration = .background(withIdentifier: "Zone5.URLRequestInterceptor.interceptorUploadSession")
+		configuration.httpMaximumConnectionsPerHost = 1
+		configuration.sessionSendsLaunchEvents = true
+		configuration.isDiscretionary = false
+		return URLSession(configuration: configuration, delegate: URLRequestDelegate(), delegateQueue: URLRequestDelegate.OperationQueue())
+	}()
+
+	// MARK: Handling intercepted requests
+
 	private func onComplete(data: Data?, response: URLResponse?, error: Error?) {
 		if let response = response {
 			self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
@@ -148,20 +174,39 @@ internal class URLRequestInterceptor: URLProtocol {
 		
 		// now we are finished with the request meta. Clear it before we continue
 		let request = request.clearMeta()
+		let currentTask: URLSessionTask
 		
 		switch type {
 		case .data:
-			self.currentTask = session.dataTask(with: request, completionHandler: onComplete)
+			currentTask = session.dataTask(with: request, completionHandler: onComplete)
+
 		case .upload:
-			if let url = url {
-				self.currentTask = session.uploadTask(with: request, fromFile: url, completionHandler: onComplete)
-			} else {
+			guard let url = url else {
 				onComplete(data: nil, response: nil, error: Zone5.Error.invalidParameters)
+
+				return
 			}
+
+			currentTask = session.uploadTask(with: request, fromFile: url)
+
+			var completionObserver : NSObjectProtocol? = nil
+			completionObserver = NotificationCenter.default.addObserver(forName: URLRequestDelegate.uploadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
+				// remove observers.
+				if let completionObserver = completionObserver {
+					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.uploadCompleteNotification, object: currentTask)
+				}
+
+				let data = notification.userInfo?["data"] as? Data
+				let response = notification.userInfo?["response"] as? URLResponse
+				let error = notification.userInfo?["error"] as? Error
+
+				self?.onComplete(data: data, response: response, error: error)
+			}
+
 		case .download:
-			let currentTask = session.downloadTask(with: request)
+			currentTask = session.downloadTask(with: request)
 		
-			let progressObserver: NSObjectProtocol? = NotificationCenter.default.addObserver(forName: Zone5DownloadDelegate.downloadProgressNotification, object: currentTask, queue: nil) { notification in
+			let progressObserver: NSObjectProtocol? = NotificationCenter.default.addObserver(forName: URLRequestDelegate.downloadProgressNotification, object: currentTask, queue: nil) { notification in
 				if let bytesWritten = notification.userInfo?["bytesWritten"] as? Int64,
 				   let totalBytesWritten = notification.userInfo?["totalBytesWritten"] as? Int64,
 				   let totalBytesExpectedToWrite = notification.userInfo?["totalBytesExpectedToWrite"] as? Int64 {
@@ -170,42 +215,37 @@ internal class URLRequestInterceptor: URLProtocol {
 			}
 			
 			var completionObserver : NSObjectProtocol? = nil
-			completionObserver = NotificationCenter.default.addObserver(forName: Zone5DownloadDelegate.downloadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
+			completionObserver = NotificationCenter.default.addObserver(forName: URLRequestDelegate.downloadCompleteNotification, object: currentTask, queue: nil) { [ weak self ] notification in
 				// remove observers.
 				if let progressObserver = progressObserver {
-					NotificationCenter.default.removeObserver(progressObserver, name: Zone5DownloadDelegate.downloadProgressNotification, object: currentTask)
+					NotificationCenter.default.removeObserver(progressObserver, name: URLRequestDelegate.downloadProgressNotification, object: currentTask)
 				}
 				if let completionObserver = completionObserver {
-					NotificationCenter.default.removeObserver(completionObserver, name: Zone5DownloadDelegate.downloadCompleteNotification, object: currentTask)
+					NotificationCenter.default.removeObserver(completionObserver, name: URLRequestDelegate.downloadCompleteNotification, object: currentTask)
 				}
 				
-				//url, response, error in
-				let error = notification.userInfo?["error"] as? Error
 				let response = notification.userInfo?["response"] as? URLResponse
-				
-				if let location = notification.userInfo?["location"] as? URL,
-				   let filename = (response as? HTTPURLResponse)?.suggestedFilename {
+				let error = notification.userInfo?["error"] as? Error
+
+				if let location = notification.userInfo?["location"] as? URL, let filename = (response as? HTTPURLResponse)?.suggestedFilename {
 					// attempt to copy this file to another location because it will be deleted on return of this function
-					let cacheURL = Zone5HTTPClient.downloadsDirectory.appendingPathComponent(filename)
+					let cacheURL = HTTPClient.downloadsDirectory.appendingPathComponent(filename)
 					try? FileManager.default.removeItem(at: cacheURL)
 					try? FileManager.default.copyItem(at: location, to: cacheURL)
 				}
 				
 				self?.onComplete(data: nil, response: response, error: error)
 			}
-			
-			self.currentTask = currentTask
 		}
-	
-		
-		currentTask?.resume()
+
+		self.currentTask = currentTask
+		currentTask.resume()
 	}
 	
 	/// Decode the Cognito token to get the username out of it. It is required for the cognito refresh
 	/// note: We are now saving the username with the OAuthToken so we don't need to pull it out of
 	/// the cognito token. But if for some reason it is missing in the OAuthToken then we can try here
 	internal func extractUsername(from jwt: String) -> String? {
-		
 		enum DecodeErrors: Error {
 			case badToken
 			case other
@@ -236,6 +276,7 @@ internal class URLRequestInterceptor: URLProtocol {
 }
 
 extension URLRequest {
+
 	/// Creates a mutable copy of self, adds meta data to it, and returns the new URLRequest struct
 	/// note URLRequest is a struct and is passed by value so the result of this must be assigned to the calling variable
 	internal func setMeta(key: URLProtocolProperty, value: Any) -> URLRequest {
@@ -259,5 +300,5 @@ extension URLRequest {
 		}
 		return mutatingRequest as URLRequest
 	}
-}
 
+}

@@ -185,7 +185,7 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 			(.post, SearchInputReport.forInstance(activityType: .workout, identifier: 12345)),
 		]
 
-        var expectations: [XCTestExpectation] = []
+		var expectations: [XCTestExpectation] = []
 		execute(with: parameters) { zone5, httpClient, urlSession, parameters in
 			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: parameters.method, body: parameters.body)
 
@@ -215,8 +215,8 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 				return .success("{\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}")
 			}
 
-            let expectation = XCTestExpectation()
-            expectations.append(expectation)
+			let expectation = XCTestExpectation()
+			expectations.append(expectation)
 
 			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
 				if case .success(let user) = result {
@@ -229,11 +229,48 @@ final class Zone5HTTPClientUploadRequestTests: XCTestCase {
 					XCTFail("\(parameters.method.rawValue) request unexpectedly completed with \(result).")
 				}
 
-                expectation.fulfill()
+				expectation.fulfill()
 			}
 		}
 
-        wait(for: expectations, timeout: 5)
+		wait(for: expectations, timeout: 5)
+	}
+
+	func testRateLimiting() {
+		let parameters = [Zone5.Method](repeating: .get, count: 100)
+
+		var tasksInProgress = 0
+		var expectations: [XCTestExpectation] = []
+		execute(with: parameters) { zone5, httpClient, urlSession, method in
+			let request = Request(endpoint: EndpointsForTesting.requiresAccessToken, method: method, body: nil)
+
+			let fileURL = developmentAssets.randomElement()!
+
+			urlSession.uploadTaskHandler = { urlRequest, uploadedURL in
+				DispatchQueue.main.async {
+					tasksInProgress += 1
+					XCTAssertTrue(tasksInProgress <= HTTPClient.downloadQueue.maxConcurrentOperationCount)
+				}
+
+				usleep(.random(in: 1000...10000)) // Give the tasks a chance to back up
+
+				return .success("{\"id\": 12345678, \"email\": \"jame.smith@example.com\", \"firstname\": \"Jane\", \"lastname\": \"Smith\"}")
+			}
+
+			let expectation = XCTestExpectation()
+			expectations.append(expectation)
+
+			_ = httpClient.upload(fileURL, with: request, expectedType: User.self) { result in
+				DispatchQueue.main.async {
+					tasksInProgress -= 1
+					XCTAssertTrue(tasksInProgress <= HTTPClient.downloadQueue.maxConcurrentOperationCount)
+				}
+
+				expectation.fulfill()
+			}
+		}
+
+		wait(for: expectations, timeout: 5)
 	}
 
 }

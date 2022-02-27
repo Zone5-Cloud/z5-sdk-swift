@@ -48,14 +48,14 @@ extension XCTestCase {
 	
 	func createNewZone5() -> Zone5 {
 		let urlSession = TestHTTPClientURLSession()
-		let httpClient = Zone5HTTPClient(urlSession: urlSession)
+		let httpClient = HTTPClient(urlSession: urlSession)
 		return Zone5(httpClient: httpClient)
 	}
 	
 
-	func execute(configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: Zone5HTTPClient, _ urlSession: TestHTTPClientURLSession) throws -> Void) rethrows {
+	func execute(configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: HTTPClient, _ urlSession: TestHTTPClientURLSession) throws -> Void) rethrows {
 		let urlSession = TestHTTPClientURLSession()
-		let httpClient = Zone5HTTPClient(urlSession: urlSession)
+		let httpClient = HTTPClient(urlSession: urlSession)
 		
 		let zone5 = Zone5(httpClient: httpClient)
 		zone5.configure(with: configuration)
@@ -65,7 +65,7 @@ extension XCTestCase {
 
 	typealias P<T:Decodable> = (token:AccessToken?, json:String, expectedResult:Zone5.Result<T>)
 
-	func execute<T>(with parameters: [P<T>], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: Zone5HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: P<T>) throws -> Void) rethrows {
+	func execute<T>(with parameters: [P<T>], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: P<T>) throws -> Void) rethrows {
 		try parameters.forEach { parameter in
 			try execute(configuration: configuration) { zone5, httpClient, urlSession in
 				zone5.accessToken = parameter.token
@@ -94,7 +94,7 @@ extension XCTestCase {
 		}
 	}
 
-	func execute<T>(with parameters: [T], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: Zone5HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: T) throws -> Void) rethrows {
+	func execute<T>(with parameters: [T], configuration: ConfigurationForTesting = .init(), _ tests: (_ zone5: Zone5, _ httpClient: HTTPClient, _ urlSession: TestHTTPClientURLSession, _ parameters: T) throws -> Void) rethrows {
 		try parameters.forEach { parameter in
 			try execute(configuration: configuration) { zone5, httpClient, urlSession in
 				try tests(zone5, httpClient, urlSession, parameter)
