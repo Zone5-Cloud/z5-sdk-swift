@@ -19,6 +19,7 @@ public class UsersView: APIView {
 		case passwordComplexity = "/rest/auth/password-complexity"
 		case reconfirmEmail = "/rest/auth/reconfirm"
 		case testPassword = "/rest/auth/test-password"
+		case purgeAccount = "/purge/api/v1/request"
 
 		var requiresAccessToken: Bool {
 			switch self {
@@ -50,6 +51,13 @@ public class UsersView: APIView {
 	public func deleteAccount(userID: Int, completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
 		let endpoint = Endpoints.deleteUser.replacingTokens(["userID": userID])
 		return get(endpoint, with: completion)
+	}
+	
+	/// Purge (soft delete) a user account
+	@discardableResult
+	public func purgeAccount(_ completion: @escaping Zone5.ResultHandler<Zone5.VoidReply>) -> PendingRequest? {
+		let endpoint = Endpoints.purgeAccount
+		return post(endpoint, body: nil, with: completion)
 	}
 	
 	/// Login as a user and obtain a bearer token
