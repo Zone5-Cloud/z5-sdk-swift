@@ -714,4 +714,26 @@ class UsersViewTests: XCTestCase {
 
         wait(for: expectations, timeout: 5)
 	}
+
+	func testPurgeAccount() {
+		let tests: [Result<Zone5.VoidReply, Zone5.Error>] = [(
+			.success(Zone5.VoidReply())
+		)]
+		var expectations: [XCTestExpectation] = []
+		execute(with: tests) { client, _, urlSession, expectedResult in
+			urlSession.dataTaskHandler = { request in
+				XCTAssertEqual(request.url?.path, "/purge/api/v1/request")
+				XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer ACCESS_TOKEN")
+				XCTAssertNil(request.httpBody)
+				XCTAssertEqual(request.httpMethod, "POST")
+				return .success("")
+			}
+
+			let expectation = ResultExpectation(for: expectedResult)
+			expectations.append(expectation)
+
+			client.users.purgeAccount(expectation.fulfill)
+		}
+		wait(for: expectations, timeout: 5)
+	}
 }
