@@ -26,15 +26,15 @@
         
       </p>
     
-      <p class="header-col--secondary">
+      <div class="header-col--secondary">
         <form role="search" action="../search.json">
           <input type="text" placeholder="Search documentation" data-typeahead>
         </form>
-      </p>
+      </div>
     
         <p class="header-col header-col--secondary">
           <a class="header-link" href="https://github.com/Zone5-Cloud/z5-sdk-swift">
-            <img class="header-icon" src="../img/gh.png"/>
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
             View on GitHub
           </a>
         </p>
@@ -43,7 +43,7 @@
 
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Zone5 Reference</a>
-      <img class="carat" src="../img/carat.png" />
+      <img class="carat" src="../img/carat.png" alt=""/>
       ThirdPartyConnectionsView Class Reference
     </p>
 
@@ -70,9 +70,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/PaymentsView.html">PaymentsView</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/RoutesView.html">RoutesView</a>
@@ -103,9 +100,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/Zone5.html#/s:5Zone5AAC9VoidReplyV">– VoidReply</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/Zone5HTTPClient.html">Zone5HTTPClient</a>
               </li>
             </ul>
           </li>
@@ -217,22 +211,13 @@
             <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/CodingKey.html">CodingKey</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/JSONDecoder.html">JSONDecoder</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/NSNumber.html">NSNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/OSLog.html">OSLog</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
@@ -256,6 +241,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/MultipartDataConvertible.html">MultipartDataConvertible</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/RequestBody.html">RequestBody</a>
@@ -342,9 +330,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/SearchResult/Page.html">– Page</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/SearchResult/CodingKeys.html">– CodingKeys</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/StringEncodedBody.html">StringEncodedBody</a>
@@ -530,6 +515,7 @@
             <h1>ThirdPartyConnectionsView</h1>
               <div class="declaration">
                 <div class="language">
+                  
                   <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">ThirdPartyConnectionsView</span> <span class="p">:</span> <span class="kt"><a href="../Classes/APIView.html">APIView</a></span></code></pre>
 
                 </div>
@@ -546,9 +532,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC018registerDeviceWithbC012registration10completionAA14PendingRequestCSgAA16PushRegistrationV_ys6ResultOyAA0mN8ResponseVA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC018registerDeviceWithbC012registration10completionAA14PendingRequest_pSgAA16PushRegistrationV_ys6ResultOyAA0mN8ResponseVA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/registerDeviceWithThirdParty(registration:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC018registerDeviceWithbC012registration10completionAA14PendingRequestCSgAA16PushRegistrationV_ys6ResultOyAA0mN8ResponseVA2AC5ErrorOGctF">registerDeviceWithThirdParty(registration:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC018registerDeviceWithbC012registration10completionAA14PendingRequest_pSgAA16PushRegistrationV_ys6ResultOyAA0mN8ResponseVA2AC5ErrorOGctF">registerDeviceWithThirdParty(registration:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -564,7 +550,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">registerDeviceWithThirdParty</span><span class="p">(</span><span class="nv">registration</span><span class="p">:</span> <span class="kt"><a href="../Structs/PushRegistration.html">PushRegistration</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/PushRegistrationResponse.html">PushRegistrationResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">registerDeviceWithThirdParty</span><span class="p">(</span><span class="nv">registration</span><span class="p">:</span> <span class="kt"><a href="../Structs/PushRegistration.html">PushRegistration</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/PushRegistrationResponse.html">PushRegistrationResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -574,9 +560,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC020deregisterDeviceWithbC05token10completionAA14PendingRequestCSgSS_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC020deregisterDeviceWithbC05token10completionAA14PendingRequest_pSgSS_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/deregisterDeviceWithThirdParty(token:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC020deregisterDeviceWithbC05token10completionAA14PendingRequestCSgSS_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF">deregisterDeviceWithThirdParty(token:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC020deregisterDeviceWithbC05token10completionAA14PendingRequest_pSgSS_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF">deregisterDeviceWithThirdParty(token:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -596,7 +582,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">deregisterDeviceWithThirdParty</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">deregisterDeviceWithThirdParty</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -606,9 +592,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC010initializebC10Connection4type10completionAA14PendingRequestCSgAA04UserG4TypeO_ys6ResultOyAA0bC18InitializeResponseVA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC010initializebC10Connection4type10completionAA14PendingRequest_pSgAA04UserG4TypeO_ys6ResultOyAA0bC18InitializeResponseVA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/initializeThirdPartyConnection(type:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC010initializebC10Connection4type10completionAA14PendingRequestCSgAA04UserG4TypeO_ys6ResultOyAA0bC18InitializeResponseVA2AC5ErrorOGctF">initializeThirdPartyConnection(type:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC010initializebC10Connection4type10completionAA14PendingRequest_pSgAA04UserG4TypeO_ys6ResultOyAA0bC18InitializeResponseVA2AC5ErrorOGctF">initializeThirdPartyConnection(type:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -624,7 +610,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">initializeThirdPartyConnection</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/ThirdPartyInitializeResponse.html">ThirdPartyInitializeResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">initializeThirdPartyConnection</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/ThirdPartyInitializeResponse.html">ThirdPartyInitializeResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -634,9 +620,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC03setbC5Token4type10parameters10completionAA14PendingRequestCSgAA18UserConnectionTypeO_AA14URLEncodedBodyVys6ResultOyA2AC9VoidReplyVAQ5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC03setbC5Token4type10parameters10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_AA14URLEncodedBodyVys6ResultOyA2AC9VoidReplyVAP5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/setThirdPartyToken(type:parameters:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC03setbC5Token4type10parameters10completionAA14PendingRequestCSgAA18UserConnectionTypeO_AA14URLEncodedBodyVys6ResultOyA2AC9VoidReplyVAQ5ErrorOGctF">setThirdPartyToken(type:parameters:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC03setbC5Token4type10parameters10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_AA14URLEncodedBodyVys6ResultOyA2AC9VoidReplyVAP5ErrorOGctF">setThirdPartyToken(type:<wbr>parameters:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -652,7 +638,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">setThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="kt"><a href="../Structs/URLEncodedBody.html">URLEncodedBody</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">setThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="kt"><a href="../Structs/URLEncodedBody.html">URLEncodedBody</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -662,9 +648,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC04pairbC10Connection4type8redirect10completionAA14PendingRequestCSgAA04UserG4TypeO_10Foundation3URLVys6ResultOySSA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC04pairbC10Connection4type8redirect10completionAA14PendingRequest_pSgAA04UserG4TypeO_10Foundation3URLVys6ResultOySSA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/pairThirdPartyConnection(type:redirect:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC04pairbC10Connection4type8redirect10completionAA14PendingRequestCSgAA04UserG4TypeO_10Foundation3URLVys6ResultOySSA2AC5ErrorOGctF">pairThirdPartyConnection(type:redirect:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC04pairbC10Connection4type8redirect10completionAA14PendingRequest_pSgAA04UserG4TypeO_10Foundation3URLVys6ResultOySSA2AC5ErrorOGctF">pairThirdPartyConnection(type:<wbr>redirect:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -685,7 +671,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">pairThirdPartyConnection</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">redirect</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">pairThirdPartyConnection</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">redirect</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -695,9 +681,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC03hasbC5Token4type10completionAA14PendingRequestCSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC03hasbC5Token4type10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/hasThirdPartyToken(type:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC03hasbC5Token4type10completionAA14PendingRequestCSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF">hasThirdPartyToken(type:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC03hasbC5Token4type10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF">hasThirdPartyToken(type:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -713,7 +699,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">hasThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">hasThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -723,9 +709,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone525ThirdPartyConnectionsViewC06removebC5Token4type10completionAA14PendingRequestCSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone525ThirdPartyConnectionsViewC06removebC5Token4type10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/removeThirdPartyToken(type:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC06removebC5Token4type10completionAA14PendingRequestCSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF">removeThirdPartyToken(type:completion:)</a>
+                    <a class="token" href="#/s:5Zone525ThirdPartyConnectionsViewC06removebC5Token4type10completionAA14PendingRequest_pSgAA18UserConnectionTypeO_ys6ResultOySbA2AC5ErrorOGctF">removeThirdPartyToken(type:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -741,7 +727,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">removeThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">removeThirdPartyToken</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/UserConnectionType.html">UserConnectionType</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -756,9 +742,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-11-23)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2022 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2022-07-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
-</div>
 </html>

@@ -26,15 +26,15 @@
         
       </p>
     
-      <p class="header-col--secondary">
+      <div class="header-col--secondary">
         <form role="search" action="../search.json">
           <input type="text" placeholder="Search documentation" data-typeahead>
         </form>
-      </p>
+      </div>
     
         <p class="header-col header-col--secondary">
           <a class="header-link" href="https://github.com/Zone5-Cloud/z5-sdk-swift">
-            <img class="header-icon" src="../img/gh.png"/>
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
             View on GitHub
           </a>
         </p>
@@ -43,7 +43,7 @@
 
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Zone5 Reference</a>
-      <img class="carat" src="../img/carat.png" />
+      <img class="carat" src="../img/carat.png" alt=""/>
       Milliseconds Structure Reference
     </p>
 
@@ -70,9 +70,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/PaymentsView.html">PaymentsView</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/RoutesView.html">RoutesView</a>
@@ -103,9 +100,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/Zone5.html#/s:5Zone5AAC9VoidReplyV">– VoidReply</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/Zone5HTTPClient.html">Zone5HTTPClient</a>
               </li>
             </ul>
           </li>
@@ -217,22 +211,13 @@
             <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/CodingKey.html">CodingKey</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/JSONDecoder.html">JSONDecoder</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/NSNumber.html">NSNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/OSLog.html">OSLog</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
@@ -256,6 +241,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/MultipartDataConvertible.html">MultipartDataConvertible</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/RequestBody.html">RequestBody</a>
@@ -342,9 +330,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/SearchResult/Page.html">– Page</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/SearchResult/CodingKeys.html">– CodingKeys</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/StringEncodedBody.html">StringEncodedBody</a>
@@ -530,6 +515,7 @@
             <h1>Milliseconds</h1>
               <div class="declaration">
                 <div class="language">
+                  
                   <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Milliseconds</span> <span class="p">:</span> <span class="kt">RawRepresentable</span><span class="p">,</span> <span class="kt">Hashable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
 <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">Milliseconds</span><span class="p">:</span> <span class="kt">ExpressibleByIntegerLiteral</span></code></pre>
 <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">Milliseconds</span><span class="p">:</span> <span class="kt">SignedNumeric</span><span class="p">,</span> <span class="kt">Strideable</span><span class="p">,</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">Comparable</span></code></pre>
@@ -579,7 +565,7 @@
                     <code>
                     <a name="/s:SY8rawValuexSg03RawB0Qz_tcfc"></a>
                     <a name="//apple_ref/swift/Method/init(rawValue:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:SY8rawValuexSg03RawB0Qz_tcfc">init(rawValue:)</a>
+                    <a class="token" href="#/s:SY8rawValuexSg03RawB0Qz_tcfc">init(rawValue:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -662,7 +648,7 @@
                 <a name="//apple_ref/swift/Section/CustomStringConvertible" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/CustomStringConvertible"></a>
-                  <h3 class="section-name"><p>CustomStringConvertible</p>
+                  <h3 class="section-name"><span>CustomStringConvertible</span>
 </h3>
                 </div>
               </div>
@@ -698,7 +684,7 @@
                     <code>
                     <a name="/s:5Zone512MillisecondsV14integerLiteralACSi_tcfc"></a>
                     <a name="//apple_ref/swift/Method/init(integerLiteral:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone512MillisecondsV14integerLiteralACSi_tcfc">init(integerLiteral:)</a>
+                    <a class="token" href="#/s:5Zone512MillisecondsV14integerLiteralACSi_tcfc">init(integerLiteral:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -730,7 +716,7 @@
                 <a name="//apple_ref/swift/Section/Numeric" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/Numeric"></a>
-                  <h3 class="section-name"><p>Numeric</p>
+                  <h3 class="section-name"><span>Numeric</span>
 </h3>
                 </div>
               </div>
@@ -740,7 +726,7 @@
                     <code>
                     <a name="/s:Sj7exactlyxSgqd___tcSzRd__lufc"></a>
                     <a name="//apple_ref/swift/Method/init(exactly:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Sj7exactlyxSgqd___tcSzRd__lufc">init(exactly:)</a>
+                    <a class="token" href="#/s:Sj7exactlyxSgqd___tcSzRd__lufc">init(exactly:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -792,7 +778,7 @@
                     <code>
                     <a name="/s:Sj1moiyxx_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/*(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Sj1moiyxx_xtFZ">*(_:_:)</a>
+                    <a class="token" href="#/s:Sj1moiyxx_xtFZ">*(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -818,7 +804,7 @@
                     <code>
                     <a name="/s:Sj2meoiyyxz_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/*=(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Sj2meoiyyxz_xtFZ">*=(_:_:)</a>
+                    <a class="token" href="#/s:Sj2meoiyyxz_xtFZ">*=(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -844,7 +830,7 @@
                     <code>
                     <a name="/s:5Zone512MillisecondsV1doiyA2C_ACtFZ"></a>
                     <a name="//apple_ref/swift/Method//(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone512MillisecondsV1doiyA2C_ACtFZ">/(_:_:)</a>
+                    <a class="token" href="#/s:5Zone512MillisecondsV1doiyA2C_ACtFZ">/(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -871,7 +857,7 @@
                     <code>
                     <a name="/s:5Zone512MillisecondsV2deoiyyACz_ACtFZ"></a>
                     <a name="//apple_ref/swift/Method//=(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone512MillisecondsV2deoiyyACz_ACtFZ">/=(_:_:)</a>
+                    <a class="token" href="#/s:5Zone512MillisecondsV2deoiyyACz_ACtFZ">/=(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -901,7 +887,7 @@
                 <a name="//apple_ref/swift/Section/Strideable" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/Strideable"></a>
-                  <h3 class="section-name"><p>Strideable</p>
+                  <h3 class="section-name"><span>Strideable</span>
 </h3>
                 </div>
               </div>
@@ -911,7 +897,7 @@
                     <code>
                     <a name="/s:Sx8advanced2byx6StrideQz_tF"></a>
                     <a name="//apple_ref/swift/Method/advanced(by:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Sx8advanced2byx6StrideQz_tF">advanced(by:)</a>
+                    <a class="token" href="#/s:Sx8advanced2byx6StrideQz_tF">advanced(by:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -937,7 +923,7 @@
                     <code>
                     <a name="/s:Sx8distance2to6StrideQzx_tF"></a>
                     <a name="//apple_ref/swift/Method/distance(to:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Sx8distance2to6StrideQzx_tF">distance(to:)</a>
+                    <a class="token" href="#/s:Sx8distance2to6StrideQzx_tF">distance(to:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -966,7 +952,7 @@
                 <a name="//apple_ref/swift/Section/AdditiveArithmetic" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/AdditiveArithmetic"></a>
-                  <h3 class="section-name"><p>AdditiveArithmetic</p>
+                  <h3 class="section-name"><span>AdditiveArithmetic</span>
 </h3>
                 </div>
               </div>
@@ -1002,7 +988,7 @@
                     <code>
                     <a name="/s:s18AdditiveArithmeticP1poiyxx_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/+(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:s18AdditiveArithmeticP1poiyxx_xtFZ">+(_:_:)</a>
+                    <a class="token" href="#/s:s18AdditiveArithmeticP1poiyxx_xtFZ">+(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1028,7 +1014,7 @@
                     <code>
                     <a name="/s:s18AdditiveArithmeticP2peoiyyxz_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/+=(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:s18AdditiveArithmeticP2peoiyyxz_xtFZ">+=(_:_:)</a>
+                    <a class="token" href="#/s:s18AdditiveArithmeticP2peoiyyxz_xtFZ">+=(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1054,7 +1040,7 @@
                     <code>
                     <a name="/s:s18AdditiveArithmeticP1soiyxx_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/-(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:s18AdditiveArithmeticP1soiyxx_xtFZ">-(_:_:)</a>
+                    <a class="token" href="#/s:s18AdditiveArithmeticP1soiyxx_xtFZ">-(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1080,7 +1066,7 @@
                     <code>
                     <a name="/s:s18AdditiveArithmeticP2seoiyyxz_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/-=(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:s18AdditiveArithmeticP2seoiyyxz_xtFZ">-=(_:_:)</a>
+                    <a class="token" href="#/s:s18AdditiveArithmeticP2seoiyyxz_xtFZ">-=(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1109,7 +1095,7 @@
                 <a name="//apple_ref/swift/Section/Comparable" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/Comparable"></a>
-                  <h3 class="section-name"><p>Comparable</p>
+                  <h3 class="section-name"><span>Comparable</span>
 </h3>
                 </div>
               </div>
@@ -1119,7 +1105,7 @@
                     <code>
                     <a name="/s:SL1loiySbx_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/&lt;(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:SL1loiySbx_xtFZ">&lt;(_:_:)</a>
+                    <a class="token" href="#/s:SL1loiySbx_xtFZ"><(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1148,7 +1134,7 @@
                 <a name="//apple_ref/swift/Section/Equatable" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/Equatable"></a>
-                  <h3 class="section-name"><p>Equatable</p>
+                  <h3 class="section-name"><span>Equatable</span>
 </h3>
                 </div>
               </div>
@@ -1158,7 +1144,7 @@
                     <code>
                     <a name="/s:SQ2eeoiySbx_xtFZ"></a>
                     <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:SQ2eeoiySbx_xtFZ">==(_:_:)</a>
+                    <a class="token" href="#/s:SQ2eeoiySbx_xtFZ">==(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1184,7 +1170,7 @@
                     <code>
                     <a name="/s:Se4fromxs7Decoder_p_tKcfc"></a>
                     <a name="//apple_ref/swift/Method/init(from:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:Se4fromxs7Decoder_p_tKcfc">init(from:)</a>
+                    <a class="token" href="#/s:Se4fromxs7Decoder_p_tKcfc">init(from:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1210,7 +1196,7 @@
                     <code>
                     <a name="/s:SE6encode2toys7Encoder_p_tKF"></a>
                     <a name="//apple_ref/swift/Method/encode(to:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:SE6encode2toys7Encoder_p_tKF">encode(to:)</a>
+                    <a class="token" href="#/s:SE6encode2toys7Encoder_p_tKF">encode(to:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1239,9 +1225,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-11-23)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2022 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2022-07-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
-</div>
 </html>

@@ -26,15 +26,15 @@
         
       </p>
     
-      <p class="header-col--secondary">
+      <div class="header-col--secondary">
         <form role="search" action="../search.json">
           <input type="text" placeholder="Search documentation" data-typeahead>
         </form>
-      </p>
+      </div>
     
         <p class="header-col header-col--secondary">
           <a class="header-link" href="https://github.com/Zone5-Cloud/z5-sdk-swift">
-            <img class="header-icon" src="../img/gh.png"/>
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
             View on GitHub
           </a>
         </p>
@@ -43,7 +43,7 @@
 
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Zone5 Reference</a>
-      <img class="carat" src="../img/carat.png" />
+      <img class="carat" src="../img/carat.png" alt=""/>
       UserWorkoutResultTurboExt Structure Reference
     </p>
 
@@ -70,9 +70,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/PaymentsView.html">PaymentsView</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/RoutesView.html">RoutesView</a>
@@ -103,9 +100,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/Zone5.html#/s:5Zone5AAC9VoidReplyV">– VoidReply</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/Zone5HTTPClient.html">Zone5HTTPClient</a>
               </li>
             </ul>
           </li>
@@ -217,22 +211,13 @@
             <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/CodingKey.html">CodingKey</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/JSONDecoder.html">JSONDecoder</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/NSNumber.html">NSNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/OSLog.html">OSLog</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
@@ -256,6 +241,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/MultipartDataConvertible.html">MultipartDataConvertible</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/RequestBody.html">RequestBody</a>
@@ -342,9 +330,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/SearchResult/Page.html">– Page</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/SearchResult/CodingKeys.html">– CodingKeys</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/StringEncodedBody.html">StringEncodedBody</a>
@@ -530,6 +515,7 @@
             <h1>UserWorkoutResultTurboExt</h1>
               <div class="declaration">
                 <div class="language">
+                  
                   <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">UserWorkoutResultTurboExt</span> <span class="p">:</span> <span class="kt">Searchable</span></code></pre>
 
                 </div>
@@ -1415,7 +1401,7 @@
                 <a name="//apple_ref/swift/Section/Codable" class="dashAnchor"></a>
                 <div class="section-name-container">
                   <a class="section-name-link" href="#/Codable"></a>
-                  <h3 class="section-name"><p>Codable</p>
+                  <h3 class="section-name"><span>Codable</span>
 </h3>
                 </div>
               </div>
@@ -1453,7 +1439,7 @@
                     <code>
                     <a name="/s:5Zone525UserWorkoutResultTurboExtV6fields_6prefixSaySSGSayAC10CodingKeysOG_SSSgtFZ"></a>
                     <a name="//apple_ref/swift/Method/fields(_:prefix:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone525UserWorkoutResultTurboExtV6fields_6prefixSaySSGSayAC10CodingKeysOG_SSSgtFZ">fields(_:prefix:)</a>
+                    <a class="token" href="#/s:5Zone525UserWorkoutResultTurboExtV6fields_6prefixSaySSGSayAC10CodingKeysOG_SSSgtFZ">fields(_:<wbr>prefix:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1483,9 +1469,8 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-11-23)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2022 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2022-07-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
-</div>
 </html>

@@ -26,15 +26,15 @@
         
       </p>
     
-      <p class="header-col--secondary">
+      <div class="header-col--secondary">
         <form role="search" action="../search.json">
           <input type="text" placeholder="Search documentation" data-typeahead>
         </form>
-      </p>
+      </div>
     
         <p class="header-col header-col--secondary">
           <a class="header-link" href="https://github.com/Zone5-Cloud/z5-sdk-swift">
-            <img class="header-icon" src="../img/gh.png"/>
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
             View on GitHub
           </a>
         </p>
@@ -43,7 +43,7 @@
 
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Zone5 Reference</a>
-      <img class="carat" src="../img/carat.png" />
+      <img class="carat" src="../img/carat.png" alt=""/>
       UsersView Class Reference
     </p>
 
@@ -70,9 +70,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/PaymentsView.html">PaymentsView</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/RoutesView.html">RoutesView</a>
@@ -103,9 +100,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/Zone5.html#/s:5Zone5AAC9VoidReplyV">– VoidReply</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/Zone5HTTPClient.html">Zone5HTTPClient</a>
               </li>
             </ul>
           </li>
@@ -217,22 +211,13 @@
             <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/CodingKey.html">CodingKey</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/JSONDecoder.html">JSONDecoder</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/NSNumber.html">NSNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/OSLog.html">OSLog</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
@@ -256,6 +241,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/MultipartDataConvertible.html">MultipartDataConvertible</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/PendingRequest.html">PendingRequest</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/RequestBody.html">RequestBody</a>
@@ -342,9 +330,6 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/SearchResult/Page.html">– Page</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/SearchResult/CodingKeys.html">– CodingKeys</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/StringEncodedBody.html">StringEncodedBody</a>
@@ -530,6 +515,7 @@
             <h1>UsersView</h1>
               <div class="declaration">
                 <div class="language">
+                  
                   <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">UsersView</span> <span class="p">:</span> <span class="kt"><a href="../Classes/APIView.html">APIView</a></span></code></pre>
 
                 </div>
@@ -546,9 +532,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC2me10completionAA14PendingRequestCSgys6ResultOyAA4UserVA2AC5ErrorOGc_tF"></a>
+                    <a name="/s:5Zone59UsersViewC2me10completionAA14PendingRequest_pSgys6ResultOyAA4UserVA2AC5ErrorOGc_tF"></a>
                     <a name="//apple_ref/swift/Method/me(completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC2me10completionAA14PendingRequestCSgys6ResultOyAA4UserVA2AC5ErrorOGc_tF">me(completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC2me10completionAA14PendingRequest_pSgys6ResultOyAA4UserVA2AC5ErrorOGc_tF">me(completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -564,7 +550,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">me</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/User.html">User</a></span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">me</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/User.html">User</a></span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -574,9 +560,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC8register4user10completionAA14PendingRequestCSgAA12RegisterUserV_ys6ResultOyAA0J0VA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC8register4user10completionAA14PendingRequest_pSgAA12RegisterUserV_ys6ResultOyAA0J0VA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/register(user:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC8register4user10completionAA14PendingRequestCSgAA12RegisterUserV_ys6ResultOyAA0J0VA2AC5ErrorOGctF">register(user:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC8register4user10completionAA14PendingRequest_pSgAA12RegisterUserV_ys6ResultOyAA0J0VA2AC5ErrorOGctF">register(user:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -592,7 +578,7 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">register</span><span class="p">(</span><span class="nv">user</span><span class="p">:</span> <span class="kt"><a href="../Structs/RegisterUser.html">RegisterUser</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/User.html">User</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">register</span><span class="p">(</span><span class="nv">user</span><span class="p">:</span> <span class="kt"><a href="../Structs/RegisterUser.html">RegisterUser</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/User.html">User</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -602,9 +588,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC13deleteAccount6userID10completionAA14PendingRequestCSgSi_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC13deleteAccount6userID10completionAA14PendingRequest_pSgSi_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/deleteAccount(userID:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC13deleteAccount6userID10completionAA14PendingRequestCSgSi_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF">deleteAccount(userID:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC13deleteAccount6userID10completionAA14PendingRequest_pSgSi_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF">deleteAccount(userID:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -620,7 +606,35 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">deleteAccount</span><span class="p">(</span><span class="nv">userID</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">deleteAccount</span><span class="p">(</span><span class="nv">userID</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Zone59UsersViewC12purgeAccountyAA14PendingRequest_pSgys6ResultOyA2AC9VoidReplyVAI5ErrorOGcF"></a>
+                    <a name="//apple_ref/swift/Method/purgeAccount(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Zone59UsersViewC12purgeAccountyAA14PendingRequest_pSgys6ResultOyA2AC9VoidReplyVAI5ErrorOGcF">purgeAccount(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Purge (soft delete) a user account</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">purgeAccount</span><span class="p">(</span><span class="n">_</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -632,7 +646,7 @@
                     <code>
                     <a name="/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept14billingCountry10completionySS_S2SSgALSaySSGSgALys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/login(email:password:clientID:clientSecret:accept:billingCountry:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept14billingCountry10completionySS_S2SSgALSaySSGSgALys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF">login(email:password:clientID:clientSecret:accept:billingCountry:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC5login5email8password8clientID0G6Secret6accept14billingCountry10completionySS_S2SSgALSaySSGSgALys6ResultOyAA13LoginResponseVA2AC5ErrorOGctF">login(email:<wbr>password:<wbr>clientID:<wbr>clientSecret:<wbr>accept:<wbr>billingCountry:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -662,7 +676,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                     <code>
                     <a name="/s:5Zone59UsersViewC6logout10completionyys6ResultOySbA2AC5ErrorOGc_tF"></a>
                     <a name="//apple_ref/swift/Method/logout(completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC6logout10completionyys6ResultOySbA2AC5ErrorOGc_tF">logout(completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC6logout10completionyys6ResultOySbA2AC5ErrorOGc_tF">logout(completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -689,9 +703,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC17isEmailRegistered5email10completionAA14PendingRequestCSgSS_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC17isEmailRegistered5email10completionAA14PendingRequest_pSgSS_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/isEmailRegistered(email:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC17isEmailRegistered5email10completionAA14PendingRequestCSgSS_ys6ResultOySbA2AC5ErrorOGctF">isEmailRegistered(email:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC17isEmailRegistered5email10completionAA14PendingRequest_pSgSS_ys6ResultOySbA2AC5ErrorOGctF">isEmailRegistered(email:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -707,7 +721,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">isEmailRegistered</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">isEmailRegistered</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -717,9 +731,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC13resetPassword5email10completionAA14PendingRequestCSgSS_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC13resetPassword5email10completionAA14PendingRequest_pSgSS_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/resetPassword(email:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC13resetPassword5email10completionAA14PendingRequestCSgSS_ys6ResultOySbA2AC5ErrorOGctF">resetPassword(email:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC13resetPassword5email10completionAA14PendingRequest_pSgSS_ys6ResultOySbA2AC5ErrorOGctF">resetPassword(email:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -735,7 +749,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -745,9 +759,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC10updateUser4user10completionAA14PendingRequestCSgAA0E0V_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC10updateUser4user10completionAA14PendingRequest_pSgAA0E0V_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/updateUser(user:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC10updateUser4user10completionAA14PendingRequestCSgAA0E0V_ys6ResultOySbA2AC5ErrorOGctF">updateUser(user:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC10updateUser4user10completionAA14PendingRequest_pSgAA0E0V_ys6ResultOySbA2AC5ErrorOGctF">updateUser(user:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -763,7 +777,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">updateUser</span><span class="p">(</span><span class="nv">user</span><span class="p">:</span> <span class="kt"><a href="../Structs/User.html">User</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">updateUser</span><span class="p">(</span><span class="nv">user</span><span class="p">:</span> <span class="kt"><a href="../Structs/User.html">User</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -775,7 +789,7 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                     <code>
                     <a name="/s:5Zone59UsersViewC14changePassword03oldE003newE010completionySSSg_SSys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/changePassword(oldPassword:newPassword:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC14changePassword03oldE003newE010completionySSSg_SSys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF">changePassword(oldPassword:newPassword:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC14changePassword03oldE003newE010completionySSSg_SSys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF">changePassword(oldPassword:<wbr>newPassword:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -800,9 +814,9 @@ Don&rsquo;t pass back a PendingRequest as this is not something that we can canc
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequestCSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequest_pSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/testPassword(username:password:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequestCSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF">testPassword(username:password:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC12testPassword8username8password10completionAA14PendingRequest_pSgSS_SSys6ResultOyAA04TestE8ResponseCA2AC5ErrorOGctF">testPassword(username:<wbr>password:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -819,7 +833,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">testPassword</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes.html#/s:5Zone520TestPasswordResponseC">TestPasswordResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">testPassword</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Classes.html#/s:5Zone520TestPasswordResponseC">TestPasswordResponse</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -860,9 +874,9 @@ This will test if a given password will pass comlpexity rules for the currently 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC14getPreferences6userID10completionAA14PendingRequestCSgSi_ys6ResultOyAA0bE0VA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC14getPreferences6userID10completionAA14PendingRequest_pSgSi_ys6ResultOyAA0bE0VA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/getPreferences(userID:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC14getPreferences6userID10completionAA14PendingRequestCSgSi_ys6ResultOyAA0bE0VA2AC5ErrorOGctF">getPreferences(userID:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC14getPreferences6userID10completionAA14PendingRequest_pSgSi_ys6ResultOyAA0bE0VA2AC5ErrorOGctF">getPreferences(userID:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -878,7 +892,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">getPreferences</span><span class="p">(</span><span class="nv">userID</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/UsersPreferences.html">UsersPreferences</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">getPreferences</span><span class="p">(</span><span class="nv">userID</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/UsersPreferences.html">UsersPreferences</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -888,9 +902,9 @@ This will test if a given password will pass comlpexity rules for the currently 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC14setPreferences11preferences10completionAA14PendingRequestCSgAA0bE0V_ys6ResultOySbA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC14setPreferences11preferences10completionAA14PendingRequest_pSgAA0bE0V_ys6ResultOySbA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/setPreferences(preferences:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC14setPreferences11preferences10completionAA14PendingRequestCSgAA0bE0V_ys6ResultOySbA2AC5ErrorOGctF">setPreferences(preferences:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC14setPreferences11preferences10completionAA14PendingRequest_pSgAA0bE0V_ys6ResultOySbA2AC5ErrorOGctF">setPreferences(preferences:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -906,7 +920,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">setPreferences</span><span class="p">(</span><span class="nv">preferences</span><span class="p">:</span> <span class="kt"><a href="../Structs/UsersPreferences.html">UsersPreferences</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">setPreferences</span><span class="p">(</span><span class="nv">preferences</span><span class="p">:</span> <span class="kt"><a href="../Structs/UsersPreferences.html">UsersPreferences</a></span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -916,9 +930,9 @@ This will test if a given password will pass comlpexity rules for the currently 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC24getEmailValidationStatus5email10completionAA14PendingRequestCSgSS_ys6ResultOySDySSSbGA2AC5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC24getEmailValidationStatus5email10completionAA14PendingRequest_pSgSS_ys6ResultOySDySSSbGA2AC5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/getEmailValidationStatus(email:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC24getEmailValidationStatus5email10completionAA14PendingRequestCSgSS_ys6ResultOySDySSSbGA2AC5ErrorOGctF">getEmailValidationStatus(email:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC24getEmailValidationStatus5email10completionAA14PendingRequest_pSgSS_ys6ResultOySDySSSbGA2AC5ErrorOGctF">getEmailValidationStatus(email:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -934,7 +948,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">getEmailValidationStatus</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Bool</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">getEmailValidationStatus</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">ResultHandler</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Bool</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -944,9 +958,9 @@ This will test if a given password will pass comlpexity rules for the currently 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC18passwordComplexity10completionAA14PendingRequestCSgys6ResultOySSA2AC5ErrorOGc_tF"></a>
+                    <a name="/s:5Zone59UsersViewC18passwordComplexity10completionAA14PendingRequest_pSgys6ResultOySSA2AC5ErrorOGc_tF"></a>
                     <a name="//apple_ref/swift/Method/passwordComplexity(completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC18passwordComplexity10completionAA14PendingRequestCSgys6ResultOySSA2AC5ErrorOGc_tF">passwordComplexity(completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC18passwordComplexity10completionAA14PendingRequest_pSgys6ResultOySSA2AC5ErrorOGc_tF">passwordComplexity(completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -962,7 +976,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">passwordComplexity</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">passwordComplexity</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -972,9 +986,9 @@ This will test if a given password will pass comlpexity rules for the currently 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Zone59UsersViewC14reconfirmEmail5email10completionAA14PendingRequestCSgSS_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF"></a>
+                    <a name="/s:5Zone59UsersViewC14reconfirmEmail5email10completionAA14PendingRequest_pSgSS_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF"></a>
                     <a name="//apple_ref/swift/Method/reconfirmEmail(email:completion:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Zone59UsersViewC14reconfirmEmail5email10completionAA14PendingRequestCSgSS_ys6ResultOyA2AC9VoidReplyVAL5ErrorOGctF">reconfirmEmail(email:completion:)</a>
+                    <a class="token" href="#/s:5Zone59UsersViewC14reconfirmEmail5email10completionAA14PendingRequest_pSgSS_ys6ResultOyA2AC9VoidReplyVAK5ErrorOGctF">reconfirmEmail(email:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -990,7 +1004,7 @@ This will test if a given password will pass comlpexity rules for the currently 
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">reconfirmEmail</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">reconfirmEmail</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="n">_</span> <span class="nv">result</span><span class="p">:</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">VoidReply</span><span class="p">,</span> <span class="kt"><a href="../Classes/Zone5.html">Zone5</a></span><span class="o">.</span><span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/PendingRequest.html">PendingRequest</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -1005,9 +1019,8 @@ This will test if a given password will pass comlpexity rules for the currently 
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2021-11-23)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>&copy; 2022 <a class="link" href="https://zone5ventures.com" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2022-07-13)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
-</div>
 </html>
