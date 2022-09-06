@@ -99,7 +99,7 @@ public class ThirdPartyConnectionsView: APIView {
 		return get(Endpoints.userConnections, parameters: nil, expectedType: [ThirdPartyResponse].self) { result in
 			switch result {
 			case .success(let connections):
-				let connectedTypes: [UserConnectionType] = UserConnectionType.allCases.filter({ t in connections.first(where: { $0.type == t.connectionName && $0.enabled == true }) != nil })
+				let connectedTypes: [UserConnectionType] = UserConnectionType.allCases.filter({ t in connections.first(where: { $0.type == t.connectionName && $0.enabled }) != nil })
 				completion(.success(connectedTypes))
 			case .failure(let error):
 				completion(.failure(error))
