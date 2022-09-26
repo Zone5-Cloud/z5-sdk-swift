@@ -29,7 +29,7 @@ public struct User: Searchable, JSONEncodedBody {
 	
 	public var identities: [String: String]?
 	
-	public var weight: Int?
+	public var weight: Double?
 	
 	public var gender: String?
 	
