@@ -11041,28 +11041,28 @@
     },
     {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Views/ThirdPartyConnectionsView.swift",
-      "line": 11,
+      "line": 12,
       "symbol": "ThirdPartyConnectionsView",
       "symbol_kind": "source.lang.swift.decl.class",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Views/ThirdPartyConnectionsView.swift",
-      "line": 41,
+      "line": 42,
       "symbol": "ThirdPartyConnectionsView.initializeThirdPartyConnection(type:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Views/ThirdPartyConnectionsView.swift",
-      "line": 48,
+      "line": 49,
       "symbol": "ThirdPartyConnectionsView.setThirdPartyToken(type:parameters:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/z5-sdk-swift/z5-sdk-swift/Zone5/Views/ThirdPartyConnectionsView.swift",
-      "line": 89,
+      "line": 111,
       "symbol": "ThirdPartyConnectionsView.removeThirdPartyToken(type:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
