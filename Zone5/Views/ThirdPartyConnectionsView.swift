@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public class ThirdPartyConnectionsView: APIView {
 	private enum Endpoints: String, InternalRequestEndpoint {
@@ -61,9 +62,15 @@ public class ThirdPartyConnectionsView: APIView {
 	/// - redirect: the URL that the user will be redirected back to on completion of third party authentication
 	/// - Returns a reponse containing a thrid party authentication URL. Open this link in a browser so the user can authenticate with the third party. On completion the user will be redirected back to the passed in redirect URL
 	@discardableResult
+	@available(iOSApplicationExtension, unavailable)
 	public func pairThirdPartyConnection(type: UserConnectionType, redirect: URL, completion: @escaping Zone5.ResultHandler<String>) -> PendingRequest? {
 		let endpoint = Endpoints.connectService.replacingTokens(["connectionType": type.connectionName])
-		return get(endpoint, parameters: ["redirect-uri": redirect.absoluteString], with: completion)
+		
+		if type == .strava, UIApplication.shared.canOpenURL(URL(string: "strava://")!) {
+			return get(endpoint, parameters: ["redirect-uri": redirect.absoluteString, "platform": "ios"], with: completion)
+		} else {
+			return get(endpoint, parameters: ["redirect-uri": redirect.absoluteString], with: completion)
+		}
 	}
 	
 	/// Checks if a connection type is enabled or not
@@ -79,6 +86,21 @@ public class ThirdPartyConnectionsView: APIView {
 				}
 				
 				completion(.success(true))
+			case .failure(let error):
+				completion(.failure(error))
+			}
+		}
+	}
+	
+	/// Returns list of connected third party types
+	/// - Parameters
+	@discardableResult
+	public func enabledThirdPartyConnections(completion: @escaping Zone5.ResultHandler<[UserConnectionType]>) -> PendingRequest? {
+		return get(Endpoints.userConnections, parameters: nil, expectedType: [ThirdPartyResponse].self) { result in
+			switch result {
+			case .success(let connections):
+				let connectedTypes: [UserConnectionType] = UserConnectionType.allCases.filter({ t in connections.first(where: { $0.type == t.connectionName && $0.enabled }) != nil })
+				completion(.success(connectedTypes))
 			case .failure(let error):
 				completion(.failure(error))
 			}
