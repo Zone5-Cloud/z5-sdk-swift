@@ -209,8 +209,9 @@ final internal class HTTPClient {
 		// our own closure which makes things nice and easy.
 		let completeAndDelete: CompletionHandler<T> = { result in
 			completion(result)
-
-			try? FileManager.default.removeItem(at: cacheURL)
+			if case .success = result {
+				try? FileManager.default.removeItem(at: cacheURL)
+			}
 		}
 
 		return execute(on: HTTPClient.uploadQueue, with: completeAndDelete) { zone5, completion in
