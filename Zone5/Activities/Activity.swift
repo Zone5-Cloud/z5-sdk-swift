@@ -10,6 +10,12 @@ public struct Activity: Searchable, Hashable {
 
 	/// The sport related to this activity.
 	public var type: ActivityType?
+	
+	public init(id: Int, activity: ActivityResultType?, type: ActivityType?) {
+		self.id = id
+		self.activity = activity
+		self.type = type
+	}
 
 	// MARK: Hashable
 
