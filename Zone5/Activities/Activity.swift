@@ -6,14 +6,10 @@ public struct Activity: Searchable, Hashable {
 	public var id: Int
 
 	/// The type of activity this activity's `id` is related to.
-	public var activity: ActivityResultType?
-
-	/// The sport related to this activity.
-	public var type: ActivityType?
+	public var type: ActivityResultType?
 	
-	public init(id: Int, activity: ActivityResultType?, type: ActivityType?) {
+	public init(id: Int, type: ActivityResultType?) {
 		self.id = id
-		self.activity = activity
 		self.type = type
 	}
 
@@ -21,14 +17,14 @@ public struct Activity: Searchable, Hashable {
 
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(id)
-		hasher.combine(activity)
+		hasher.combine(type)
 	}
 
 	// MARK: Codable
 
 	public enum CodingKeys: String, Codable, CodingKey, CaseIterable {
 		case id
-		case activity = "type"
+		case type
 	}
 
 	public static func fields(_ fields: [CodingKeys] = CodingKeys.allCases, prefix: String? = nil) -> [String] {
