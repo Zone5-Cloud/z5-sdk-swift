@@ -28,8 +28,7 @@ public struct Activity: Searchable, Hashable {
 
 	public enum CodingKeys: String, Codable, CodingKey, CaseIterable {
 		case id
-		case activity
-		case type
+		case activity = "type"
 	}
 
 	public static func fields(_ fields: [CodingKeys] = CodingKeys.allCases, prefix: String? = nil) -> [String] {
