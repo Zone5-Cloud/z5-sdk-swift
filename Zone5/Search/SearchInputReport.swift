@@ -85,7 +85,7 @@ public struct SearchInputReport: JSONEncodedBody, SearchInputCriteria {
 	public static func forInstance(activityType: ActivityResultType, identifier: Int) -> SearchInputReport {
 		var report = self.init()
 		report.opts = 3
-		report.activities = [Activity(id: identifier, type: activityType)]
+		report.activities = [Activity(id: identifier, type: activityType, sport: nil)]
 		return report
     }
 
