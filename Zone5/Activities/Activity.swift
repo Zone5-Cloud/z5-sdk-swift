@@ -7,10 +7,10 @@ public struct Activity: Searchable, Hashable {
 
 	/// The type of activity this activity's `id` is related to.
 	public var type: ActivityResultType?
-	
+
 	/// The sport related to this activity.
 	public var sport: ActivityType?
-	
+
 	public init(id: Int, type: ActivityResultType?, sport: ActivityType?) {
 		self.id = id
 		self.type = type
