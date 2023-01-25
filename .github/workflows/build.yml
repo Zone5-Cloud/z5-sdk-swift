@@ -58,7 +58,7 @@ jobs:
 
     - name: Capture Results
       if: success() || failure()
-      uses: kishikawakatsumi/xcresulttool@v1.3.1
+      uses: kishikawakatsumi/xcresulttool@v1.7.0
       with:
         path: |
           XcodeProject.xcresult
