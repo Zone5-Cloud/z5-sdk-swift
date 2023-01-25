@@ -39,7 +39,7 @@ jobs:
         xcodebuild test \
           -workspace "Package.xcworkspace" \
           -scheme "Zone5" \
-          -destination "platform=iOS Simulator,id=${DEVICE}" \
+          -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
           -enableCodeCoverage YES \
           -derivedDataPath "${GITHUB_WORKSPACE}/../DerivedDataSwift" \
           -resultBundlePath "SwiftPackage" \
@@ -49,7 +49,7 @@ jobs:
         xcodebuild test \
           -project "Zone5.xcodeproj" \
           -scheme "Zone5" \
-          -destination "platform=iOS Simulator,id=${DEVICE}" \
+          -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
           -enableCodeCoverage YES \
           -derivedDataPath "${GITHUB_WORKSPACE}/../DerivedDataXcode" \
           -resultBundlePath "XcodeProject" \
@@ -58,7 +58,7 @@ jobs:
 
     - name: Capture Results
       if: success() || failure()
-      uses: kishikawakatsumi/xcresulttool@v1.3.1
+      uses: kishikawakatsumi/xcresulttool@v1.7.0
       with:
         path: |
           XcodeProject.xcresult
