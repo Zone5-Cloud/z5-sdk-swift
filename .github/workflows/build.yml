@@ -32,10 +32,6 @@ jobs:
 
     - name: Run Tests
       run: |
-        DEVELOPER_PATH=$(xcode-select --print-path)
-        PLATFORM=$(ls -1 "${DEVELOPER_PATH}/Platforms/iPhoneOS.platform/DeviceSupport/" | sort -gr | head -n 1)
-        DEVICE=$(xcrun simctl list devices "iOS ${PLATFORM}" | grep "iPhone" | head -n 1 | sed -Ee 's/^.*\(([A-Z0-9\-]+)\).*$/\1/g')
-
         xcodebuild test \
           -workspace "Package.xcworkspace" \
           -scheme "Zone5" \
