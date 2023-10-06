@@ -8,42 +8,24 @@
 
 public enum UserConnectionType: Int, Codable, CaseIterable {
     case garminconnect = 0
-
     case fitbit = 1
-
     case withings = 2
-
     case myfitnesspal = 3
-
     case underarmour = 4
-
     case garminwellness = 5
-
     case trainingpeaks = 6
-
     case strava = 7
-
     case polar = 8
-
     case ridewithgps = 9
-
     case todaysplan = 10
-
     case suunto = 11
-
     case garmintraining = 12
-
     case turbo = 13
-
     // Specialized Ride
     case specialized = 14
-
     case nike = 15
-
     case wahoo = 16
-
     case whoop = 17
-
     case komoot = 18
 
     public var connectionName: String {
