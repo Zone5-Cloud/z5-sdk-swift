@@ -99,6 +99,7 @@ class SearchResultTests: XCTestCase {
 		XCTAssertNotNil(result)
 		XCTAssertEqual(6, result?.result.results[0].channels?.count)
 		XCTAssertEqual(8, result?.result.results[1].channels?.count)
+		XCTAssertEqual(6, result?.result.results[0].permissions?.count)
 	}
 
 }

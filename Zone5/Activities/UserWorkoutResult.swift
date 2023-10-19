@@ -579,7 +579,7 @@ public struct UserWorkoutResult: Searchable {
 
 	//public var metadata: [String: Any]?
 
-	public var permissions: [DataAccessRequest]?
+	public var permissions: [String]?
 
 	public var aap: UserWorkoutResultAlt?
 
