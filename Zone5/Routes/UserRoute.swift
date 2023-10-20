@@ -111,7 +111,7 @@ public struct UserRoute: Searchable, JSONEncodedBody {
 	public var visibilityMask: Int?
 
 	/// Permissions which the current user has scope to on this object
-	public var permissions: Set<DataAccessRequest>?
+	public var permissions: Set<String>?
 
 	/// The processing state - used when a route is imported or cloned from another source
 	public var state: FileUploadState?
