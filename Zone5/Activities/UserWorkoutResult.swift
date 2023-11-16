@@ -63,7 +63,10 @@ public struct UserWorkoutResult: Searchable {
 	/// A flag indicating how this activity result came into the system
 	public var source: ResultSource?
 
-	/// Locality based of geolocation data
+	/// Metadata related to third party uploads
+	public var thirdParty: ThirdPartyUploadResult?
+
+    /// Locality based of geolocation data
 	public var locality: String?
 
 	/// A bitmask tracking which fields have been manually modified in the activity results
@@ -912,6 +915,7 @@ public struct UserWorkoutResult: Searchable {
 		case maximum = "max"
 		case average = "avg"
 		case weightedAverage = "wavg"
+        case thirdParty = "thirdParty"
 	}
 
 	public static func fields(_ fields: [CodingKeys] = CodingKeys.allCases, prefix: String? = nil) -> [String] {
