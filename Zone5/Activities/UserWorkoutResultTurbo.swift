@@ -38,7 +38,7 @@ public struct UserWorkoutResultTurbo: Searchable {
 	public var timeInAssist3P: Double?
 	public var timeInAssist4P: Double?
 	public var timeInAssist5P: Double?
-	//public var timeInAssist6P: Double?
+	public var timeInAssist6P: Double?
 	public var bat1DecayAssist0P: Int?
 	public var bat1DecayAssist1P: Int?
 	public var bat1DecayAssist2P: Int?
@@ -96,7 +96,7 @@ public struct UserWorkoutResultTurbo: Searchable {
 		case timeInAssist3P
 		case timeInAssist4P
 		case timeInAssist5P
-		//case timeInAssist6P
+		case timeInAssist6P
 		case bat1DecayAssist0P
 		case bat1DecayAssist1P
 		case bat1DecayAssist2P
