@@ -16,7 +16,7 @@ extension JSONEncodedBody {
 	}
 
     public func encodedData() throws -> Data {
-		return try JSONEncoder().encode(self)
+		return try JSONEncoder.sorted().encode(self)
 	}
 
 	// MARK: MultipartDataConvertible
@@ -25,4 +25,12 @@ extension JSONEncodedBody {
 		return try? encodedData()
 	}
 
+}
+
+public extension JSONEncoder {
+	static func sorted() -> JSONEncoder {
+		let encoder = JSONEncoder()
+		encoder.outputFormatting = .sortedKeys
+		return encoder
+	}
 }
